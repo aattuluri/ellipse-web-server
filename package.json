@@ -12,6 +12,9 @@
   },
   "author": "lalith",
   "license": "ISC",
+  "engines": {
+    "node": "11.0.0"
+  },
   "bugs": {
     "url": "https://github.com/aattuluri/ellipse-web-server/issues"
   },
