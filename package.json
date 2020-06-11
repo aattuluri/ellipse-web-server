@@ -2,9 +2,9 @@
   "name": "ellipseserver",
   "version": "1.0.0",
   "description": "Codebase for ellipse's server backend",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "index.js"
+    "start": "app.js"
   },
   "repository": {
     "type": "git",
