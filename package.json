@@ -4,6 +4,7 @@
   "description": "Codebase for ellipse's server backend",
   "main": "app.js",
   "scripts": {
+    "start": "app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,5 +30,6 @@
     "mongodb": "^3.5.8",
     "mongoose": "^5.9.18",
     "validator": "^13.1.0"
-  }
+  },
+  "devDependencies": {}
 }
