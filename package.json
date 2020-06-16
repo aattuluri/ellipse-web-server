@@ -4,7 +4,7 @@
   "description": "Codebase for ellipse's server backend",
   "main": "app.js",
   "scripts": {
-    "start": "app.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/aattuluri/ellipse-web-server#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.2.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -29,6 +30,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.8",
     "mongoose": "^5.9.18",
+    "otp-generator": "^1.1.0",
     "validator": "^13.1.0"
   },
   "devDependencies": {}

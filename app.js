@@ -15,7 +15,7 @@ mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
 })
 const PORT = process.env.PORT || 4000;
 app.use(authRouter);

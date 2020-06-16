@@ -1,7 +1,8 @@
-const mongoose = require('mongoose')
-const validator = require('validator')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+var otpGenerator = require("otp-generator");
 
 const userSchema = mongoose.Schema({
     name: {
@@ -23,14 +24,54 @@ const userSchema = mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minLength: 7
+        minLength: 8
     },
     tokens: [{
         token: {
             type: String,
             required: true
         }
-    }]
+    }],
+    uid: {
+        type: String,
+    },
+    signupTime: {
+        type: String,
+        default: Date.now
+    },
+    phno: {
+        type: String,
+    },
+    collegeId:{
+        type: String,
+    },
+    collegeName: {
+        type: String,
+    },
+    gender: {
+        type: String,
+    },
+    bio: {
+        type: String,
+    },
+    imageUrl: {
+        type: String,
+    },
+    status:{
+        type: Boolean,
+    },
+    lastseen: {
+        type: String,
+        default: Date.now
+    },
+    otp: {
+        type: Number,
+    },
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+    }
 })
 userSchema.pre('save', async function (next) {
     // Hash the password before saving the user model
@@ -40,6 +81,13 @@ userSchema.pre('save', async function (next) {
     }
     next()
 })
+
+userSchema.methods.generateOtp = async function(){
+    const otp = otpGenerator.generate(6, {upperCase: false, specialChars: false });
+    console.log(otpGenerator.generate(6, { upperCase: false, specialChars: false }));
+    console.log(otp);
+    return otp;
+}
 
 userSchema.methods.generateAuthToken = async function() {
     // Generate an auth token for the user
