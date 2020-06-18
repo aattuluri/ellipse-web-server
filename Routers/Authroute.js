@@ -2,6 +2,7 @@ const express = require('express');
 const LoginUser = require('../Models/User');
 const auth = require('../Middleware/auth');
 var otpGenerator = require("otp-generator");
+const bcrypt = require('bcryptjs');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router()
@@ -84,9 +85,20 @@ router.post('/api/users/login', async(req, res) => {
     //Login a registered user
     try {
         const { email, password } = req.body
+        console.log(email);
+        console.log(password);
         // User.findByCredentials
         
-        const user = await LoginUser.findOne({email:email});
+        // const user = await LoginUser.findByCredentials(email,password);
+        const user = await LoginUser.findOne({ email} );
+        console.log(user);
+        if (!user) {
+            throw new Error('Invalid login credentials')
+        }
+        const isPasswordMatch = await bcrypt.compare(password, user.password)
+        if (!isPasswordMatch) {
+            throw new Error('Invalid login credentials')
+        }
         if (!user) {
             return res.status(401).send({error: 'Login failed! Check authentication credentials'})
         }
@@ -97,18 +109,31 @@ router.post('/api/users/login', async(req, res) => {
     }
 
 })
-// router.post('/api/users/userdetails',(req,res)=>{
-//     try{
-//         const {}
-//     }
-//     catch(err){
-//         res.status(400).json({ error: err.message }) 
-//     }
-// })
+router.post('/api/users/userdetails',auth,(req,res)=>{
+    try{
+        const {gender,college,designation} = req.body;
+        const user = req.user;
+        LoginUser.update(
+            {'email':user.email},
+            {$set:{
+                'collegeName': college,
+                'gender': gender,
+                'designation': designation
+            }}).then((val)=>{
+            console.log(val);
+            res.status(200).json({message:"success"})
+        })
 
-router.get('/users/me', auth, async(req, res) => {
+
+    }
+    catch(err){
+        res.status(400).json({ error: err.message }) 
+    }
+})
+
+router.get('/api/users/me', auth, async(req, res) => {
     // View logged in user profile
-    res.send(req.user)
+    res.json(req.user)
 })
 
 router.post('/api/users/logout', auth, async (req, res) => {
@@ -118,7 +143,7 @@ router.post('/api/users/logout', auth, async (req, res) => {
             return token.token != req.token
         })
         await req.user.save()
-        res.send()
+        res.status(200).json({message: "success"});
     } catch (error) {
         res.status(500).send(error.message)
     }

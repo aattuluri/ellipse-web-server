@@ -34,6 +34,7 @@ const userSchema = mongoose.Schema({
     }],
     uid: {
         type: String,
+        default: null
     },
     signupTime: {
         type: String,
@@ -41,36 +42,53 @@ const userSchema = mongoose.Schema({
     },
     phno: {
         type: String,
+        default: null
     },
     collegeId:{
         type: String,
+        default: null
     },
     collegeName: {
         type: String,
+        default: null
     },
     gender: {
         type: String,
+        default: null
     },
     bio: {
         type: String,
+        default: null
     },
     imageUrl: {
         type: String,
+        default: null
     },
     status:{
         type: Boolean,
+        default: false
     },
     lastseen: {
         type: String,
-        default: Date.now
+        default: Date.now,
+        default: null
     },
     otp: {
         type: Number,
+        default: null
     },
     username: {
         type: String,
         required: true,
         unique: true,
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    designation: {
+        type: String,
+        default: null
     }
 })
 userSchema.pre('save', async function (next) {
@@ -100,7 +118,9 @@ userSchema.methods.generateAuthToken = async function() {
 
 userSchema.statics.findByCredentials = async (email, password) => {
     // Search for a user by email and password.
-    const user = await User.findOne({ email} )
+    console.log(email);
+    const user = await User.findOne({ email} );
+    console.log(user);
     if (!user) {
         throw new Error('Invalid login credentials')
     }
