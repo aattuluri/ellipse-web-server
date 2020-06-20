@@ -1,5 +1,5 @@
 const express = require('express');
-const LoginUser = require('../Models/User');
+const UserLogin = require('../Models/User');
 const auth = require('../Middleware/auth');
 var otpGenerator = require("otp-generator");
 const bcrypt = require('bcryptjs');
@@ -16,9 +16,9 @@ router.post('/api/users/signup', async (req, res) => {
     // Create a new user
     try {
         const {email} = req.body;
-        const user = await LoginUser.findOne({email:email});
+        const user = await UserLogin.findOne({email:email});
         if(!user){
-            const user = new LoginUser(req.body)
+            const user = new UserLogin(req.body)
             await user.save()
             const token = await user.generateAuthToken()
             res.status(200).json({ user, token })
@@ -36,7 +36,7 @@ router.post('/api/users/sendverificationemail',auth,async (req,res)=>{
     try{
         const {email} = req.body;
         const otp = await otpGenerator.generate(4, {upperCase: false, specialChars: false,alphabets: false });
-        const user = await LoginUser.findOne({email:email});
+        const user = await UserLogin.findOne({email:email});
         const msg = {
             to: email,
             from: 'nani.punepalli@gmail.com', // Use the email address or domain you verified above
@@ -46,7 +46,7 @@ router.post('/api/users/sendverificationemail',auth,async (req,res)=>{
           };
           try {
             await sgMail.send(msg);
-            LoginUser.update({'email':email},{$set:{'otp': otp}}).then((val)=>{
+            UserLogin.update({'email':email},{$set:{'otp': otp}}).then((val)=>{
                 console.log(val);
             })
             res.status(200).json({message:"success"});
@@ -90,7 +90,7 @@ router.post('/api/users/login', async(req, res) => {
         // User.findByCredentials
         
         // const user = await LoginUser.findByCredentials(email,password);
-        const user = await LoginUser.findOne({ email} );
+        const user = await UserLogin.findOne({ email} );
         console.log(user);
         if (!user) {
             throw new Error('Invalid login credentials')
@@ -113,7 +113,7 @@ router.post('/api/users/userdetails',auth,(req,res)=>{
     try{
         const {gender,college,designation} = req.body;
         const user = req.user;
-        LoginUser.update(
+        UserLogin.update(
             {'email':user.email},
             {$set:{
                 'collegeName': college,
