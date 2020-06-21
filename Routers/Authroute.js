@@ -5,7 +5,7 @@ var otpGenerator = require("otp-generator");
 const bcrypt = require('bcryptjs');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-const router = express.Router()
+const router = express.Router();
 
 
 router.get('/api',(req,res)=>{

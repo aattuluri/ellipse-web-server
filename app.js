@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const authRouter = require('./Routers/authroute');
+const eventRouter = require('./Routers/Eventroute');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./Models/User');
@@ -19,6 +20,7 @@ mongoose.connect(process.env.MONGODB_URL, {
 })
 const PORT = process.env.PORT || 4000;
 app.use(authRouter);
+app.use(eventRouter);
 app.listen(PORT, (req, res) => {
     console.log(`Server Started at PORT ${PORT}`);
 });
