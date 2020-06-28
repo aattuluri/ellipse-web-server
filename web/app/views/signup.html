@@ -1,0 +1,141 @@
+<header class="intro-header" style="background-image: url('img/youngrouptravelers.jpg')">
+    <!--
+    <div class="top-button pull-right"><a href="agent-signup" rel="null" type="url" class="btn" target="_parent">Agent Sign Up</a> </div>
+    -->
+    {{> header}}
+    <!-- <div class="pull-right">
+      <div class="col-md-12">
+        <a class="btn btn-default agent-signup-btn" href="agent-signup">Want to work as a<br/>travel agent<br/>on Agent Avery?<br/><br/><br/><span class="agent-signup-btn-text">START NOW</span></a>
+      </div>
+    </div> -->
+    <div class="container-fulid">
+        <div class="row">
+            <div class="col-xs-12 site">
+                <div class="site-heading">
+                   <div class="login-form col-xs-12 col-sm-7 col-md-5 pull-right">
+                      <p class="section-txt1">
+                        <span class="underline">APPLY NOW</span>
+                      </p>
+                       <form id="agentsignup" method="POST" action="agent-signup" class="sign-up-content form-horizontal">
+                         <input name="type" type="hidden" value="agent">
+                         <div class="form-group">
+                           <div class="col-sm-12">
+                             <input name="firstName" type="text" class="form-control shorter-field" placeholder="First name"
+                               data-parsley-error-message="Enter your Firstname" data-parsley-trigger="blur" required="">
+                           </div>
+                         </div>
+                         <div class="form-group">
+                           <div class="col-sm-12">
+                             <input name="lastName" type="text" class="form-control shorter-field" placeholder="Last name"
+                               data-parsley-error-message="Enter your Lastname" data-parsley-trigger="blur" required="">
+                           </div>
+                         </div>
+                         <div class="form-group">
+                           <div class="col-sm-12">
+                             <input id="email" name="email" type="email" class="form-control shorter-field" placeholder="Email address"
+                               data-parsley-type="email" data-parsley-trigger="change"
+                               data-parsley-remote="/email-not-duplicate"
+                               data-parsley-remote-options='{ "type": "get", "data" : { "email": function() {return $("#email").val(); } }}'
+                               data-parsley-remote-message="Email already used"
+                               required="">
+                           </div>
+                         </div>
+                         <!-- <div class="form-group">
+                           <div class="col-sm-12">
+                             <input name="password" type="password" class="form-control shorter-field" id="inputPassword3"
+                               placeholder="Password"
+                               data-parsley-error-message="Enter a Password" data-parsley-trigger="blur" required="">
+                           </div>
+                         </div>
+                         <div class="form-group">
+                           <div class="col-sm-12">
+                             <input type="password" class="form-control shorter-field" id="inputPassword4" placeholder="Confirm password"
+                                 data-parsley-equalto="#inputPassword3" data-parsley-trigger="blur"
+                                 data-parsley-equalto-message="Passwords should match"
+                                   required="">
+                           </div>
+                         </div>
+                         
+                         <div class="form-group">
+                           <div class="col-sm-12">
+                             <input name="mobileNumber" type="text" class="form-control shorter-field"
+                                 id="mobile-number" data-parsley-pattern="^\+?[1-9]\d{1,14}$"
+                                 data-parsley-pattern-message="Please enter a valid phone number"
+                                 data-parsley-trigger="blur" placeholder="+15555555555">
+                           </div>
+                         </div>
+
+                         <div class="form-group">
+                           <div class="col-sm-12">
+                             <p>Please provide top 5-7 destinations where you do the majority of your bookings (e.g. Paris, Northern Italy, China, etc.)</p>
+                             <input id="destinations" type="text" class="form-control shorter-field tm-input" id="top-destinations" placeholder="Press enter a destination">
+
+                             <div class="tags-group destinations">
+                             </div>
+                           </div>
+                         </div>
+                       <div class="form-group">
+                           <div class="col-sm-12">
+                             <p>Please provide top 5-7 types of trips you specialize in (e.g. Cruise, Honeymoon, Family, Disneyland, Adventure, etc.)</p>
+                             <input id="specialities" type="text" class="form-control shorter-field tm-input" id="top-trip-types" placeholder="Press enter a speciality">
+
+                             <div class="tags-group specialities">
+                             </div>
+                           </div>
+                       </div> -->
+                       <div class="form-group">
+                         <div class="col-sm-12">
+                           <input type="checkbox" name="terms" value="terms"
+                           data-parsley-checkmin="1" data-parsley-error-message="Please agree to Terms & Conditions." required/>
+                           &nbsp;&nbsp;I agree to Agent Avery's <a data-toggle="modal" data-target="#terms" href="#" target="_blank">terms of use</a><br/>
+                         </div>
+                       </div>
+                       </form>
+                       <div class="right-align-button">
+                         <div class="form-group">
+                               <!-- <span class="sign-up"> <a href="/all-login"> Already have an account?</a>&nbsp;&nbsp; </span> -->
+                               <a id="submit" class="btn btn-primary-aa">Meet travelers on Agent Avery</a>
+                         </div>
+                       </div>
+                       <br>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="row box-space">
+  <div class="col-xs-12 col-sm-6 phone-screen-txt">
+    <p class="section-txt1"><span class="">To communicate with your clients, you have to speak their language!</span></p>
+
+    <p>Agent Avery empowers you - the travel agent - to collaborate with your clients to book and manage trips using Facebook Messenger.</p>
+    <p>We equip you with a robust set of tools that can help you communicate with your clients. Share messages, images, and itineraries all through the dashboard.</p>
+    <p>With 1 billion people now on Messenger, you can't afford to not be on their communication path!</p>
+    <p>Agent Avery is a new way of servicing today's digital-savvy travelers!</p>
+  </div>
+  
+  <div class="col-xs-12 col-sm-6 features-list">
+    <img src="img/agent-signup-1.jpg" alt="singup as a travel agent">
+  </div>
+  
+</div>
+<div class="row box-space">
+  <div class="col-xs-12 col-sm-6 features-list">
+    <img src="img/agent-signup-2.jpg" alt="singup as a travel agent">
+  </div>
+  <div class="col-xs-12 col-sm-6 phone-screen-txt">
+    <p class="section-txt1"><span class="">Do you want to work with Agent Avery?</span></p>
+
+    <p>Agent Avery partners exclusively with top travel experts.</p>
+    <p>Is reponsiveness your middle name?</p>
+    <p>Do you know all the hidden gems in the world's top destinations?
+    <p>Can you handle last-minute trips in a snap?
+    <p>Do you have have access to secret deals that only you know about?</p>
+    <p>Do you go the extra mile to put a smile on your client's face?</p>
+    <p>If you can answer "YES!" to these questions, <a href="#">Apply Now!</a></p>
+  </div>
+</div>
+{{> terms_agreement}}
+
+<script src="js/signup.js"></script>

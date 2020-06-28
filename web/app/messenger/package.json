@@ -1,0 +1,11 @@
+{
+  "name": "messenger",
+  "version": "0.0.1",
+  "description": "Agent Avery facebook messenger plugin",
+  "main": "messenger.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Anil Attuluri <anilcs0405@gmail.com>",
+  "license": "BSD"
+}
