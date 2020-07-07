@@ -3,13 +3,20 @@ const auth = require('../Middleware/auth');
 const router = express.Router();
 const Events = require('../Models/Events');
 
-router.post('/api/events',(req,res)=>{
-    let event = new Events()
-    event.user_id = req.body.user_id
-    event.name = req.body.name
-    event.description = req.body.description
-    event.start_time = req.body.start_time
-    event.finish_time = req.body.finish_time
+router.post('/api/events',auth,(req,res)=>{
+    let event = new Events(req.body)
+    // event.user_id = req.body.user_id
+    // console.log(req.body.user_id);
+    // event.name = req.body.name;
+    // event.description = req.body.description;
+    // event.start_time = req.body.start_time;
+    // event.finish_time = req.body.finish_time;
+    // event.eventType = req.body.eventType;
+    // event.eventMode = req.body.eventMode;
+    // event.tags = req.body.tags;
+    // event.poster = req.body.poster;
+    // event.registrationEndTime = req.body.registrationEndTime;
+
     event.save(function(err) {
         if (err) {
             res.status(400).json({
@@ -27,7 +34,7 @@ router.post('/api/events',(req,res)=>{
     })
 });
 
-router.get('/events',(req,res)=>{
+router.get('/api/events',(req,res)=>{
     Events.get((err, event) => {
         if (err) {
             res.json({
@@ -36,10 +43,9 @@ router.get('/events',(req,res)=>{
                 message: err
             });
         }
-
         res.json(event)
     })
-})
+});
 
 module.exports = router
 

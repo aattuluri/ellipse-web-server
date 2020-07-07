@@ -69,8 +69,14 @@ router.post('/api/users/verifyotp',auth, async (req,res)=>{
         const user = await req.user;
         if(user.otp == otp){
             // console.log("Verified");
-            res.status(200).json({"message":"verified"});
-            
+            UserLogin.update(
+                {'email':user.email},
+                {$set:{
+                    'isVerified': true
+                }}).then((val)=>{
+                // console.log(val);
+                res.status(200).json({"message":"verified"});
+            })   
         }
         else{
             console.log({"message":"Not verified"});
@@ -80,7 +86,31 @@ router.post('/api/users/verifyotp',auth, async (req,res)=>{
         res.status(400).json({ error: error.message})
     }
 })
- 
+
+router.post('/api/users/updatepassword',auth,async(req,res)=>{
+    try {
+        const {email,cPassword,nPassword} = req.body;
+        const user = await req.user;
+        const isPasswordMatch = await bcrypt.compare(cPassword, user.password)
+        if (!isPasswordMatch) {
+            return res.status(401).send({error: 'Incorrect current Password'});
+        }
+        if (!user) {
+            return res.status(401).send({error: 'Login failed! Check authentication credentials'});
+        }
+        const hasedPassword = await bcrypt.hash(nPassword, 8)
+        UserLogin.update({'email':user.email},{$set:{'password':hasedPassword}}).then((val)=>{
+            console.log(val);
+            res.status(200).json({message:"success"})
+        })
+        res.status(200).json({message: "success"});
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
+
+
+
 router.post('/api/users/login', async(req, res) => {
     //Login a registered user
     try {
@@ -131,10 +161,32 @@ router.post('/api/users/userdetails',auth,(req,res)=>{
     }
 })
 
+router.post('/api/users/userdetails2',auth,(req,res)=>{
+    try{
+
+        const {image,bio} = req.body;
+        const user = req.user;
+        console.log(user);
+        UserLogin.update(
+            {'email':user.email},
+            {$set:
+                {'bio': bio,
+                'imageUrl': image
+            }}).then((val)=>{
+                console.log(val);
+                res.status(200).json({message:"success"})
+            })
+    }
+    catch(err){
+        res.status(400).json({ error: err.message }) 
+    }
+})
+
 router.get('/api/users/me', auth, async(req, res) => {
     // View logged in user profile
     res.json(req.user)
 })
+
 
 router.post('/api/users/logout', auth, async (req, res) => {
     // Log user out of the application
