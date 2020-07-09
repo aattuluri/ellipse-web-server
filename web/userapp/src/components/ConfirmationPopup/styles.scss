@@ -1,0 +1,74 @@
+  .info-popup {
+    transition: transform .3s ease-out;
+    position: absolute;
+    top: 75px;
+    left: 10px;
+    background-color: white;
+    border-radius: 6px;
+  }
+
+  .chatbox {
+    top: 75px;
+  }
+
+  tr {
+    padding: 50px;
+  }
+
+  .info-row {
+    padding: 5px;
+  }
+
+  .info-title {
+    font-weight: bold;
+  }
+
+  .info-body {
+    width: 325px;
+    margin: auto;
+    font-family: 'Roboto';
+  }
+
+
+  .hourly-details {
+    width: 50%;
+    margin: 0 auto;
+  }
+
+  .info-description {
+    margin: auto;
+  }
+
+  .desc-font {
+    margin-top: 10px;
+    font-size: 1em;
+  }
+
+
+  .fee-header {
+    font-family: 'Roboto';
+    font-weight: 400;
+    font-size: 24px;
+    text-align: center;
+  }
+
+  p {
+    font-family: 'Roboto';
+    font-size: 14px;
+  }
+
+  .close-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+
+
+
+    .info-total {
+      font-family: 'Roboto';
+      font-size: 20px;
+      font-weight: 400;
+      margin-top: 10px;
+    }
+}

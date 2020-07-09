@@ -1,0 +1,320 @@
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400italic,600italic,600,300italic,300);
+
+body {
+  background-color: #f1f1f1;
+}
+p {
+  line-height: 1.2;
+}
+.container{
+	width: 970px !important;
+}
+
+h1, h2, h3, h4 {
+	font-family:'Source Sans Pro';
+}
+
+.box-space{
+  margin: 15px;
+}
+.box-space:first-child {
+  margin-top: 0;
+}
+.sub-title {
+	font-size: 22px;
+}
+
+.about-text p, .about-text ul {
+  opacity: 0.9;
+}
+
+.about-text a.aa-link {
+  font-size: 20px;
+  color: #252830;
+}
+
+.about-text ul {
+  margin-top: 20px;
+}
+
+.about-text .about-text-heading {
+  line-height: 1.2;
+	font-size: 20px;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: -15px;
+}
+
+.short-header{
+	height: 100px;
+	font-family:'Source Sans Pro';
+}
+
+.redirect{
+    background-color: rgba(51,238,187,0.8);
+    padding: 15px;
+    margin-top: 100px;
+}
+
+.section-higlight {
+	background-color: #373A3A;
+	text-align: center;
+	color:#fff;
+	padding-bottom: 30px;
+}
+
+.section-txt1{
+	color: #252a2c;
+  font-size: 24px;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+.section-txt2{
+  font-size: 24px;
+}
+
+.features-list{
+	text-align: left;
+  margin-bottom: 20px;
+}
+
+.features-list p {
+	margin: 15px 0;
+}
+.features-list .title {
+	font-weight: bold;
+}
+
+.phone-screen-txt {
+	text-align: left;
+  margin-top: 15px;
+}
+
+.phone-screen-txt .section-txt1 {
+	text-align: left;
+}
+.phone-screen-txt .title {
+  font-size: 18px;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+.phone-screen-txt .features-content {
+  padding-left: 40px;
+}
+.phone-screen-txt .left-line {
+  position: absolute;
+  height: 80%;
+  border-left: 3px solid #252a2c;
+  top: 55px;
+  left: 15px;
+}
+.phone-screen-txt p {
+	margin-top: 0;
+}
+.phone-screen-txt1 .lg {
+  position: relative;
+  float: left;
+  margin-top: 10px;
+  top: 0;
+  left: 0;
+}
+
+.phone-screen-txt .lg {
+  font-size: 35px;
+  margin-top: 20px;
+  font-weight: bold;
+}
+.phone-screen-txt1 .features-content{
+  padding-left: 60px;
+}
+.features-image {
+  text-align: center;
+}
+.features-image img {
+  width: 100%;
+}
+.features-image .first-phone {
+  width: 75%;
+}
+
+.agent-signup-btn {
+	margin-top: 15px;
+	box-shadow: 3px 1px 0 2px rgba(0,0,0,0.1);
+	border: 5px solid #000000;
+  font-family: 'Source Sans Pro';
+	font-size: 0.6em;
+  font-weight:bold;
+	line-height: 1.1em;
+	color: #000000;
+	background-color: #666666;
+	opacity: 0.9;
+	height: 140px;
+	width: 220px;
+	position: relative;
+	-webkit-transition: all 0.5s ease-in-out;
+}
+.agent-signup-btn:hover {
+	margin-top: 15px;
+	box-shadow: 3px 1px 0 2px rgba(0,0,0,0.1);
+	border: 3px solid #000000;
+  font-family: 'Source Sans Pro';
+	font-size: 0.6em;
+  font-weight:bold;
+	line-height: 1.1em;
+	color: #000000;
+	background-color: #999999;
+	opacity: 0.9;
+	height: 140px;
+	width: 220px;
+	position: relative;
+	-webkit-transform: scale(1.1);
+}
+
+.lets-get-started {
+	cursor: pointer;
+}
+
+.bulge-button {
+	-webkit-transition: all 0.5s ease-in-out;
+}
+
+.bulge-button:hover {
+	-webkit-transform: scale(1.1);
+}
+
+.agent-signup-btn-text {
+	color: #ffffff;
+	font-size: 2.0em;
+}
+
+/* About us*/
+.features-image2 {
+  margin: 0 0 20px;
+}
+.features-image2 img {
+  width: 100%;
+  border: 15px solid #cccccc;
+  box-shadow: 5px 8px 0 #9C9C9C;
+}
+.section-gray {
+  background-color: #cccccc;
+  text-align: center;
+  color:#fff;
+  padding-bottom: 20px;
+}
+
+.section-gray img {
+  height: 50px;
+}
+.about-us {
+  font-size: 18px;
+}
+
+.about-us .txt-grey {
+  color: #9C9C9C;
+}
+
+.txt-bold {
+  font-weight: bold;
+}
+/* For agent profile page */
+.agent-profile .avatar {
+  margin-top: -60px;
+  font-size: 24px;
+}
+.agent-profile .avatar img {
+  border: 1px solid #cccccc;
+  border-radius: 10px;
+  padding: 4px;
+  background-color: #fff;
+  width: 120px;
+}
+.agent-profile .description .section-txt1, .agent-profile .tags .section-txt1, .agent-profile .reviews .section-txt1 {
+  text-align: left;
+}
+.agent-profile .specialties, .agent-profile .destinations {
+  padding: 0;
+}
+.agent-profile .tags .item {
+  background-color: #cccccc;
+  border-radius: 15px;
+  padding: 5px 10px;
+}
+.agent-profile .social-share .section-txt1{
+  font-size: 20px;
+}
+
+.agent-profile .social-share .btn {
+  width: 60px;
+  border-radius: 10px;
+  border: 0;
+  height: 60px;
+  padding-right: 0;
+}
+.agent-profile .social-share .btn-twitter {
+  margin-left: 20px;
+}
+.agent-profile .social-share .fa {
+  line-height: 60px;
+}
+.agent-profile .social-share .fa:before {
+  font-size: 45px;
+}
+.agent-profile .user-info img {
+  width: 50px;
+  float: left;
+}
+
+.agent-profile .user-info p {
+  padding-left: 60px;
+}
+
+@media screen and (min-width: 768px) {
+  p {
+    line-height: 1.5;
+  }
+  .box-space{
+    margin: 30px 15px;
+  }
+  .box-space:first-child {
+    margin-top: 15px;
+  }
+  .features-list{
+    margin: 40px 0;
+  }
+  .phone-screen-txt {
+    margin-top: 10px;
+  }
+  .phone-screen-txt .left-line {
+    height: 90%;
+    top: 60px;
+  }
+  .section-txt1, .section-txt2 {
+    font-size: 30px;
+  }
+
+  .about-us {
+    font-size: 20px;
+  }
+  .features-image2 {
+    margin: 20px 0 0;
+  }
+
+  .about-text {
+    font-size: 20px;
+  }
+  .about-text .about-text-heading {
+    line-height: 1.5;
+    font-size: 22px;
+  }
+
+  .agent-profile .avatar {
+    margin-top: -90px;
+    font-size: 24px;
+  }
+  .agent-profile .avatar img {
+    width: 160px;
+  }
+}

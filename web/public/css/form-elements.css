@@ -1,0 +1,36 @@
+
+.btn-primary-aa{
+
+    border-color: #5BC3B1;
+    padding: 15px 35px;
+    color: #fff;
+    background-color: #5BC3B1;
+
+}
+
+.btn-primary-aa:focus, .btn-primary-aa.focus, .btn-primary-aa:hover, .btn-primary-aa:active, .btn-primary-aa.active, .open > .dropdown-toggle.btn-primary-aa {
+
+    color: #5BC3B1;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.btn{
+    border-radius: 0px;
+}
+
+.form-control:focus{
+	border-color: #5BC3B1;
+}
+
+.btn-primary-outline {
+    color: #5BC3B1;
+    background-color: transparent;
+    border-color: #5BC3B1;
+}
+
+.btn-primary-outline:focus, .btn-primary-outline.focus, .btn-primary-outline:hover, .btn-primary-outline:active, .btn-primary-outline.active, .open > .dropdown-toggle.btn-primary-outline {
+    color: #ffffff;
+    background-color: #5BC3B1;
+    box-shadow: none;
+}

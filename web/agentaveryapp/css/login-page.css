@@ -1,0 +1,160 @@
+.login-pg .intro-header .site-heading {
+  padding: 0;
+  margin-top: 0;
+}
+
+.login-pg .section-txt1 {
+  font-size: 24px;
+}
+
+.login-form{
+	background-color: #E9E9E9;
+  color: #252830;
+  border-left: 1px solid #9C9C9C;
+  border-right: 1px solid #9C9C9C;
+  margin: 50px 30px;
+}
+
+
+.login-fields{
+	margin-top: 30px;
+}
+
+.login-form .logo-txt{
+	font-size: 60px;
+	font-weight: 300;
+	margin-left: 10px;
+	color:#252830;
+}
+
+
+.logo-sub-txt{
+	font-size: 20px;
+}
+
+.logo img{
+	margin-top: -20px;
+}
+
+/*Sign Up*/
+.message {
+	 margin-top: 30px;
+	 text-align: center;
+	 height: 36px;
+	 color: #33EEBB;
+}
+
+.login-error {
+	 margin-top: -15px;
+	 margin-left: -15px;
+	 height: 36px;
+	 color: #DD4B39;
+}
+
+.login-btn {
+	align: center;
+}
+
+.sign-up{
+	padding:10px;
+	margin-left: 20px;
+}
+
+.right-align-button{
+	 text-align: center;
+}
+
+.right-align-button .btn {
+  text-transform: none;
+  font-weight: normal;
+  letter-spacing: 0;
+}
+
+.control-label{
+	padding-top: 0px;
+}
+
+.sign-up-content {
+  margin: 20px 10px;
+}
+.sign-up-content .form-group {
+    margin-right: 0px;
+    margin-left: 0px;
+    margin-bottom: 10px;
+    color: #9C9C9C;
+    font-size: 16px;
+    text-align: left;
+}
+
+.sign-up-content .form-group a {
+  text-decoration: underline;
+}
+
+.sign-up-content .parsley-errors-list {
+  text-align: center;
+}
+
+.form-control {
+  height: 50px;
+  font-size: 16px;
+}
+
+.login-pg .box-space {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.login-pg .features-list {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.login-pg .features-list img{
+  width: 100%
+}
+
+.login-pg .phone-screen-txt {
+  padding: 0 40px;
+}
+.login-pg .phone-screen-txt .section-txt1 {
+  text-align: left;
+  font-size: 40px;
+  color: #252a2c;
+  line-height: 1.2;
+}
+
+.login-pg .phone-screen-txt p {
+  color: #9C9C9C;
+}
+.login-pg .phone-screen-txt .section-txt2 {
+  margin: 0;
+}
+
+.tags{
+	display: inline-block;
+	background-color: #eeeeee;
+    padding: 5px 10px;
+    border-radius: 3px;
+    border: 1px solid #dddddd;
+    margin-right: 5px;
+    margin: 5px 3px 0px 0px;
+}
+.tags-rmv{
+	font-size: .7em;
+	padding-left: 5px;
+}
+.tags-group{
+	margin-top: 5px;
+}
+
+.center{
+	text-align: center;
+}
+
+.modal-body {
+  	max-height: calc(100vh - 200px);
+  	overflow-y: auto;
+		font-family:'Source Sans Pro';
+		text-align: justify;
+		text-justify: inter-word;
+}

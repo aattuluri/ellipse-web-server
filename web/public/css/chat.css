@@ -1,0 +1,234 @@
+.chatbox{
+    position: fixed;
+    background: #fff;
+    bottom:0;
+    padding-bottom: 15px;
+}
+
+.ChatHeader {
+    display: flex;
+    padding-bottom: 10px;
+}
+
+.ChatHeader-clientInfo {
+    flex: 1 1 auto;
+}
+
+.ChatHeader-itinerary {
+    flex: 0 0 auto;
+    padding-top: 16px;
+}
+
+.action-column{
+	text-align: right;
+}
+
+
+.chat-item{
+	margin-left:5px;
+	margin-top:-30px;
+	margin-bottom:20px;
+}
+
+.chat-image{
+	width: 50px;
+    border-radius: 100%;
+    margin-top:30px;
+}
+
+
+.user-name{
+	font-size: 1.3em;
+    margin-left: 10px;
+    margin-right: 5px;
+    font-weight: 400;
+}
+
+.chat-message{
+	margin-left: 60px;
+    margin-top: -30px;
+}
+
+.chat-message-images {
+    width: 70%;
+}
+.chat-message-images .carousel-inner > .item > img {
+    height: 400px;
+}
+
+.chat-message-images .carousel-control {
+    background-image: none;
+}
+
+.chat-message-images .ti-angle-left, .chat-message-images .ti-angle-right {
+    position: absolute;
+    top: 200px;
+    left: 25%;
+    z-index: 5;
+    display: inline-block;
+    color: #5BC3B1;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.chat {
+    margin-bottom: 100px;
+}
+
+.client-info > .job-item{
+    margin-left: 0px;
+}
+
+.flextable-primary {
+    width: 15%;
+}
+
+.hr-divider-content{
+    z-index:0;
+}
+
+.flextable{
+    display: block;
+}
+
+.success-icon{
+    color:green;
+    font-weight: 500;
+    padding-right: 15px;
+}
+
+#sentItinerary{
+    display: none;
+}
+
+.sent-itinerary{
+    border: 1px solid #eeeeee;
+    padding: 15px;
+    margin-top: 30px;
+}
+
+.sent-itinerary .row{
+    margin:0px;
+}
+
+.icon:before{
+    left: -3px;
+}
+
+.image-btn{
+    left:-1px;
+}
+
+.checkbox label{
+    display:inline;
+    font-size:1.2em;
+}
+
+.price-textfield{
+    width: 50px;
+    display:inline;
+}
+
+.price-input{
+        display: inline;
+    margin: 25px;
+        font-weight: normal;
+
+}
+
+.sm-field{
+    width: 15%;
+    display:inline;
+}
+
+.price-description{
+    width: 500px;
+    margin-left: 18px;
+}
+
+.total{
+    font-size: 2em;
+    font-weight: 400;
+    margin-bottom: 30px;
+    margin-left: -6px;
+}
+.agent-fee{
+    background-color: #eee;
+    padding: 20px;
+    border-radius: 15px;
+    font-size: 1.2em;
+}
+
+.price-field-lbl{
+    margin-top:8px;
+}
+
+.bold{
+    font-weight: 400;
+}
+
+.aa-success-text {
+	 font-size: 0.9em;
+	 color: #33EEBB;
+}
+
+.aa-failed-text {
+	font-size: 0.9em;
+	color: #DD4B39;
+}
+
+.chat-inline-image {
+	max-width:750px;
+}
+
+.cd-btn-fee {
+		margin-top: 25px;
+		width: 200px;
+}
+
+.enable-or-disable-sound-div {
+	text-align: center;
+}
+
+.enable-or-disable-sound {
+	cursor: pointer;
+}
+
+/* For upload files */
+.fileinput-button {
+    position: fixed;
+    top: 150px;
+    right: 100px;
+    display: inline-block;
+    background-color: #fff;
+    z-index: 999;
+    border: 3px solid;
+}
+
+.fileinput-button span {
+    font-size: 25px;
+    font-weight: bold;
+    line-height: 30px;
+}
+#attachment-upload-form {
+    height: 450px;
+    overflow-y: scroll;
+}
+#attachment-upload-form.dropzone .dz-preview .dz-progress,
+#attachment-upload-form.dropzone .dz-preview .dz-success-mark,
+#attachment-upload-form.dropzone .dz-preview .dz-error-mark {
+    top: 25%;
+}
+
+.crop-dialog {
+    width: 900px;
+}
+.remove-files {
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    color: #5BC3BB;
+    font-size: 24px;
+    z-index: 999;
+}

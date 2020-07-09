@@ -1,0 +1,10 @@
+.agent_agreement input {
+  color: #000000;
+  font-weight: bold;
+}
+
+.agent_agreement input:focus {
+  border-color: #5BC3B1;
+  color: #000000;
+  font-weight: bold;
+}

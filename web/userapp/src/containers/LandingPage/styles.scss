@@ -1,0 +1,106 @@
+:local(.styles) {
+
+  background-color: #212629;
+
+  height: 100%;
+
+  text-align: center;
+
+  color: #ffffff;
+
+  .bg-color {
+      background-color: #212629;
+  }
+
+  .top-background {
+     z-index: -1;
+     overflow: hidden;
+     margin-top: 75px;
+     text-align: center;
+     height: 40%;
+     opacity: 0.1;
+     background-size: 100% 100%;
+     background-image: url('../../static/img/home-bg.jpg');
+  }
+
+  .top-bg {
+    z-index: 10;
+    margin-top: -250px;
+  }
+
+  .top-section {
+    text-align: center;
+    position: relative;
+  }
+
+  .how-it-works-img {
+    margin: 0 auto;
+    max-height: 380px;
+    max-width: 400px;
+    height: 40%;
+    width: 80%;
+    background-size: 100% 80%;
+    background-image: url('./img/index-mobile-2.png');
+    background-repeat: no-repeat;
+  }
+
+  .top-heading {
+    margin-top: -225px;
+  }
+
+  .how-it-works {
+
+  }
+
+  .heading {
+    margin-top: 80px;
+  }
+
+  .heading {
+    font-size: 1.25em;
+    font-weight: bold;
+  }
+
+  .caption {
+    font-weight: bold;
+  }
+
+  .icon-container {
+    width: 50%;
+    margin: 0 auto;
+    width:70px;height:70px;border-radius:35px;font-size:20px;color:#000;line-height:35px;text-align:center;background:#fff
+  }
+
+  .feature-icon {
+    margin-top: 22%;
+  }
+
+  .features-desc {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .v-space-ssssm {
+    height: 10px;
+  }
+
+  .v-space-sssm {
+    height: 20px;
+  }
+
+  .v-space-ssm {
+    height: 40px;
+  }
+
+  .v-space-sm {
+    height: 60px;
+  }
+
+  .v-space-m {
+    height: 120px;
+  }
+
+  .v-space-lg {
+    height: 180px;
+  }
+}

@@ -1,0 +1,24 @@
+:local(.styles) {
+
+    overflow: auto;
+    cursor: pointer;
+
+    text-align: center;
+
+    .aa-btn {
+      z-index: 9999;
+      background: #33eebb;
+      color: #252a2c;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 50px;
+      font-weight: bold;
+      height: 50px;
+      min-width: 80px;
+      max-width: 150px;
+    }
+}

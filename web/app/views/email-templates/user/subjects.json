@@ -1,0 +1,12 @@
+{
+  "confirmation": "You're registered! Confirm your email to let Agent Avery help you with your journey",
+  "welcome": "Congrats! Welcome to Agent Avery. Get ready to travel!",
+  "reset_password": "Agent Avery - Reset Password",
+  "itinerary": "Agent Avery - Itinerary",
+  "new_agent_found":  "Great news!! A travel agent would like to help you plan your trip!",
+  "new_plugin_user": "Congrats! Welcome to Agent Avery!!",
+  "new_chat_messages": "New chat messages",
+  "new_chat_messages_reminder_1": "New chat messages",
+  "new_chat_messages_reminder_2": "New chat messages",
+  "new_chat_messages_reminder_final": "New chat messages"
+}

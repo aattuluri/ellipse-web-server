@@ -1,0 +1,27 @@
+{{> short-header}}
+<div class="row section-higlight">
+    <div class="col-xs-12">
+        <h1>Hello {{userName}}, Welcome to Agent Avery!</h1>
+        <p>Please review the agreement below and fill in the information as necessary.
+              You are jusy one step away from planning the trips for the travellers.</p>
+        <div style="width: 80%; margin-left: auto ;margin-right: auto ;" class="agent_agreement">
+          <form id="agent_agreement" method="POST" path="/agent-agreement">
+            {{> agent_agreement_body}}
+            <input type="hidden" name="userId" value={{userId}}></input>
+            <br/>
+            <div>
+              <div class"form-group">
+                  <a id="submit" class="btn btn-primary-aa">SUBMIT</a>
+              </div>
+              <br/>
+              <br/>
+            </div>
+          </form>
+          <hr/>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/js/agent_agreement.js"/></script>
+<link href="/css/form-elements.css" rel="stylesheet">
+<link href="/css/agent-agreement.css" rel="stylesheet">

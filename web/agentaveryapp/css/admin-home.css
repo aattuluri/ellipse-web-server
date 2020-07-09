@@ -1,0 +1,63 @@
+
+.admin-logout {
+  float: right;
+  margin-right: 20px;
+  margin-top: -20px;
+}
+
+h4 {
+  text-align: center;
+  font-weight: 400;
+}
+
+.agent-list {
+  margin-left: 25px;
+  margin: auto;
+  overflow-y: scroll;
+}
+
+.pending-approval-agent-list {
+  max-height: 150px;
+}
+
+.all-agent-list {
+  max-height: 250px;
+}
+
+.chat {
+  margin-left: 25px !important;
+  margin-top: 25px !important;
+  width: 100%;
+}
+
+.chat-id-input {
+  width: 200px;
+  height: 36px;
+}
+
+.agent-info-row {
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.agent-info-val {
+  display: inline-block;
+  width: 150px;
+  margin-left: 5px;
+}
+
+.small {
+  width: 100px !important;
+}
+
+.large {
+  width: 225px !important;
+}
+
+.chat-clear-btn {
+  margin-left: 25px;
+}
+
+.approve-agent-btn {
+
+}

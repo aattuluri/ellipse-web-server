@@ -1,0 +1,57 @@
+.search {
+	margin-top: 30px;
+	width: 300px;
+}
+
+.reccomended {
+
+    font-size: .5em;
+    background-color: #000;
+    color: #fff;
+    border-radius: 4px;
+    padding: 3px 8px;
+    margin-left: 15px;
+}
+
+.description{
+	margin-bottom: 20px;
+}
+
+.job-item .icon{
+	color: #30343e;
+}
+
+.job-item .info{
+	padding-bottom: 10px;
+}
+
+.icon-label{
+	padding-left:3px;
+	padding-right:10px;
+}
+
+.job-item h3{
+	padding-bottom: 10px;
+}
+
+.action-column a {
+	width: 140px;
+}
+
+.num-active-chats {
+	color: #252a2c;
+	font-size: 2em;
+}
+
+.decline-chat {
+	padding: 15px 35px;
+}
+
+.icon-lg {
+	width: 40px;
+	height: 40px;
+}
+
+.vspace {
+	height: 10px;
+}
