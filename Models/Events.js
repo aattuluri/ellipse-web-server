@@ -38,6 +38,7 @@ let eventShema = mongoose.Schema({
     },
     feesType:{
         type: String,
+        required: true
     },
     fees: {
         type: Number,

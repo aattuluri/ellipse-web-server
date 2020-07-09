@@ -26,70 +26,29 @@ const userSchema = mongoose.Schema({
         required: true,
         minLength: 8
     },
+    username: {
+        type: String,
+        // required: true,
+        unique: true,
+    },
     tokens: [{
         token: {
             type: String,
             required: true
         }
     }],
-    uid: {
-        type: String,
-        default: null
-    },
     signupTime: {
         type: String,
         default: Date.now
-    },
-    phno: {
-        type: String,
-        default: null
-    },
-    collegeId:{
-        type: String,
-        default: null
-    },
-    collegeName: {
-        type: String,
-        default: null
-    },
-    gender: {
-        type: String,
-        default: null
-    },
-    bio: {
-        type: String,
-        default: null
-    },
-    imageUrl: {
-        type: String,
-        default: null
-    },
-    status:{
-        type: Boolean,
-        default: false
-    },
-    lastseen: {
-        type: String,
-        default: Date.now,
-        default: null
     },
     otp: {
         type: Number,
         default: null
     },
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-    },
     isVerified: {
         type: Boolean,
         default: false
     },
-    designation: {
-        type: String,
-        default: null
-    }
 })
 userSchema.pre('save', async function (next) {
     // Hash the password before saving the user model

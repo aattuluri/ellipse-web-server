@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
+const UserDetails = require('../Models/UserDetails');
 
 
 router.get('/api',(req,res)=>{
@@ -115,13 +116,7 @@ router.post('/api/users/login', async(req, res) => {
     //Login a registered user
     try {
         const { email, password } = req.body
-        console.log(email);
-        console.log(password);
-        // User.findByCredentials
-        
-        // const user = await LoginUser.findByCredentials(email,password);
         const user = await UserLogin.findOne({ email} );
-        console.log(user);
         if (!user) {
             throw new Error('Invalid login credentials')
         }
@@ -132,55 +127,60 @@ router.post('/api/users/login', async(req, res) => {
         if (!user) {
             return res.status(401).send({error: 'Login failed! Check authentication credentials'})
         }
-        const token = await user.generateAuthToken()
-        res.status(200).json({ user, token })
+        const token = await user.generateAuthToken();
+
+        const userDetails = await UserDetails.findOne({email});
+        res.status(200).json({ user,userDetails, token })
     } catch (error) {
         res.status(400).json({ error: error.message })
     }
 
 })
-router.post('/api/users/userdetails',auth,(req,res)=>{
+router.post('/api/users/userdetails',auth,async (req,res)=>{
     try{
-        const {gender,college,designation} = req.body;
-        const user = req.user;
-        UserLogin.update(
-            {'email':user.email},
-            {$set:{
-                'collegeName': college,
-                'gender': gender,
-                'designation': designation
-            }}).then((val)=>{
-            console.log(val);
-            res.status(200).json({message:"success"})
-        })
-
-
-    }
-    catch(err){
-        res.status(400).json({ error: err.message }) 
-    }
-})
-
-router.post('/api/users/userdetails2',auth,(req,res)=>{
-    try{
-
-        const {image,bio} = req.body;
+        const {imageUrl,gender,collegeName,collegeId,designation,bio} = req.body;
         const user = req.user;
         console.log(user);
-        UserLogin.update(
-            {'email':user.email},
-            {$set:
-                {'bio': bio,
-                'imageUrl': image
-            }}).then((val)=>{
-                console.log(val);
-                res.status(200).json({message:"success"})
-            })
+        console.log(collegeName);
+        const userDetails = new UserDetails({
+            'id': user._id,
+            'email': user.email,
+            'bio': bio,
+            'imageUrl': imageUrl,
+            'name': user.name,
+            'gender': gender,
+            'collegeName': collegeName,
+            'designation': designation
+        })
+        console.log(userDetails);
+        await userDetails.save();
+        res.status(200).json({userDetails})
     }
     catch(err){
         res.status(400).json({ error: err.message }) 
     }
 })
+
+// router.post('/api/users/userdetails2',auth,(req,res)=>{
+//     try{
+
+//         const {image,bio} = req.body;
+//         const user = req.user;
+//         console.log(user);
+//         UserLogin.update(
+//             {'email':user.email},
+//             {$set:
+//                 {'bio': bio,
+//                 'imageUrl': image
+//             }}).then((val)=>{
+//                 console.log(val);
+//                 res.status(200).json({message:"success"})
+//             })
+//     }
+//     catch(err){
+//         res.status(400).json({ error: err.message }) 
+//     }
+// })
 
 router.get('/api/users/me', auth, async(req, res) => {
     // View logged in user profile
