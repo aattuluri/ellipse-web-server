@@ -1,0 +1,4 @@
+curl -X POST -H "Content-Type: application/json" -d '{
+"recipient":{"id":1040960522607288},
+"message":{"attachment":{"type":"image","payload":{"url":"https://agentavery.com/img/user_profile.png"}}}
+}' "https://graph.facebook.com/v2.6/me/messages?access_token=EAACQWcKXPJABAKwAqQVDqW4nt54K6ZA91du1LlOPMx94ubEKx6uWUd6QCQw9z6DUtssFGc75rDGRYZCNqnIZAx1JazlZBJQBhDsZCpKPlIo5lXq1ZAhvqZAEkq6GSPwccHaj6h2bYBn8BUYIjcKPWxedCZAQsmX2mkP56pPuQZB4skAZDZD"

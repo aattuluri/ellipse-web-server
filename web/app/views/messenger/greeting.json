@@ -1,0 +1,22 @@
+{
+  "title":"Welcome to AgentAvery!",
+  "image_url":"https://agentavery.com/img/messenger/greeting_card.png",
+  "subtitle":"Book your trip conveniently with Avery, your automated assistant, or plan it with a human travel expert and get insider tips – all via text!",
+  "buttons":[
+    {
+      "type":"postback",
+      "title":"Find Cruises",
+      "payload": "search.cruises"
+    },
+    {
+      "type":"postback",
+      "title":"Search Activities",
+      "payload": "search.activities"
+    },
+    {
+      "type":"postback",
+      "title":"Connect with Travel Expert!",
+      "payload": "search.experts"
+    }
+  ]
+}

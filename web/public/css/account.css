@@ -1,0 +1,91 @@
+/** Fields **/
+.field-value {
+  font-size: 16px;
+  color: #5bc3b1;
+}
+
+/** Profile picture stuff **/
+.profile-picture-container {
+  position: relative;
+}
+.profile-picture {
+  width: 180px;
+  height: 100%;
+}
+.profile-picture:hover {
+  opacity: 0.7;
+}
+.profile-picture-edit {
+  position: absolute;
+  top: 0;
+  left: 160px;
+  font-size: 25px;
+  opacity: 0.7;
+  -webkit-transition: all 0.5s ease-in-out;
+}
+
+.profile-picture-edit:hover {
+  cursor: pointer;
+  opacity: 1.0;
+  -webkit-transform: scale(1.2);
+}
+
+.profile-picture-confirm {
+  position: relative;
+  top: 20px;
+  font-size: 50px;
+}
+
+.profile-picture-ok {
+  padding: 5px;
+  color: #5bc3b1;
+}
+
+.profile-picture-ok:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.profile-picture-cancel {
+  padding: 5px;
+  color: #ff5a5f;
+}
+
+.profile-picture-cancel:hover {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+// .account-status-label {
+//   font-size: 1.5em;
+// }
+
+.account-status-options a {
+  cursor: pointer;
+}
+
+.account-status-options a:hover {
+  cursor: pointer;
+}
+
+
+.account-status-label .warning {
+  color: orange;
+}
+
+.account-status-options {
+  font-size: 1em;
+}
+
+.profile-form .item {
+  float: left;
+  line-height: 20px;
+  margin: 5px;
+}
+.profile-form .item .ti-close {
+  font-weight: bold;
+  margin-left: 8px;
+}
+.profile-form .tab-content {
+  margin: 15px 0;
+}

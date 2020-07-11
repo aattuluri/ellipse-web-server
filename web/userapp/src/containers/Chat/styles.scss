@@ -1,0 +1,102 @@
+:local(.styles) {
+    position: fixed;
+    top: 75px;
+    height: calc(100% - 65px);
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+
+    .divider {
+        margin: '8px 0';
+        height: 1;
+        backgroundColor: '#33eebb';
+    }
+
+    .sidebar-content {
+        display: inline-block;
+        position: absolute;
+        top: 1px;
+        height: '100%';
+        text-align: center;
+    }
+
+    .sidebar-link {
+        display: block;
+        color: '#33eebb';
+        text-align: center;
+        text-decoration: none;
+        opacity: 1;
+    }
+
+    .history-box{
+        flex: 1;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        padding: 10px;
+    }
+
+    .status-row {
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+
+    .bottom-row {
+
+        display: flex;
+        flex-direction: row;
+
+        .input-box {
+            color: white;
+            flex: 1;
+            margin-right: 5px;
+            height: 40px;
+            border-radius: 3px;
+            overflow: hidden;
+            padding: 7px;
+            background-color : #3b4043;
+        }
+        .input-box:focus {
+            flex: 1;
+            margin-right: 10px;
+            height: 40px;
+            border-radius: 3px;
+            overflow: hidden;
+            padding: 7px;
+            background-color : #3b4043;
+            outline: .5px solid #252a2c;
+            border: .5px solid #252a2c;
+        }
+        .input-box:focus {
+        /* Safari */
+          outline: .1px solid #33eebb;
+          border: .1px solid #33eebb;
+        }
+
+        .input-box::-moz-selection {
+          /* Firefox */
+          outline: .1px solid #33eebb;
+          border: .1px solid #33eebb;
+        }
+        .send-button {
+            align-self: flex-end;
+            margin-top: 10px;
+            height: 40px;
+            font-size: 20px;
+            color: #33eebb;
+        }
+    }
+    .black {
+        color: black;
+    }
+    .white {
+        color: white;
+    }
+    .red {
+        color: red;
+    }
+    .nav-icon {
+        padding-top: 10px;
+        padding-right: 10px;
+        padding-left: 10px;
+  }
+}

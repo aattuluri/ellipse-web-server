@@ -1,0 +1,56 @@
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.4/socket.io.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-rc1/jquery.min.js"></script>
+</head>
+<body>
+
+  <script>(function () { window.chatPluginSettings = { APIKey: '78a0a9d0-dd18-48b0-bf1b-d7bef3c4128c', chatTitle: 'Chat with me' }; var done = false; var script = document.createElement('script'); script.async = true; script.type = 'text/javascript'; script.src = 'https://agentavery.com/dist/chat.plugin.js'; document.getElementsByTagName('HEAD').item(0).appendChild(script); script.onreadystatechange = script.onload = function (e) { if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) { done = true; } }; })()</script>
+
+  <script>
+    $( document ).ready(function() {
+      //do an api call
+
+        // $.ajax({
+        //   beforeSend: function(xhrObj){
+        //         xhrObj.setRequestHeader("apikey","78a0a9d0-dd18-48b0-bf1b-d7bef3c4128c");
+        //   },
+   		// 		url: 'http://localhost:3001/p/user',
+   		// 		type: 'PUT',
+   		// 		dataType: "json",
+   		// 		contentType: 'application/json; charset=utf-8',
+   		// 		data: JSON.stringify({email: 'aattulur@qti.qualcomm.com', firstName: 'Anil', lastName: 'Qualcomm'}),
+   		// 		success: function(response, textStatus, jqXHR) {
+   		// 			console.log("Successfull!!")
+   		// 		},
+   		// 		error: function(jqXHR, textStatus, errorThrown){
+   		// 			console.log("Error!!")
+   		// 		}
+   		// 	});
+        //
+        //
+        // $.ajax({
+        //   beforeSend: function(xhrObj){
+        //         xhrObj.setRequestHeader("apikey","78a0a9d0-dd18-48b0-bf1b-d7bef3c4128c");
+        //   },
+   		// 		url: 'http://localhost:3001/p/loadChat/EJa4X5jfW',
+   		// 		type: 'GET',
+   		// 		success: function(response, textStatus, jqXHR) {
+   		// 			console.log("Successfull!!")
+   		// 		},
+   		// 		error: function(jqXHR, textStatus, errorThrown){
+   		// 			console.log("Error!!")
+   		// 		}
+   		// 	});
+        //
+        //
+        // //connect to socket io
+        // socket = io ("http://localhost:3001");
+        // socket.on('connect', function () {
+        //   console.log("Connected to server!");
+        // });
+    });
+
+  </script>
+</body>
+</html>

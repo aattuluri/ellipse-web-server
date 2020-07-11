@@ -1,0 +1,265 @@
+:local(.styles) {
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-header {
+    position: fixed;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    height: 45px;
+    padding-top: 10px;
+    opacity: 1;
+    text-align: center;
+
+    .header-center-section {
+      position: relative;
+      margin-right: 10px;
+    }
+
+    .header-logo {
+      height: 30px;
+      width: 30px;
+    }
+
+    .header-right-section {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .nav {
+      margin-bottom: 0;
+      color: #ffffff;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: inherit;
+      vertical-align: middle;
+    }
+
+    .nav-icon {
+      padding-top: 5px;
+      padding-right: 10px;
+      padding-left: 10px;
+    }
+
+    a, a:hover {
+      color: #FFF;
+    }
+  }
+
+  .chat-error {
+    color: red;
+  }
+
+  .start-chat {
+    display: none;
+    &.active {
+      display: block;
+    }
+    .start-chat-inner {
+      position: fixed;
+      bottom: 10px;
+      right: 5px;
+      z-index: 100;
+      cursor: pointer;
+    }
+    .aa-collapse-btn {
+      display: block;
+      text-align: center;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      color: #fff;
+      background: #212629;
+      border: 1px solid #fff;
+      box-shadow: 0 6px 13px 0 #212629;
+      text-decoration: none;
+
+      img {
+        width: 20px;
+        margin-left: 10px;
+      }
+      &:active, &:hover {
+        border: 2px solid #33eebb;
+      }
+    }
+  }
+
+  .get-started {
+    .chat-header {
+      position: relative;
+    }
+
+    input:-webkit-autofill {
+      background-color : #3b4043;
+      color: #ffffff !important;
+    }
+
+    .get-started-inner {
+      padding: 0 15px;
+    }
+
+    form {
+      margin-bottom: 0;
+    }
+
+    .login-input {
+      border-radius: 4px;
+      margin-top: 10px;
+      padding: 10px;
+      background-color : #3b4043;
+      min-height: 25px;
+      width: 100%;
+      color: #ffffff;
+      // outline: .5px solid #252a2c;
+      border: .5px solid #252a2c;
+    }
+
+    .login-input:focus {
+    /* Safari */
+      outline: .1px solid #33eebb;
+      border: .1px solid #33eebb;
+    }
+
+    .login-input::-moz-selection {
+      /* Firefox */
+      outline: .1px solid #33eebb;
+      border: .1px solid #33eebb;
+    }
+
+    .aa-btn {
+      margin: 12px 0;
+      line-height: 40px;
+      height: 40px;
+      &:active, &:hover {
+        color: #fff;
+        opacity: 0.5;
+        border-bottom: 1px solid #fff;
+      }
+      &.disable {
+        color: #fff;
+        opacity: 0.5;
+        border-bottom: 1px solid #fff;
+        pointer-events: none;
+        cursor: default;
+      }
+    }
+  }
+
+  .chat {
+    height: 100%;
+
+    .chat-inner {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 45px 5px 10px;
+    }
+
+    .divider {
+      margin: '8px 0';
+      height: 1;
+      backgroundColor: '#33eebb';
+    }
+
+    .sidebar-content {
+      display: inline-block;
+      position: absolute;
+      top: 1px;
+      height: '100%';
+      text-align: center;
+    }
+
+    .sidebar-link {
+      display: block;
+      color: '#33eebb';
+      text-align: center;
+      text-decoration: none;
+      opacity: 1;
+    }
+
+    .history-box{
+      flex: 1;
+      overflow-x: hidden;
+      padding: 10px;
+
+      .img {
+        max-width: 90%;
+        min-width: 220px;
+        img {
+          width: 100%;
+        }
+        .time-label {
+          float: right;
+          position: relative;
+          bottom: 0px;
+        }
+      }
+    }
+
+    .status-row {
+      font-size: 12px;
+      height: 12px;
+    }
+
+    .bottom-row {
+      display: flex;
+      flex-direction: row;
+
+      .input-box {
+          color: white;
+          flex: 1;
+          margin-right: 5px;
+          height: 40px;
+          border-radius: 3px;
+          overflow: hidden;
+          padding: 7px;
+          background-color : #3b4043;
+      }
+      .input-box:focus {
+          flex: 1;
+          margin-right: 10px;
+          height: 40px;
+          border-radius: 3px;
+          overflow: hidden;
+          padding: 7px;
+          background-color : #3b4043;
+          outline: .5px solid #252a2c;
+          border: .5px solid #252a2c;
+      }
+      .input-box:focus {
+      /* Safari */
+        outline: .1px solid #33eebb;
+        border: .1px solid #33eebb;
+      }
+
+      .input-box::-moz-selection {
+        /* Firefox */
+        outline: .1px solid #33eebb;
+        border: .1px solid #33eebb;
+      }
+      .send-button {
+          align-self: flex-end;
+          margin-top: 10px;
+          height: 40px;
+          font-size: 20px;
+          color: #33eebb;
+      }
+    }
+    .black {
+      color: black;
+    }
+    .white {
+      color: white;
+    }
+    .red {
+      color: red;
+    }
+  }
+}

@@ -1,0 +1,90 @@
+
+.login-form {
+	background-color:#fff;
+	padding: 15px 5px;
+  width: 320px;
+  margin: auto;
+}
+
+.login-fields {
+	margin-top: 5px;
+}
+
+.login-form .logo-txt{
+	font-size: 20px;
+	font-weight: 300;
+	margin-left: 10px;
+	color:#252830;
+}
+
+
+.logo-sub-txt{
+	font-size: 10px;
+}
+
+.logo img{
+	margin-top: -20px;
+}
+
+
+/*Sign Up*/
+.signup-form {
+
+    width: 340px;
+
+}
+
+.message {
+	 margin-top: 5px;
+	 text-align: center;
+	 height: 12px;
+	 color: #33EEBB;
+}
+
+.login-error {
+	 margin-top: -3px;
+	 margin-left: -3px;
+	 height: 12px;
+	 color: #DD4B39;
+}
+
+.login-btn {
+	align: center;
+}
+
+.sign-up {
+	padding:2px;
+	margin-left: 5px;
+}
+
+.right-align-button {
+	 text-align: right;
+}
+
+.sign-up-content {
+	padding-top: 5px;
+}
+
+.shorter-field {
+	width: 90%;
+}
+
+.form-horizontal .control-label {
+	padding-top: 0px;
+}
+
+.form-group {
+	margin-bottom: 15px;
+}
+
+.center{
+	text-align: center;
+}
+
+.modal-body {
+  	max-height: calc(100vh - 20px);
+  	overflow-y: auto;
+		font-family:'Source Sans Pro';
+		text-align: justify;
+		text-justify: inter-word;
+}
