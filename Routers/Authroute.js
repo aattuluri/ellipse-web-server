@@ -7,7 +7,7 @@ const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
 const UserDetails = require('../Models/UserDetails');
-
+const collegeController = require('./collegeController')
 
 router.get('/api',(req,res)=>{
     res.send("server is working");
@@ -365,5 +365,8 @@ router.post('/api/users/emailverified',auth, async (req, res) => {
         res.status(400).json(error.message);
     }
 })
+
+router.route('/colleges')
+    .get(collegeController.index)
 
 module.exports = router
