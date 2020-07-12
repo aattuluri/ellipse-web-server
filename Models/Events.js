@@ -32,9 +32,11 @@ let eventShema = mongoose.Schema({
     tags: {
         type: Array,
     },
-    poster: {
+    o_allowed: {
         type: String,
-        // required: true,
+    },
+    posterUrl: {
+        type: String,
     },
     feesType:{
         type: String,

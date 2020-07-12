@@ -1,12 +1,12 @@
 require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
-const authRouter = require('./Routers/Authroute');
+const authRouter = require('./Routers/authroute');
 const eventRouter = require('./Routers/Eventroute');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./Models/User');
-const auth = require('./Middleware/Auth');
+const auth = require('./Middleware/auth');
 const app = express();
 app.use(cors());
 app.use(bodyParser.json({ limit: "50mb" }));
