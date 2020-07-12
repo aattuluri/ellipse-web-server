@@ -34,7 +34,7 @@ router.post('/api/events',auth,(req,res)=>{
     })
 });
 
-router.get('/api/events',(req,res)=>{
+router.get('/api/events',auth,(req,res)=>{
     Events.get((err, event) => {
         if (err) {
             res.json({
@@ -46,6 +46,44 @@ router.get('/api/events',(req,res)=>{
         res.json(event)
     })
 });
+
+router.get('/api/event',auth,async (req,res)=>{
+    try{
+        const event = await Events.findOne({_id: req.query.id});
+        res.status(200).json({event}); 
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+    
+})
+
+router.post('/api/updateevent',auth, async (req,res)=>{
+    try{
+         const eId = req.body.eventId;
+         Events.updateOne({_id: eId},{$set:{
+             'name': req.body.name,
+             'description': req.body.description,
+             'start_time': req.body.start_time,
+             'finish_time': req.body.finish_time,
+             'registrationEndTime': req.body.registrationEndTime,
+             'eventMode': req.body.eventMode,
+             'eventType': req.body.eventType,
+             'regLink': req.body.regLink,
+             'fees': req.body.fees,
+             'about': req.body.about,
+             'feesType': req.body.feesType,
+             'college': req.body.college
+         }}).then(value =>{
+             Events.findOne({_id: eId}).then(event =>{
+                res.status(200).json({event});
+             })   
+         })
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
 
 module.exports = router
 
