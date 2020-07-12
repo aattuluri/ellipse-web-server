@@ -1,6 +1,6 @@
 const express = require('express');
 const UserLogin = require('../Models/User');
-const auth = require('../Middleware/auth');
+const auth = require('../Middleware/Auth');
 var otpGenerator = require("otp-generator");
 const bcrypt = require('bcryptjs');
 const sgMail = require('@sendgrid/mail');
