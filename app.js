@@ -6,7 +6,7 @@ const eventRouter = require('./Routers/Eventroute');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./Models/User');
-const auth = require('./Middleware/auth');
+const auth = require('./Middleware/Auth');
 const app = express();
 app.use(cors());
 app.use(bodyParser.json({ limit: "50mb" }));
