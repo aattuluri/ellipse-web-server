@@ -254,7 +254,7 @@ router.post('/api/users/logoutall', auth, async(req, res) => {
 
 router.post('/api/users/check',auth, async (req, res) => {
     try {
-        const userdetails = await UserDetails.findOne({ 'user_id': req.body.id })
+        const userdetails = await UserDetails.findOne({ 'userid': req.body.id })
         if (!userdetails) {
             return res.status(404).send("The user id doesn't exists")
         }
@@ -276,7 +276,7 @@ router.post('/api/users/check',auth, async (req, res) => {
 })
 router.post('/api/users/check_fill',auth, async (req, res) => {
     try {
-        UserDetails.updateOne({ 'user_id': req.body.id }, { $set: { 'collegeId': req.body.college, 'imageUrl': req.body.image_url } }).then((val)=>{
+        UserDetails.updateOne({ 'userid': req.body.id }, { $set: { 'collegeId': req.body.college, 'imageUrl': req.body.image_url } }).then((val)=>{
             console.log(val);
         })
 
