@@ -347,7 +347,7 @@ router.post('/api/users/emailverified',auth, async (req, res) => {
         UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'verified': true } }).then((val)=>{
             console.log(val);
         })
-        UserLogin.update(
+        await UserLogin.updateOne(
             {'email':user.email},
             {$set:{
                 'isVerified': true
