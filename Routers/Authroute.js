@@ -23,7 +23,7 @@ router.post('/api/users/signup', async (req, res) => {
             await user.save()
             const token = await user.generateAuthToken()
             const userDetails = new UserDetails({
-                'id': user._id,
+                'userid': user._id,
                 'username': user.username,
             'email': user.email,
             'name': user.name,
