@@ -258,12 +258,13 @@ router.post('/api/users/check',auth, async (req, res) => {
         if (!userdetails) {
             return res.status(404).send("The user id doesn't exists")
         }
+        if (userdetails.verified == false) {
+            return res.status(401).send("empty");
+        }
         if (userdetails.collegeId == null || userdetails.imageUrl == null) {
             return res.status(402).send("empty");
         }
-        if (userdetails.verified != true) {
-            return res.status(401).send("empty");
-        }
+        
         if (userdetails.collegeId != null && userdetails.imageUrl != null && userdetails.verified != false) {
             return res.status(403).send("empty");
         }
