@@ -9,7 +9,11 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./Models/User');
 const auth = require('./Middleware/Auth');
+<<<<<<< HEAD
 // const files = require('./Models/ProfilePics');
+=======
+//const files = require('./Models/ProfilePics');
+>>>>>>> 60f28edbf3b4448d30853a7d0656a14be4263c4e
 const app = express();
 app.use(cors());
 app.use(bodyParser.json({ limit: "50mb" }));
