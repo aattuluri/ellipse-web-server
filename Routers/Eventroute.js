@@ -66,9 +66,9 @@ router.get('/api/events',auth,(req,res)=>{
                 message: err
             });
         }
-        event.forEach(e => {
-            e.posterUrl = ""
-        });
+        // event.forEach(e => {
+        //     e.posterUrl = ""
+        // });
         res.json(event)
     })
 });
@@ -86,6 +86,7 @@ router.get('/api/event',auth,async (req,res)=>{
 
 router.get('/api/event/image',auth,async (req,res)=>{
     try{
+        console.log(req.query.id);
         const image = await EventsMedia.findOne({_id: req.query.id});
         res.status(200).json({image}); 
     }
