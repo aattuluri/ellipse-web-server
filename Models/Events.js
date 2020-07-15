@@ -1,4 +1,4 @@
-let mongoose = require('mongoose')
+let mongoose = require('mongoose');
 
 let eventShema = mongoose.Schema({
     user_id: {

@@ -1,12 +1,15 @@
 require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
+// const redis = require("redis");
 const authRouter = require('./Routers/Authroute');
 const eventRouter = require('./Routers/Eventroute');
+// const client = redis.createClient();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./Models/User');
 const auth = require('./Middleware/Auth');
+const files = require('./Models/ProfilePics');
 const app = express();
 app.use(cors());
 app.use(bodyParser.json({ limit: "50mb" }));
@@ -24,3 +27,13 @@ app.use(eventRouter);
 app.listen(PORT, (req, res) => {
     console.log(`Server Started at PORT ${PORT}`);
 });
+
+
+// client.on("error", function(error) {
+//     console.error(error);
+//   });
+   
+//   client.set("name", "lalith", redis.print);
+//   client.get("name", (err,result) =>{
+//       console.log(result);
+//   });

@@ -8,6 +8,9 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
 const UserDetails = require('../Models/UserDetails');
 const collegeController = require('./collegeController')
+var Grid = require('gridfs-stream');
+// const ProfilePics = require('../Models/ProfilePics');
+
 
 router.get('/api',(req,res)=>{
     res.send("server is working");
@@ -166,6 +169,7 @@ router.post('/api/users/userdetails',auth,async (req,res)=>{
         const user = await req.user;
         // console.log(user);
         console.log(collegeName);
+        console.log(imageUrl);
         UserDetails.update({email: user.email},{$set:{
             'userid': user._id,
             'bio': bio,
@@ -177,9 +181,9 @@ router.post('/api/users/userdetails',auth,async (req,res)=>{
         }
             
         }).then(val =>{
-            console.log(val);
+            // console.log(val);
             UserDetails.findOne({email: user.email}).then(userDetails =>{
-                console.log(userDetails);
+                // console.log(userDetails);
                 res.status(200).json({userDetails});
             })
             
