@@ -9,6 +9,7 @@ const router = express.Router();
 const UserDetails = require('../Models/UserDetails');
 const collegeController = require('./collegeController')
 var Grid = require('gridfs-stream');
+const { route } = require('./ChatRoute');
 // const ProfilePics = require('../Models/ProfilePics');
 
 
@@ -128,7 +129,15 @@ router.post('/api/users/updatepassword',auth,async(req,res)=>{
     }
 })
 
-
+router.get('/api/users/getuser',auth,async(req,res)=>{
+    try{
+        const userDetails = await UserDetails.findOne({userid:req.query.id})
+        res.send({'name': userDetails.name,'image': userDetails.imageUrl})
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
 
 router.post('/api/users/login', async(req, res) => {
     //Login a registered user

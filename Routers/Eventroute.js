@@ -2,26 +2,14 @@ const express = require('express');
 const auth = require('../Middleware/Auth');
 const router = express.Router();
 const Events = require('../Models/Events');
-// const chatService = require('../Chat/ChatService');
 const { json } = require('body-parser');
 const EventsMedia = require('../Models/EventsMedia');
-
-router.post('/api/events',auth,(req,res)=>{
-    console.log(req.body);
-    let event = new Events(req.body)
+const chatService = require('../Chat/ChatService');
+var fs = require('fs');
+router.post('/api/events',auth,async(req,res)=>{
+    let event = new Events(req.body);
     let eventsMedia = new EventsMedia();
-    // event.user_id = req.body.user_id
-    // console.log(req.body.user_id);
-    // event.name = req.body.name;
-    // event.description = req.body.description;
-    // event.start_time = req.body.start_time;
-    // event.finish_time = req.body.finish_time;
-    // event.eventType = req.body.eventType;
-    // event.eventMode = req.body.eventMode;
-    // event.tags = req.body.tags;
-    // event.poster = req.body.poster;
-    // event.registrationEndTime = req.body.registrationEndTime;
-    event.save(function(err) {
+    await event.save(function(err) {
         if (err) {
             res.status(400).json({
                 status: 'error',
@@ -33,6 +21,7 @@ router.post('/api/events',auth,(req,res)=>{
         eventsMedia.image_data = req.body.image_data;
         eventsMedia.user_id = event._id;
         eventsMedia.type = req.body.type;
+        console.log(eventsMedia);
         // console.log(event._id);
         eventsMedia.save((err) =>{
             if (err) {
@@ -44,16 +33,26 @@ router.post('/api/events',auth,(req,res)=>{
             }
             // console.log()
             Events.updateOne({_id:event._id},{$set:{'posterUrl':eventsMedia._id}}).then((value)=>{
-                res.status(200).json({
-                    status: 'success',
-                    code: 200,
-                    message: 'Event added successfully',
-                    data: event
+                const mes = JSON.stringify({
+                    'id': req.body.user_id,
+                    'message': 'welcome',
+                    'time': Date.now()
+                });
+                console.log(event._id);
+                chatService.createChatForEvent(event._id,mes,(value)=>{
+                    // console.log(value);
+                    
                 })
-            })
-            
-        })
-        
+                
+                
+            })  
+        })  
+    })
+    res.status(200).json({
+        // status: 'success',
+        code: 200,
+        message: 'Event added successfully',
+        // data: event
     })
 });
 
@@ -95,6 +94,49 @@ router.get('/api/event/image',auth,async (req,res)=>{
     }
     
 })
+
+// router.get('/api/img',async (req,res)=>{
+//     try{
+//     var img = await fs.readFileSync("./AppleBadge.png");
+//     var encode_image = await img.toString('base64');
+//     // console.log(encode_image);
+//     var finalImg = {
+//         contentType: 'image/png',
+//         image:  new Buffer(encode_image, 'base64')
+//     };
+//     res.contentType('image/png');
+//     console.log(finalImg.image.buffer)
+    
+//    res.send(`<img src=${encode_image}>`)
+// }
+//    catch (error) {
+//     console.log(error);
+//     res.status(400).json({ error: error.message })
+// }
+// })
+
+// router.get('/api/image',async (req,res)=>{
+//     try{
+//         console.log(req.query.id);
+//         const image = await EventsMedia.findOne({_id: req.query.id});
+//     //     var img = await fs.readFileSync("/Users/lalithreddy/React Apps/ellipse-web-server/AppleBadge.png");
+//     // var encode_image = await img.toString('base64');
+//     // console.log(encode_image);
+//         // fs.writeFileSync("./example.jpg", image.image_data);
+//         console.log(image.type);
+//         // res.contentType('image/jpeg');
+//         const i =  image.type + ","+image.image_data;
+//         // console.log(i);
+//         // console.log(i.buffer)
+//         res.send(i);
+//         // res.status(200).json(image.image_data); 
+//     }
+//     catch (error) {
+//         console.log(error);
+//         res.status(400).json({ error: error.message })
+//     }
+    
+// })
 
 router.post('/api/updateevent',auth, async (req,res)=>{
     try{
