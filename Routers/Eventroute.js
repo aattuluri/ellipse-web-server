@@ -1,14 +1,17 @@
 const express = require('express');
+var Mongoose = require('mongoose');
 const auth = require('../Middleware/Auth');
 const router = express.Router();
 const Events = require('../Models/Events');
 const { json } = require('body-parser');
 const EventsMedia = require('../Models/EventsMedia');
 const chatService = require('../Chat/ChatService');
-var fs = require('fs');
+const Files = require('../Models/Files');
+const md5 = require('md5');
+// console.log(md5(Date.now()))
 router.post('/api/events',auth,async(req,res)=>{
-    let event = new Events(req.body);
-    let eventsMedia = new EventsMedia();
+    const event = new Events(req.body);
+    const user = req.user;
     await event.save(function(err) {
         if (err) {
             res.status(400).json({
@@ -16,45 +19,66 @@ router.post('/api/events',auth,async(req,res)=>{
                 code: 500,
                 message: err
             })
-        }
+        }      
+        const mes = JSON.stringify({
+            'id': req.body.user_id,
+            'message': 'welcome',
+            'time': Date.now()
+        });
+        chatService.createChatForEvent(event._id,mes,(value)=>{
+            res.status(200).json({
+                status: 'success',
+                code: 200,
+                message: 'Event added successfully',
+                eventId: event._id
+            })
+        })
         
-        eventsMedia.image_data = req.body.image_data;
-        eventsMedia.user_id = event._id;
-        eventsMedia.type = req.body.type;
-        console.log(eventsMedia);
-        // console.log(event._id);
-        eventsMedia.save((err) =>{
-            if (err) {
-                res.status(400).json({
-                    status: 'error',
-                    code: 500,
-                    message: err
-                })
-            }
-            // console.log()
-            Events.updateOne({_id:event._id},{$set:{'posterUrl':eventsMedia._id}}).then((value)=>{
-                const mes = JSON.stringify({
-                    'id': req.body.user_id,
-                    'message': 'welcome',
-                    'time': Date.now()
-                });
-                console.log(event._id);
-                chatService.createChatForEvent(event._id,mes,(value)=>{
-                    // console.log(value);
-                    
-                })
-                
-                
-            })  
-        })  
     })
-    res.status(200).json({
-        // status: 'success',
-        code: 200,
-        message: 'Event added successfully',
-        // data: event
-    })
+    
 });
+
+router.post('/api/event/uploadimage',auth,(req,res)=>{
+    const user = req.user;
+    const {eventId} = req.body
+    const fileName = eventId + md5(Date.now())  
+    console.log(eventId);
+    Files.saveFile (req.files.image,fileName, user._id, function (err, result) {
+        if (!err) {
+            console.log("aaxd")
+            Events.updateOne({_id:eventId},{$set:{'posterUrl':fileName}}).then((value)=>{
+                res.status(200).json({
+                    status: 'success',
+                    code: 200,
+                    message: 'image added successfully',
+                })
+            }) 
+        }
+        else{
+            res.status(400).json({
+                status: 'error',
+                code: 500,
+                message: err
+            })
+        }
+      });  
+})
+
+router.get('/api/image',(req,res)=>{
+    try{
+        Files.getFile (req.query.id, res,function (err, result) {
+            if (!err) {
+                //Do Nothing
+            }
+            console.log(err);
+            res.send(new Error("Failed to find a file."));
+          });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+});
+
 
 router.get('/api/events',auth,(req,res)=>{
     Events.get((err, event) => {
@@ -83,17 +107,17 @@ router.get('/api/event',auth,async (req,res)=>{
     
 })
 
-router.get('/api/event/image',auth,async (req,res)=>{
-    try{
-        console.log(req.query.id);
-        const image = await EventsMedia.findOne({_id: req.query.id});
-        res.status(200).json({image}); 
-    }
-    catch (error) {
-        res.status(400).json({ error: error.message })
-    }
+// router.get('/api/event/image',auth,async (req,res)=>{
+//     try{
+//         console.log(req.query.id);
+//         const image = await EventsMedia.findOne({_id: req.query.id});
+//         res.status(200).json({image}); 
+//     }
+//     catch (error) {
+//         res.status(400).json({ error: error.message })
+//     }
     
-})
+// })
 
 // router.get('/api/img',async (req,res)=>{
 //     try{

@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
+const fileUpload = require('express-fileupload');
 // const redis = require("redis");
 const authRouter = require('./Routers/Authroute');
 const eventRouter = require('./Routers/Eventroute');
@@ -14,6 +15,7 @@ const socketIO = require("socket.io");
 const http = require("http");
 const chatService = require('./Chat/ChatService');
 const app = express();
+app.use(fileUpload());
 app.use(cors());
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,7 +31,7 @@ const server = http.createServer(app);
 const io = socketIO(server);
 
 io.on("connection", socket => {
-    console.log("started")
+    // console.log("started")
     socket.on("initialdata", () => {
         console.log("hello");
       });
