@@ -2,8 +2,12 @@
 // var redisClient = require('redis-connection')
 const redis = require("redis");
 const redisClient = redis.createClient();
+redisClient.on('connect',()=>{
+  console.log("connected")
+})
 
 function createChatForEvent(eventId,message,cb){
+  console.log(eventId);
   redisClient.LPUSH(eventId+":messages",message,cb);
 }
 function getChatMessages(chatId,callback){
