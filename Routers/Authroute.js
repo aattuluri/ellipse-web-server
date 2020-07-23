@@ -7,9 +7,11 @@ const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
 const UserDetails = require('../Models/UserDetails');
-const collegeController = require('./collegeController')
+const collegeController = require('./collegeController');
 var Grid = require('gridfs-stream');
 const { route } = require('./ChatRoute');
+const Files = require('../Models/Files');
+const md5 = require('md5');
 // const ProfilePics = require('../Models/ProfilePics');
 
 
@@ -174,15 +176,14 @@ router.post('/api/users/login', async(req, res) => {
 })
 router.post('/api/users/userdetails',auth,async (req,res)=>{
     try{
-        const {imageUrl,gender,collegeName,collegeId,designation,bio} = req.body;
+        const {gender,collegeName,collegeId,designation,bio} = req.body;
         const user = await req.user;
         // console.log(user);
         console.log(collegeName);
-        console.log(imageUrl);
-        UserDetails.update({email: user.email},{$set:{
+        // console.log(imageUrl);
+        UserDetails.updateOne({email: user.email},{$set:{
             'userid': user._id,
             'bio': bio,
-            'imageUrl': imageUrl,
             'name': user.name,
             'gender': gender,
             'collegeName': collegeName,
@@ -191,10 +192,11 @@ router.post('/api/users/userdetails',auth,async (req,res)=>{
             
         }).then(val =>{
             // console.log(val);
-            UserDetails.findOne({email: user.email}).then(userDetails =>{
-                // console.log(userDetails);
-                res.status(200).json({userDetails});
-            })
+            res.status(200).json({message: "success"});
+            // UserDetails.findOne({email: user.email}).then(userDetails =>{
+            //     // console.log(userDetails);
+                
+            // })
             
         })
         
@@ -202,6 +204,33 @@ router.post('/api/users/userdetails',auth,async (req,res)=>{
     catch(err){
         res.status(400).json({ error: err.message }) 
     }
+})
+router.post('/api/users/uploadimage', auth, (req, res) => {
+    const user = req.user;
+    // const eventId = req.query.id;
+    console.log(user._id)
+    const fileName = user._id + md5(Date.now())
+    // console.log(eventId);
+    Files.saveFile(req.files.image, fileName, user._id,"userprofilepic", function (err, result) {
+        if (!err) {
+            console.log("aaxd")
+            UserDetails.updateOne({ userid: user._id  }, { $set: { 'imageUrl': fileName } }).then((value) => {
+                console.log("done");
+                res.status(200).json({
+                    status: 'success',
+                    code: 200,
+                    message: 'image added successfully',
+                })
+            })
+        }
+        else {
+            res.status(400).json({
+                status: 'error',
+                code: 500,
+                message: err
+            })
+        }
+    });
 })
 
 // router.post('/api/users/userdetails2',auth,(req,res)=>{

@@ -36,7 +36,7 @@ async function getFileById(fileId, res, cb) {
 }
 
 
-async function saveFile(rs,fileName,userId, cb) {
+async function saveFile(rs,fileName,userId,purpose, cb) {
 
     // var filename = Shortid.generate();
     var contentType = rs.mimetype;
@@ -45,7 +45,7 @@ async function saveFile(rs,fileName,userId, cb) {
     bufferStream.end(Buffer.from(rs.data));
 
     var ws = await gridFSBucket.openUploadStream(fileName,
-        { "metadata": { "contentType": contentType, "origFilename": origFilename, "userId": userId } });
+        { "metadata": { "contentType": contentType, "origFilename": origFilename, "userId": userId,"purpose": purpose } });
     await bufferStream.pipe(ws).on('error', function (error) {
         cb(error, {"message": "fail"});
     }).

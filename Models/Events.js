@@ -43,7 +43,7 @@ let eventShema = mongoose.Schema({
         required: true
     },
     fees: {
-        type: Number,
+        type: String,
         // required: true,
     },
     registrationEndTime: {
@@ -68,6 +68,15 @@ let eventShema = mongoose.Schema({
     },
     college: {
         type: String,
+    },
+    regFields: {
+        type: Array
+    },
+    regMode: {
+        type: String
+    },
+    participantsType:{
+        type: String
     }
 
 });
