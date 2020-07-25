@@ -261,7 +261,8 @@ router.get('/api/users/me', auth, async(req, res) => {
         console.log(user.email);
        const userDetails = await UserDetails.findOne({email:user.email})
        console.log(userDetails);
-       res.status(200).json(userDetails);
+       var list =[userDetails];
+       res.status(200).json(list);
     }
     catch (err) {
         res.status(400).json({ error: err.message })
