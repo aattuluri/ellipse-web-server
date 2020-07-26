@@ -32,22 +32,50 @@ const PORT = process.env.PORT || 4000;
 const server = http.createServer(app);
 const webSocketServer = new webSocket.Server({server});
 webSocketServer.on('connection',(client)=>{
-    // console.log(client);
-    // console.log("connected")
-    // client.on("initial_data",()=>{
-    //     console.log("hello");
-    // })
-     client.send(JSON.stringify({
-       "event_id": "5f1523f48bc4f93304e90aa2",
-       "sender_id": "2357",
-       "message": "Welcome to Ellipse"
-    }));
-    client.on('message',mes =>{
-        
-        console.log(JSON.parse(mes));
+    // client.room = [];
+    client.send(JSON.stringify({msg:"user joined"}));
+    client.on('message',message =>{
+        var messag=JSON.parse(message);
+        const roomId = messag.room;
+        const data = messag.msg;
+        if(messag.join){
+            // console.log(messag.join);
+            // client.room.push(messag.join)
+        }
+        if(messag.room){
+            console.log("message")
+            chatService.addChatMessage(roomId,JSON.stringify(data),(value)=>{
+                console.log("done");
+            })
+            broadcast(message);
+            
+
+        }
+        // console.log(JSON.parse(mes));
+        client.on('error',e=>console.log(e))
+        client.on('close',(e)=>console.log('websocket closed'+e))
     })
-    // client.send("hello")
+
 })
+function broadcast(message){
+
+    webSocketServer.clients.forEach(client=>{
+        // console.log(client);
+    client.send(message)
+    })
+}
+
+
+app.use(authRouter);
+app.use(eventRouter);
+app.use(chatRouter);
+app.use(registerRouter);
+server.listen(PORT, (req, res) => {
+    console.log(`Server Started at PORT ${PORT}`);
+});
+
+//code for socket.io
+
 // const io = socketIO(server);
 
 // io.on("connection", socket => {
@@ -62,20 +90,9 @@ webSocketServer.on('connection',(client)=>{
 //       })
 //       socket.on("newmessage",(roomid,data)=>{
 //           console.log(data);
-//         chatService.addChatMessage(roomid,JSON.stringify(data),(value)=>{
-//             console.log("done");
-//         })
+        // chatService.addChatMessage(roomid,JSON.stringify(data),(value)=>{
+        //     console.log("done");
+        // })
 //         io.to(roomid+":room").emit("message",data) 
 //       })
 // })
-
-app.use(authRouter);
-app.use(eventRouter);
-app.use(chatRouter);
-app.use(registerRouter);
-server.listen(PORT, (req, res) => {
-    console.log(`Server Started at PORT ${PORT}`);
-});
-
-
-

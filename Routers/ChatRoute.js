@@ -10,11 +10,11 @@ router.post('/api/chat/create',auth,(req,res)=>{
 });
 
 router.get('/api/chat/getMessages',(req,res)=>{
-    const mes = JSON.stringify({
-        'id': "5f0ed73d9633fe43bddac78f",
-        'message': 'welcome',
-        'time': Date.now()
-    });
+    // const mes = JSON.stringify({
+    //     'id': "5f0ed73d9633fe43bddac78f",
+    //     'message': 'welcome',
+    //     'time': Date.now()
+    // });
     // chatService.createChatForEvent(req.query.id,mes,(value)=>{
     //     // console.log(value);
         
