@@ -3,7 +3,11 @@
 const redis = require("redis");
 const redisClient = redis.createClient();
 redisClient.on('connect',()=>{
-  console.log("connected")
+  console.log("rdis client connected")
+})
+
+redisClient.on('error',(err)=>{
+  console.log(err);
 })
 
 function createChatForEvent(eventId,message,cb){
