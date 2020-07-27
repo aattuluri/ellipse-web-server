@@ -56,7 +56,7 @@ router.post('/api/users/sendverificationemail',auth,async (req,res)=>{
         const user = await UserLogin.findOne({email:email});
         const msg = {
             to: email,
-            from: 'nani.punepalli@gmail.com', // Use the email address or domain you verified above
+            from: 'support@ellipseapp.com', // Use the email address or domain you verified above
             subject: 'Ellipse OTP Authentication',
             text: `${otp}`,
             html: `<h1>your otp is ${otp}</h1>`,
@@ -322,7 +322,7 @@ router.post('/api/users/check_fill',auth, async (req, res) => {
     try {
         const colleges = await Colleges.findOne({ _id: req.body.college })
         const cname =colleges.name
-        UserDetails.updateOne({ 'userid': req.body.id }, { $set: { 'collegeId': req.body.college,'collegeName':cname, 'imageUrl': req.body.image_url } }).then((val)=>{
+        UserDetails.updateOne({ 'userid': req.body.id }, { $set: { 'collegeId': req.body.college,'collegeName':cname, 'imageUrl': req.body.image_url,'bio': req.body.bio,'designation': req.body.designation } }).then((val)=>{
             console.log(val);
         })
 

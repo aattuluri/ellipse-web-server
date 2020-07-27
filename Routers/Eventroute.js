@@ -38,6 +38,45 @@ router.post('/api/events', auth, async (req, res) => {
 
 });
 
+router.post('/api/post_event', auth, async (req, res) => {
+    let event = new Events()
+    event.posterUrl = req.body.posterUrl
+    event.user_id = req.body.user_id
+    event.college = req.body.college
+    event.name = req.body.name
+    event.description = req.body.description
+    event.about = req.body.description
+    event.eventType = req.body.eventType
+    event.eventMode = req.body.eventMode
+    event.feesType = req.body.feesType
+    event.addressType = req.body.addressType
+    event.fees = req.body.fees
+    //event.platform_link = req.body.platform_link
+    event.o_allowed = req.body.o_allowed
+    event.start_time = req.body.start_time
+    event.finish_time = req.body.finish_time
+    event.registrationEndTime = req.body.registrationEndTime
+    event.regLink = req.body.regLink
+    event.save(function (err) {
+        if (err) {
+            res.json({
+                status: 'error',
+                code: 500,
+                message: err
+            })
+        }
+        res.json({
+            status: 'success',
+            code: 200,
+            message: 'added event successfully',
+            eventId: event._id
+        })
+    })
+});
+
+
+
+
 router.post('/api/event/uploadimage', auth, (req, res) => {
     const user = req.user;
     const eventId = req.query.id;

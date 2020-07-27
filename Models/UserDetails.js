@@ -7,7 +7,7 @@ var otpGenerator = require("otp-generator");
 const userSchema = mongoose.Schema({
     name: {
         type: String,
-        required: true,
+        // required: true,
         trim: true
     },
     email: {
@@ -21,7 +21,7 @@ const userSchema = mongoose.Schema({
     },
     username:{
         type: String,
-        
+        default: null
     },
     phno: {
         type: String,
