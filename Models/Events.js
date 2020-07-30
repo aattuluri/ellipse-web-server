@@ -1,4 +1,5 @@
 let mongoose = require('mongoose');
+const { bool } = require('sharp');
 
 let eventShema = mongoose.Schema({
     user_id: {
@@ -77,6 +78,9 @@ let eventShema = mongoose.Schema({
     },
     participantsType:{
         type: String
+    },
+    registered: {
+        type: bool,
     }
 
 });

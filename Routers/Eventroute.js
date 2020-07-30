@@ -4,11 +4,15 @@ const auth = require('../Middleware/Auth');
 const router = express.Router();
 const Events = require('../Models/Events');
 const { json } = require('body-parser');
-const EventsMedia = require('../Models/EventsMedia');
+// const EventsMedia = require('../Models/EventsMedia');
 const chatService = require('../Chat/ChatService');
 const Files = require('../Models/Files');
 const md5 = require('md5');
-// console.log(md5(Date.now()))
+const Registration = require('../Models/Registrations');
+const e = require('express');
+
+
+
 router.post('/api/events', auth, async (req, res) => {
     const event = new Events(req.body);
     const user = req.user;
@@ -26,12 +30,12 @@ router.post('/api/events', auth, async (req, res) => {
             'time': Date.now()
         });
         // chatService.createChatForEvent(event._id, mes, (value) => {
-            res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: 'Event added successfully',
-                eventId: event._id
-            })
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: 'Event added successfully',
+            eventId: event._id
+        })
         // })
 
     })
@@ -82,7 +86,7 @@ router.post('/api/event/uploadimage', auth, (req, res) => {
     const eventId = req.query.id;
     const fileName = eventId + md5(Date.now())
     // console.log(eventId);
-    Files.saveFile(req.files.image, fileName, user._id,"eventposter", function (err, result) {
+    Files.saveFile(req.files.image, fileName, user._id, "eventposter", function (err, result) {
         if (!err) {
             console.log("aaxd")
             Events.updateOne({ _id: eventId }, { $set: { 'posterUrl': fileName } }).then((value) => {
@@ -120,19 +124,40 @@ router.get('/api/image', (req, res) => {
 
 
 router.get('/api/events', auth, (req, res) => {
-    Events.get((err, event) => {
-        if (err) {
-            res.json({
-                status: 'error',
-                code: 500,
-                message: err
-            });
-        }
-        // event.forEach(e => {
-        //     e.posterUrl = ""
-        // });
-        res.json(event)
-    })
+    const user = req.user;
+    try {
+        Events.get((err, events) => {
+            if (err) {
+                res.json({
+                    status: 'error',
+                    code: 500,
+                    message: err
+                });
+            }
+            events.forEach((e,index,array) => {
+                Registration.findOne({ user_id: user._id, event_id: e._id }).then(value => {
+                    // console.log(value);
+                    if (value != null) {
+                        e.registered = true; 
+                    }
+                    else{
+                        e.registered = false;
+                    }
+                    if(index == array.length - 1){
+                        res.status(200).json(events)
+                    }
+
+                })
+
+            })
+
+
+        })
+    }
+    catch (error) {
+        res.status(400).json({ 'error': error });
+    }
+
 });
 
 router.get('/api/event', auth, async (req, res) => {
@@ -164,7 +189,8 @@ router.post('/api/updateevent', auth, async (req, res) => {
                 'fees': req.body.fees,
                 'about': req.body.about,
                 'feesType': req.body.feesType,
-                'college': req.body.college
+                'college': req.body.college,
+                'participantsType': req.body.participantsType
             }
         }).then(value => {
             Events.findOne({ _id: eId }).then(event => {

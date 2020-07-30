@@ -176,18 +176,21 @@ router.post('/api/users/login', async(req, res) => {
 })
 router.post('/api/users/userdetails',auth,async (req,res)=>{
     try{
-        const {gender,collegeName,collegeId,designation,bio} = req.body;
+        const {gender,collegeId,designation,bio} = req.body;
         const user = await req.user;
         // console.log(user);
-        console.log(collegeName);
+        // console.log(collegeName);
         // console.log(imageUrl);
+        console.log(collegeId);
+        const college = await Colleges.findOne({ _id: collegeId })
         UserDetails.updateOne({email: user.email},{$set:{
             'userid': user._id,
             'bio': bio,
             'name': user.name,
             'gender': gender,
-            'collegeName': collegeName,
-            'designation': designation
+            'collegeName': college.name,
+            'designation': designation,
+            'collegeId': collegeId
         }
             
         }).then(val =>{
