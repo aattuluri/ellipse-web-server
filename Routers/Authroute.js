@@ -303,7 +303,7 @@ router.post('/api/users/logout', auth, async (req, res) => {
 // })
 
 
-router.post('/api/users/check',auth, async (req, res) => {
+router.post('/api/users/check', auth, async (req, res) => {
     try {
         const userdetails = await UserDetails.findOne({ user_id: req.body.id })
         if (!userdetails) {
@@ -315,9 +315,12 @@ router.post('/api/users/check',auth, async (req, res) => {
         if (userdetails.college_id == null || userdetails.profile_pic == null) {
             return res.status(402).send("empty");
         }
-        
+
         if (userdetails.college_id != null && userdetails.profile_pic != null && userdetails.verified != false) {
-            return res.status(403).send("empty");
+            const user = req.user;
+            const userDetails = await UserDetails.findOne({ email: user.email })
+            const college_id=userDetails.college_id
+            return res.status(403).send(college_id);
         }
         console.log("Checked")
 
@@ -326,6 +329,9 @@ router.post('/api/users/check',auth, async (req, res) => {
         res.status(500).send('There was a problem in check');
     }
 })
+
+
+
 router.post('/api/users/check_fill',auth, async (req, res) => {
     try {
         const colleges = await Colleges.findOne({ _id: req.body.college })
@@ -368,7 +374,7 @@ router.post('/api/users/emailverify',auth, async (req, res) => {
         } else {
             const msg = {
                 to: email,
-                from: 'nani.punepalli@gmail.com', // Use the email address or domain you verified above
+                from: 'support@ellipseapp.com', // Use the email address or domain you verified above
                 subject: 'OTP to verify your mail',
                 text: `${otp}`,
                 html: `<h1>your otp is ${otp}</h1>`,
