@@ -11,8 +11,8 @@ const registerRouter = require('./Routers/RegistrationRoute');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./Models/User');
-const auth = require('./Middleware/Auth');
-const socketIO = require("socket.io");
+// const auth = require('./Middleware/Auth');
+// const socketIO = require("socket.io");
 const webSocket = require("ws");
 const http = require("http");
 const chatService = require('./Chat/ChatService');
@@ -30,40 +30,32 @@ mongoose.connect(process.env.MONGODB_URL, {
 
 const PORT = process.env.PORT || 4000;
 const server = http.createServer(app);
-const webSocketServer = new webSocket.Server({server});
-webSocketServer.on('connection',(client)=>{
+const webSocketServer = new webSocket.Server({ server });
+webSocketServer.on('connection', (webSocketClient) => {
     // client.room = [];
-    client.send(JSON.stringify({msg:"user joined"}));
-    client.on('message',message =>{
-        var messag=JSON.parse(message);
-        const roomId = messag.room;
-        const data = messag.msg;
-        if(messag.join){
-            // console.log(messag.join);
-            // client.room.push(messag.join)
-        }
-        if(messag.room){
-            console.log("message")
-            chatService.addChatMessage(roomId,JSON.stringify(data),(value)=>{
-                console.log("done");
-            })
-            broadcast(message);
-            
+    webSocketClient.on('message', (message) => {
+        console.log(message)
+        let data = JSON.parse(message);
+        console.log(data);
+        chatService.addChatMessage(data.event_id,JSON.stringify(data.msg),(value)=>{
+            console.log("done");
+        })
+        switch (data.action) {
+            case 'send_message':
+                webSocketServer
+                    .clients
+                    .forEach(client => {
+                        client.send(JSON.stringify({
+                            action: "receive_message",
+                            event_id: data.event_id,
+                            msg: data.msg
+                        }))
 
+                    });
+                break;
         }
-        // console.log(JSON.parse(mes));
-        client.on('error',e=>console.log(e))
-        client.on('close',(e)=>console.log('websocket closed'+e))
-    })
-
+    });
 })
-function broadcast(message){
-
-    webSocketServer.clients.forEach(client=>{
-        // console.log(client);
-    client.send(message)
-    })
-}
 
 
 app.use(authRouter);
@@ -73,6 +65,21 @@ app.use(registerRouter);
 server.listen(PORT, (req, res) => {
     console.log(`Server Started at PORT ${PORT}`);
 });
+
+
+
+// client.send(JSON.stringify({
+                        //     "action": "receive_message",
+                        //     "sender_type": data.sender_type,
+                        //     "event_id": data.event_id,
+                        //     "sender_id": data.sender_id,
+                        //     "message": data.message,
+                        //     "time": data.time
+                        // }));
+
+
+
+
 
 //code for socket.io
 

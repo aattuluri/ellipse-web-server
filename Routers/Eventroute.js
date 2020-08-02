@@ -4,17 +4,70 @@ const auth = require('../Middleware/Auth');
 const router = express.Router();
 const Events = require('../Models/Events');
 const { json } = require('body-parser');
-// const EventsMedia = require('../Models/EventsMedia');
-const chatService = require('../Chat/ChatService');
+// const chatService = require('../Chat/ChatService');
 const Files = require('../Models/Files');
 const md5 = require('md5');
 const Registration = require('../Models/Registrations');
 const e = require('express');
+const Colleges = require('../Models/CollegeModel');
+const Announcement = require('../Models/Announcements');
+
+
+//Adding the announcement
+router.post('/api/event/add_announcement',auth,async (req,res)=>{
+    try{
+        // const event_id = req.query.id;
+        const announcement = new Announcement();
+        announcement.event_id = req.body.event_id;
+        announcement.title = req.body.title;
+        announcement.description = req.body.description
+        announcement.visible_all = req.body.visible_all
+        await announcement.save((err)=>{
+            if(err){
+                res.status(400).json({
+                    status: 'error',
+                    code: 500,
+                    message: err
+                })
+            }
+            res.status(200).json({
+                status: 'success',
+                code: 200,
+                message: 'Added successfully',
+
+            })
+
+        })
+    }catch(error){
+        res.status(400).json({
+            status: 'error',
+            code: 500,
+            message: error.message
+        })
+    }
+})
+
+//Retrieving announcements for a event
+router.get('/api/event/get_announcements', auth, (req, res) => {
+    try {
+
+        Announcement.find({ event_id: req.query.id }).then((result) => {
+            res.status(200).json(result);
+        })
+    }
+    catch (error) {
+        res.status(400).json({ 'error': error })
+    }
+
+})
 
 
 
 router.post('/api/events', auth, async (req, res) => {
+    try{
     const event = new Events(req.body);
+    const college = await Colleges.findOne({ name: req.body.college_name });
+    event.college_id = college._id;
     const user = req.user;
     await event.save(function (err) {
         if (err) {
@@ -24,43 +77,42 @@ router.post('/api/events', auth, async (req, res) => {
                 message: err
             })
         }
-        const mes = JSON.stringify({
-            'id': req.body.user_id,
-            'message': 'welcome',
-            'time': Date.now()
-        });
-        // chatService.createChatForEvent(event._id, mes, (value) => {
+        
         res.status(200).json({
             status: 'success',
             code: 200,
             message: 'Event added successfully',
             eventId: event._id
         })
-        // })
 
     })
+}catch (error) {
+    res.status(400).json({ error: error.message })
+}
 
 });
 
 router.post('/api/post_event', auth, async (req, res) => {
     let event = new Events()
-    event.posterUrl = req.body.posterUrl
+    const college = await Colleges.findOne({ name: req.body.college });
+    event.poster_url = req.body.posterUrl
     event.user_id = req.body.user_id
     event.college = req.body.college
     event.name = req.body.name
     event.description = req.body.description
     event.about = req.body.description
-    event.eventType = req.body.eventType
-    event.eventMode = req.body.eventMode
-    event.feesType = req.body.feesType
-    event.addressType = req.body.addressType
-    event.fees = req.body.fees
-    //event.platform_link = req.body.platform_link
+    event.event_type = req.body.eventType
+    event.event_mode = req.body.eventMode
+    event.fee_type = req.body.feesType
+    event.venue_type = req.body.addressType
+    event.fee = req.body.fees
     event.o_allowed = req.body.o_allowed
     event.start_time = req.body.start_time
     event.finish_time = req.body.finish_time
-    event.registrationEndTime = req.body.registrationEndTime
-    event.regLink = req.body.regLink
+    event.registration_end_time = req.body.registrationEndTime
+    event.reg_link = req.body.regLink
+    event.college_id = college._id
+    event.venue = req.body.venue
     event.save(function (err) {
         if (err) {
             res.json({
@@ -89,7 +141,7 @@ router.post('/api/event/uploadimage', auth, (req, res) => {
     Files.saveFile(req.files.image, fileName, user._id, "eventposter", function (err, result) {
         if (!err) {
             console.log("aaxd")
-            Events.updateOne({ _id: eventId }, { $set: { 'posterUrl': fileName } }).then((value) => {
+            Events.updateOne({ _id: eventId }, { $set: { 'poster_url': fileName } }).then((value) => {
                 res.status(200).json({
                     status: 'success',
                     code: 200,
@@ -182,15 +234,15 @@ router.post('/api/updateevent', auth, async (req, res) => {
                 'description': req.body.description,
                 'start_time': req.body.start_time,
                 'finish_time': req.body.finish_time,
-                'registrationEndTime': req.body.registrationEndTime,
-                'eventMode': req.body.eventMode,
-                'eventType': req.body.eventType,
-                'regLink': req.body.regLink,
-                'fees': req.body.fees,
+                'registration_end_time': req.body.registrationEndTime,
+                'event_mode': req.body.eventMode,
+                'event_type': req.body.eventType,
+                'reg_link': req.body.regLink,
+                'fee': req.body.fees,
                 'about': req.body.about,
-                'feesType': req.body.feesType,
+                'fee_type': req.body.feesType,
                 'college': req.body.college,
-                'participantsType': req.body.participantsType
+                'o_allowed': req.body.participantsType
             }
         }).then(value => {
             Events.findOne({ _id: eId }).then(event => {
@@ -202,6 +254,7 @@ router.post('/api/updateevent', auth, async (req, res) => {
         res.status(400).json({ error: error.message })
     }
 })
+
 
 module.exports = router
 

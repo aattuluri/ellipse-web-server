@@ -37,7 +37,7 @@ const userSchema = mongoose.Schema({
             required: true
         }
     }],
-    signupTime: {
+    signup_time: {
         type: String,
         default: Date.now
     },
@@ -45,7 +45,7 @@ const userSchema = mongoose.Schema({
         type: Number,
         default: null
     },
-    isVerified: {
+    is_verified: {
         type: Boolean,
         default: false
     },

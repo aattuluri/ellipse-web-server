@@ -15,7 +15,7 @@ const userSchema = mongoose.Schema({
         required: true,
         
     },
-    userid: {
+    user_id: {
         type: String,
         default: null
     },
@@ -23,15 +23,15 @@ const userSchema = mongoose.Schema({
         type: String,
         default: null
     },
-    phno: {
+    phone_no: {
         type: String,
         default: null
     },
-    collegeId:{
+    college_id:{
         type: String,
         default: null
     },
-    collegeName: {
+    college_name: {
         type: String,
         default: null
     },
@@ -43,7 +43,7 @@ const userSchema = mongoose.Schema({
         type: String,
         default: null
     },
-    imageUrl: {
+    profile_pic: {
         type: String,
         default: null
     },
@@ -54,7 +54,6 @@ const userSchema = mongoose.Schema({
     lastseen: {
         type: String,
         default: Date.now,
-        default: null
     },
     designation: {
         type: String,

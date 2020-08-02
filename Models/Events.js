@@ -4,81 +4,119 @@ const { bool } = require('sharp');
 let eventShema = mongoose.Schema({
     user_id: {
         type: String,
-        required: true,
+        default: null
+        // required: true,
     },
     name: {
         type: String,
-        required: true,
+        default: null,
+        // required: true,
     },
     description: {
         type: String,
-        required: true,
+        default: null
+        // required: true,
     },
     start_time: {
         type: Date,
-        required: true,
+        default: null
+        // required: true,
     },
     finish_time: {
         type: Date,
-        required: true,
+        default: null
+        // required: true,
     },
-    eventType: {
+    event_type: {
         type: String,
-        required: true
+        default: null
+        // required: true
     },
-    eventMode: {
+    //Online,Offline
+    event_mode: {
         type: String,
-        required: true
+        default: null
+        // required: true
     },
     tags: {
         type: Array,
+        default: null
     },
     o_allowed: {
-        type: String,
+        type: bool,
+        default: null
     },
-    posterUrl: {
+    poster_url: {
         type: String,
+        default: null
     },
-    feesType:{
+    fee_type:{
         type: String,
-        required: true
+        default: null
+        // required: true
     },
-    fees: {
+    fee: {
         type: String,
+        default: null
         // required: true,
     },
-    registrationEndTime: {
+    registration_end_time: {
         type: Date,
-        required: true
+        default: null
+        // required: true
     },
-    regLink: {
-        type: String
-    },
-    organizer: {
+    reg_link: {
         type: String,
+        default: null
+    },
+    moderators: {
+        type: Array,
+        default: null
     },
     about: {
         type: String,
-        required: true
+        // required: true,
+        default: null
     },
     requirements: {
         type: Array,
+        default: null
     },
-    addressType: {
+    // college,other
+    venue_type: {
         type: String,
+        default: null
     },
-    college: {
+    venue: {
         type: String,
+        default: null
     },
-    regFields: {
-        type: Array
+    venue_college: {
+        type: String,
+        default: null
     },
-    regMode: {
-        type: String
+    college_id: {
+        type: String,
+        default: null
     },
-    participantsType:{
-        type: String
+    college_name: {
+        type: String,
+        default: null
     },
+    //title,field,options  
+    //short_text,long_desc,dropdown,date,checkbox,radiobutton,date,link
+    reg_fields: {
+        type: Array,
+        default: null
+    },
+    //link,form
+    reg_mode: {
+        type: String,
+        default: null
+    },
+    // participants_type:{
+    //     type: String
+    // },
     registered: {
         type: bool,
     }

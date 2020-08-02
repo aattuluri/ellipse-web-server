@@ -7,7 +7,7 @@ const Events = require('../Models/Events');
 const Registration = require('../Models/Registrations');
 
 
-
+//register the event
 
 router.post('/api/event/register', auth, async (req, res) => {
     try {
@@ -36,14 +36,30 @@ router.post('/api/event/register', auth, async (req, res) => {
 
 });
 
+
+
+//get all registered events for a user
+router.get('/api/user/registeredEvents', auth, (req, res) => {
+    try {
+        const user = req.user;
+        Registration.find({ user_id: req.query.id }).then((result) => {
+            res.status(200).json(result);
+        })
+    }
+    catch (error) {
+        res.status(400).json({ 'error': error })
+    }
+
+})
+
+
+
+// get all registration for the event with event id
 router.get('/api/event/registeredEvents', auth, (req, res) => {
     try {
         const user = req.user;
-        console.log("skmc")
         console.log(req.query.id);
-        // userid = "5f19663a44165e1d501bf9c9"
         Registration.find({ event_id: req.query.id }).then((result) => {
-            // console.log(result);
             res.status(200).json(result);
         })
     }

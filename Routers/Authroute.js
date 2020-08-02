@@ -29,7 +29,7 @@ router.post('/api/users/signup', async (req, res) => {
             await user.save()
             const token = await user.generateAuthToken()
             const userDetails = new UserDetails({
-                'userid': user._id,
+                'user_id': user._id,
                 'username': user.username,
             'email': user.email,
             'name': user.name,
@@ -89,7 +89,7 @@ router.post('/api/users/verifyotp',auth, async (req,res)=>{
             UserLogin.update(
                 {'email':user.email},
                 {$set:{
-                    'isVerified': true
+                    'is_verified': true
                 }}).then((val)=>{
                 // console.log(val);
                 UserDetails.update({ 'email':user.email }, { $set: { 'verified': true } }).then((value)=>{
@@ -133,8 +133,8 @@ router.post('/api/users/updatepassword',auth,async(req,res)=>{
 
 router.get('/api/users/getuser',auth,async(req,res)=>{
     try{
-        const userDetails = await UserDetails.findOne({userid:req.query.id})
-        res.send({'name': userDetails.name,'image': userDetails.imageUrl})
+        const userDetails = await UserDetails.findOne({user_id:req.query.id})
+        res.send({'name': userDetails.name,'image': userDetails.profile_pic})
     }
     catch (error) {
         res.status(400).json({ error: error.message })
@@ -166,8 +166,8 @@ router.post('/api/users/login', async(req, res) => {
         // }
         const userid = user._id;
         const useremail = user.email;
-        const isVerified = user.isVerified;
-        res.status(200).json({userid, useremail, token,isVerified})
+        const isVerified = user.is_verified;
+        res.status(200).json({userid, useremail, token,is_verified})
         // res.status(200).json({ user,userDetails, token })
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -176,21 +176,22 @@ router.post('/api/users/login', async(req, res) => {
 })
 router.post('/api/users/userdetails',auth,async (req,res)=>{
     try{
-        const {gender,collegeId,designation,bio} = req.body;
+        const {gender,college_id,designation,bio} = req.body;
         const user = await req.user;
-        // console.log(user);
+        console.log(user);
         // console.log(collegeName);
         // console.log(imageUrl);
-        console.log(collegeId);
-        const college = await Colleges.findOne({ _id: collegeId })
+        console.log(college_id);
+        const college = await Colleges.findOne({ _id: college_id });
+        console.log(college);
         UserDetails.updateOne({email: user.email},{$set:{
-            'userid': user._id,
+            'user_id': user._id,
             'bio': bio,
             'name': user.name,
             'gender': gender,
-            'collegeName': college.name,
+            'college_name': college.name,
             'designation': designation,
-            'collegeId': collegeId
+            'college_id': college_id
         }
             
         }).then(val =>{
@@ -217,7 +218,7 @@ router.post('/api/users/uploadimage', auth, (req, res) => {
     Files.saveFile(req.files.image, fileName, user._id,"userprofilepic", function (err, result) {
         if (!err) {
             console.log("aaxd")
-            UserDetails.updateOne({ userid: user._id  }, { $set: { 'imageUrl': fileName } }).then((value) => {
+            UserDetails.updateOne({ user_id: user._id  }, { $set: { 'profile_pic': fileName } }).then((value) => {
                 console.log("done");
                 res.status(200).json({
                     status: 'success',
@@ -261,9 +262,9 @@ router.get('/api/users/me', auth, async(req, res) => {
     // View logged in user profile
     try{
         const user = req.user;
-        console.log(user.email);
+        // console.log(user.email);
        const userDetails = await UserDetails.findOne({email:user.email})
-       console.log(userDetails);
+    //    console.log(userDetails);
        var list =[userDetails];
        res.status(200).json(list);
     }
@@ -286,32 +287,32 @@ router.post('/api/users/logout', auth, async (req, res) => {
     }
 })
 
-router.post('/api/users/logoutall', auth, async(req, res) => {
-    // Log user out of all devices
-    try {
-        req.user.tokens.splice(0, req.user.tokens.length)
-        await req.user.save()
-        res.send()
-    } catch (error) {
-        res.status(500).send(error.message)
-    }
-})
+// router.post('/api/users/logoutall', auth, async(req, res) => {
+//     // Log user out of all devices
+//     try {
+//         req.user.tokens.splice(0, req.user.tokens.length)
+//         await req.user.save()
+//         res.send()
+//     } catch (error) {
+//         res.status(500).send(error.message)
+//     }
+// })
 
 
 router.post('/api/users/check',auth, async (req, res) => {
     try {
-        const userdetails = await UserDetails.findOne({ userid: req.body.id })
+        const userdetails = await UserDetails.findOne({ user_id: req.body.id })
         if (!userdetails) {
             return res.status(404).send("The user id doesn't exists")
         }
         if (userdetails.verified == false) {
             return res.status(401).send("empty");
         }
-        if (userdetails.collegeId == null || userdetails.imageUrl == null) {
+        if (userdetails.college_id == null || userdetails.profile_pic == null) {
             return res.status(402).send("empty");
         }
         
-        if (userdetails.collegeId != null && userdetails.imageUrl != null && userdetails.verified != false) {
+        if (userdetails.college_id != null && userdetails.profile_pic != null && userdetails.verified != false) {
             return res.status(403).send("empty");
         }
         console.log("Checked")
@@ -325,7 +326,7 @@ router.post('/api/users/check_fill',auth, async (req, res) => {
     try {
         const colleges = await Colleges.findOne({ _id: req.body.college })
         const cname =colleges.name
-        UserDetails.updateOne({ 'userid': req.body.id }, { $set: { 'collegeId': req.body.college,'collegeName':cname, 'imageUrl': req.body.image_url,'bio': req.body.bio,'designation': req.body.designation } }).then((val)=>{
+        UserDetails.updateOne({ 'userid': req.body.id }, { $set: { 'college_id': req.body.college,'college_name':cname, 'profile_pic': req.body.image_url,'bio': req.body.bio,'designation': req.body.designation } }).then((val)=>{
             console.log(val);
         })
 
@@ -398,7 +399,7 @@ router.post('/api/users/emailverified',auth, async (req, res) => {
         await UserLogin.updateOne(
             {'email':user.email},
             {$set:{
-                'isVerified': true
+                'is_verified': true
             }})
         const userdetails = await UserDetails.findOne({ otp: req.body.otp })
         if (!userdetails) {
