@@ -198,7 +198,7 @@ router.get('/api/events', auth, (req, res) => {
                     }
                     finalEvents.push(e);
                     if(index == array.length - 1){
-                        res.status(200).json(events)
+                        res.status(200).json(finalEvents)
                     }
 
                 })
