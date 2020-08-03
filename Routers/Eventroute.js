@@ -177,6 +177,7 @@ router.get('/api/image', (req, res) => {
 
 router.get('/api/events', auth, (req, res) => {
     const user = req.user;
+    const finalEvents = [];
     try {
         Events.get((err, events) => {
             if (err) {
@@ -195,6 +196,7 @@ router.get('/api/events', auth, (req, res) => {
                     else{
                         e.registered = false;
                     }
+                    finalEvents.push(e);
                     if(index == array.length - 1){
                         res.status(200).json(events)
                     }
