@@ -199,13 +199,7 @@ router.post('/api/users/userdetails',auth,async (req,res)=>{
         }
             
         }).then(val =>{
-            // console.log(val);
             res.status(200).json({message: "success"});
-            // UserDetails.findOne({email: user.email}).then(userDetails =>{
-            //     // console.log(userDetails);
-                
-            // })
-            
         })
         
     }
@@ -239,6 +233,35 @@ router.post('/api/users/uploadimage', auth, (req, res) => {
             })
         }
     });
+})
+
+router.post('/api/users/updateprofile',auth,async (req,res)=>{
+    try{
+        const {name,email,username,gender,college_name,designation,bio} = req.body;
+        const user = await req.user;
+        console.log(user);
+        // console.log(collegeName);
+        // console.log(imageUrl);
+        // console.log(college_id);
+        const college = await Colleges.findOne({ name: college_name });
+        console.log(college);
+        UserDetails.updateOne({email: user.email},{$set:{
+            'bio': bio,
+            'name': name,
+            'username': username,
+            'gender': gender,
+            'college_name': college_name,
+            'designation': designation,
+            'college_id': college._id,
+        }
+            
+        }).then(val =>{
+            res.status(200).json({message: "success"});
+        })
+    }
+    catch(err){
+        res.status(400).json({ error: err.message }) 
+    }
 })
 
 // router.post('/api/users/userdetails2',auth,(req,res)=>{

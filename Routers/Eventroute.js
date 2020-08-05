@@ -240,15 +240,15 @@ router.post('/api/updateevent', auth, async (req, res) => {
                 'description': req.body.description,
                 'start_time': req.body.start_time,
                 'finish_time': req.body.finish_time,
-                'registration_end_time': req.body.registrationEndTime,
-                'event_mode': req.body.eventMode,
-                'event_type': req.body.eventType,
-                'reg_link': req.body.regLink,
-                'fee': req.body.fees,
+                'registration_end_time': req.body.registration_end_time,
+                'event_mode': req.body.event_mode,
+                'event_type': req.body.event_type,
+                'reg_link': req.body.reg_link,
+                'fee': req.body.fee,
                 'about': req.body.about,
-                'fee_type': req.body.feesType,
+                'fee_type': req.body.fee_type,
                 'college': req.body.college,
-                'o_allowed': req.body.participantsType
+                'o_allowed': req.body.o_allowed
             }
         }).then(value => {
             Events.findOne({ _id: eId }).then(event => {

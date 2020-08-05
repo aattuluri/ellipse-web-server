@@ -119,6 +119,10 @@ let eventShema = mongoose.Schema({
     // },
     registered: {
         type: bool,
+    },
+    posted_on: {
+        type: Date,
+        default: Date.now()
     }
 
 });
