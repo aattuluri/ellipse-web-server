@@ -63,7 +63,7 @@ router.post('/api/users/sendverificationemail',auth,async (req,res)=>{
           };
           try {
             await sgMail.send(msg);
-            UserLogin.update({'email':email},{$set:{'otp': otp}}).then((val)=>{
+            UserLogin.updateOne({'email':email},{$set:{'otp': otp}}).then((val)=>{
                 console.log(val);
             })
             res.status(200).json({message:"success"});

@@ -175,9 +175,10 @@ router.get('/api/image', (req, res) => {
 });
 
 
-router.get('/api/events', auth, (req, res) => {
+router.get('/api/events', auth, async (req, res) => {
     const user = req.user;
     const finalEvents = [];
+    // const registeredEvents = await Registration.find({user_id: user._id})
     try {
         Events.get((err, events) => {
             if (err) {
@@ -187,21 +188,24 @@ router.get('/api/events', auth, (req, res) => {
                     message: err
                 });
             }
-            events.forEach((e,index,array) => {
-                Registration.findOne({ user_id: user._id, event_id: e._id }).then(value => {
-                    // console.log(value);
-                    if (value != null) {
-                        e.registered = true; 
-                    }
-                    else{
-                        e.registered = false;
-                    }
+            var count = 0;
+            var len = events.length;
+            events.forEach( async (e,index,array) =>{
+                const registeredEvent = await Registration.find({user_id: user._id, event_id: e._id})
+                console.log(registeredEvent);
+                if(registeredEvent.length === 0){
+                    e.registered = false;
                     finalEvents.push(e);
-                    if(index == array.length - 1){
-                        res.status(200).json(finalEvents)
-                    }
-
-                })
+                    count = count + 1;
+                }
+                else{
+                    e.registered = true;
+                    finalEvents.push(e);
+                    count = count + 1;
+                }
+                if(count === len){
+                    res.status(200).json(finalEvents)
+                }
 
             })
 
