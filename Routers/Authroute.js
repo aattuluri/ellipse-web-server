@@ -167,10 +167,10 @@ router.post('/api/users/login', async(req, res) => {
         const userid = user._id;
         const useremail = user.email;
         const isVerified = user.is_verified;
-        console.log(userid);
-        console.log(isVerified);
-        console.log(useremail);
-        console.log(token);
+        // console.log(userid);
+        // console.log(isVerified);
+        // console.log(useremail);
+        // console.log(token);
         res.status(200).json({userid, useremail, token,isVerified})
         // res.status(200).json({ user,userDetails, token })
     } catch (error) {

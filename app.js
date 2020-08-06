@@ -7,6 +7,7 @@ const authRouter = require('./Routers/Authroute');
 const eventRouter = require('./Routers/Eventroute');
 const chatRouter = require('./Routers/ChatRoute');
 const registerRouter = require('./Routers/RegistrationRoute');
+const reportRouter = require('./Routers/ReportRoute');
 // const client = redis.createClient();
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -62,6 +63,7 @@ app.use(authRouter);
 app.use(eventRouter);
 app.use(chatRouter);
 app.use(registerRouter);
+app.use(reportRouter);
 server.listen(PORT, (req, res) => {
     console.log(`Server Started at PORT ${PORT}`);
 });
