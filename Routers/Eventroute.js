@@ -66,8 +66,9 @@ router.get('/api/event/get_announcements', auth, (req, res) => {
 router.post('/api/events', auth, async (req, res) => {
     try{
     const event = new Events(req.body);
-    const college = await Colleges.findOne({ name: req.body.college_name });
-    event.college_id = college._id;
+    // const college = await Colleges.findOne({ name: req.body.college_name });
+    const college = await Colleges.findOne({ _id: req.body.college_id});
+    event.college_name = college.name;
     const user = req.user;
     await event.save(function (err) {
         if (err) {
@@ -137,7 +138,6 @@ router.post('/api/event/uploadimage', auth, (req, res) => {
     const user = req.user;
     const eventId = req.query.id;
     const fileName = eventId + md5(Date.now())
-    // console.log(eventId);
     Files.saveFile(req.files.image, fileName, user._id, "eventposter", function (err, result) {
         if (!err) {
             console.log("aaxd")

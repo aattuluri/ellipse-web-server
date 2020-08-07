@@ -21,7 +21,7 @@ async function getFileById(fileId, res, cb) {
             //Do Nothing
         }
         else{
-            res.header('Content-Type', 'image/jpeg')
+            res.header('Content-Type', result.metadata.contentType)
     gridFSBucket.openDownloadStreamByName(fileId).
         pipe(res).
         on('error', function (error) {
@@ -56,27 +56,44 @@ async function saveFile(rs,fileName,userId,purpose, cb) {
 }
 
 function deleteFileById(fileId, cb) {
-    gfs.remove({
-        filename: fileId
-    }, function (err) {
-        if (err) return cb(err);
-        cb(null);
-    });
+    const db = conn.db;
+    const collection = db.collection('fs.files'); 
+    collection.findOne({filename: fileId}).then((result)=>{
+        if(!result){
+            //Do Nothing
+            cb(null,{"message": "success"})
+        }
+        else{
+            gridFSBucket.delete(result._id).then(()=>{
+                cb(null,{"message": "success"})
+            })
+
+        }
+    })  
+    // const db = conn.db;
+    // gridFSBucket.delete(fileId).on('finish',()=>{
+    //     cb(null,{"message": "success"})
+    // })
+    // gfs.remove({
+    //     filename: fileId
+    // }, function (err) {
+    //     if (err) return cb(err);
+    //     cb(null);
+    // });
 }
 
-function deleteUserFileById(fileId, userId, cb) {
-    gfs.remove({
-        filename: fileId,
-        "metadata.userId": userId,
-    }, function (err) {
-        if (err) return cb(err);
-        cb(null);
-    });
-}
+// function deleteUserFileById(fileId, userId, cb) {
+//     gfs.remove({
+//         filename: fileId,
+//         "metadata.userId": userId,
+//     }, function (err) {
+//         if (err) return cb(err);
+//         cb(null);
+//     });
+// }
 
 module.exports = {
     getFile: getFileById,
     saveFile: saveFile,
     deleteFile: deleteFileById,
-    deleteUserFile: deleteUserFileById
 };

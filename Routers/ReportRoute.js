@@ -13,11 +13,6 @@ router.post('/api/event/report', auth, async (req, res) => {
     try {
         const user = req.user;
         const { event_id,title,description } = req.body;
-        console.log(event_id);
-        // const eventId = req.query.id;
-        // console.log(data);
-        // console.log(eventId);
-        // console.log(user._id);
         const report = new Report({
             user_id: user._id,
             event_id: event_id,
