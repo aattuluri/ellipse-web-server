@@ -247,8 +247,10 @@ router.post('/api/updateevent', auth, async (req, res) => {
                 'fee': req.body.fee,
                 'about': req.body.about,
                 'fee_type': req.body.fee_type,
-                'college': req.body.college,
-                'o_allowed': req.body.o_allowed
+                // 'college': req.body.college,
+                'o_allowed': req.body.o_allowed,
+                'requirements': req.body.requirements,
+                'tags': tags,
             }
         }).then(value => {
             Events.findOne({ _id: eId }).then(event => {
