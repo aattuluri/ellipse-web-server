@@ -11,19 +11,32 @@ const Registration = require('../Models/Registrations');
 const e = require('express');
 const Colleges = require('../Models/CollegeModel');
 const Announcement = require('../Models/Announcements');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const pdf = require('html-pdf');
+
+
+router.get('/api/generatepdf', async (req, res) => {
+    pdf.create('<!doctype html><html><head></head><body><h1>Lalith Reddy</h1></body></html>', {}).toFile('me.pdf', (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        res.send(result);
+    })
+})
 
 
 //Adding the announcement
-router.post('/api/event/add_announcement',auth,async (req,res)=>{
-    try{
+router.post('/api/event/add_announcement', auth, async (req, res) => {
+    try {
         // const event_id = req.query.id;
         const announcement = new Announcement();
         announcement.event_id = req.body.event_id;
         announcement.title = req.body.title;
         announcement.description = req.body.description
         announcement.visible_all = req.body.visible_all
-        await announcement.save((err)=>{
-            if(err){
+        await announcement.save((err) => {
+            if (err) {
                 res.status(400).json({
                     status: 'error',
                     code: 500,
@@ -38,7 +51,7 @@ router.post('/api/event/add_announcement',auth,async (req,res)=>{
             })
 
         })
-    }catch(error){
+    } catch (error) {
         res.status(400).json({
             status: 'error',
             code: 500,
@@ -61,35 +74,56 @@ router.get('/api/event/get_announcements', auth, (req, res) => {
 
 })
 
+router.post('/api/event/sendemail', auth, async (req, res) => {
+    try {
+        const emails = req.body.emails;
+        const title = req.body.title;
+        const content = req.body.content;
+        emails.forEach(async e => {
+            const msg = {
+                to: e,
+                from: 'support@ellipseapp.com', // Use the email address or domain you verified above
+                subject: 'Information',
+                text: 'http://staging.ellipseapp.com/home',
+                html: `<h1>${title}</h1><h2>${content}</h2>`,
+            };
+            await sgMail.send(msg);
+            res.status(200).json({ message: "success" });
+        })
+    }
+    catch (error) {
+        res.status(400).json({error: error});
+    }
 
+})
 
 router.post('/api/events', auth, async (req, res) => {
-    try{
-    const event = new Events(req.body);
-    // const college = await Colleges.findOne({ name: req.body.college_name });
-    const college = await Colleges.findOne({ _id: req.body.college_id});
-    event.college_name = college.name;
-    const user = req.user;
-    await event.save(function (err) {
-        if (err) {
-            res.status(400).json({
-                status: 'error',
-                code: 500,
-                message: err
-            })
-        }
-        
-        res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: 'Event added successfully',
-            eventId: event._id
-        })
+    try {
+        const event = new Events(req.body);
+        // const college = await Colleges.findOne({ name: req.body.college_name });
+        const college = await Colleges.findOne({ _id: req.body.college_id });
+        event.college_name = college.name;
+        const user = req.user;
+        await event.save(function (err) {
+            if (err) {
+                res.status(400).json({
+                    status: 'error',
+                    code: 500,
+                    message: err
+                })
+            }
 
-    })
-}catch (error) {
-    res.status(400).json({ error: error.message })
-}
+            res.status(200).json({
+                status: 'success',
+                code: 200,
+                message: 'Event added successfully',
+                eventId: event._id
+            })
+
+        })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
 
 });
 
@@ -190,20 +224,20 @@ router.get('/api/events', auth, async (req, res) => {
             }
             var count = 0;
             var len = events.length;
-            events.forEach( async (e,index,array) =>{
-                const registeredEvent = await Registration.find({user_id: user._id, event_id: e._id})
+            events.forEach(async (e, index, array) => {
+                const registeredEvent = await Registration.find({ user_id: user._id, event_id: e._id })
                 console.log(registeredEvent);
-                if(registeredEvent.length === 0){
+                if (registeredEvent.length === 0) {
                     e.registered = false;
                     finalEvents.push(e);
                     count = count + 1;
                 }
-                else{
+                else {
                     e.registered = true;
                     finalEvents.push(e);
                     count = count + 1;
                 }
-                if(count === len){
+                if (count === len) {
                     res.status(200).json(finalEvents)
                 }
 
@@ -218,7 +252,7 @@ router.get('/api/events', auth, async (req, res) => {
 
 });
 
-router.get('/api/event', auth, async (req, res) => {
+router.get('/api/event', async (req, res) => {
     try {
         const event = await Events.findOne({ _id: req.query.id });
         res.status(200).json({ event });

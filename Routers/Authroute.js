@@ -261,18 +261,12 @@ router.post('/api/users/uploadimage', auth, async (req, res) => {
     const userDetails = await UserDetails.findOne({user_id: user._id});
     if(userDetails.profile_pic != null){
         Files.deleteFile(userDetails.profile_pic,(result)=>{
-            console.log("akaka");
-            Files.saveFile(req.files.image, fileName, user._id,"userprofilepic", function (err, result) {
+            Files.saveFile(req.files.image, userDetails.profile_pic, user._id,"userprofilepic", function (err, result) {
                 if (!err) {
-                    console.log("sskm")
-                    // console.log("aaxd")
-                    UserDetails.updateOne({ user_id: user._id  }, { $set: { 'profile_pic': fileName } }).then((value) => {
-                        console.log("done");
-                        res.status(200).json({
-                            status: 'success',
-                            code: 200,
-                            message: 'image added successfully',
-                        })
+                    res.status(200).json({
+                        status: 'success',
+                        code: 200,
+                        message: 'image added successfully',
                     })
                 }
                 else {
