@@ -8,6 +8,10 @@ server {
 
     root /var/www/staging.ellipseapp.com/html;
     index index.html index.htm index.nginx-debian.html;
+    
+    location /api {
+        proxy_pass http://127.0.0.1:4000;
+    }
 
 }
 
