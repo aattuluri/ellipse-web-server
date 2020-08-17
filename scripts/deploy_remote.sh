@@ -9,7 +9,7 @@ MODULES_CACHE_ELLIPSEWEBSERVER="$DEPLOY_ROOT/node_modules_ellipse-web-server.tar
 
 SCRIPT_PWD=`pwd`
 
-function build_ui {
+#function build_ui {
   #TODO
   #echo "Building UI"
   #cd $BUILD_DIR
@@ -19,7 +19,7 @@ function build_ui {
   #sudo -u deploy npm install
   #sudo -u deploy npm install string-format moment-timezone html-pdf
   #sudo -u deploy tar cf $MODULES_CACHE_WEB node_modules
-}
+#}
 
 function build_ellipse_web_server {
   echo "Building ellipseapp web server"
@@ -38,7 +38,7 @@ sudo -u deploy mkdir -p $BUILD_DIR
 sudo -u deploy git clone --branch master --depth 1 https://github.com/aattuluri/ellipse-web-server.git $BUILD_DIR
 
 # Build artifacts.
-build_ui
+#build_ui
 build_ellipse_web_server
 
 # Restart node process.
