@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 BUILD_ID=`date +%s`
-DEPLOY_ROOT="/srv/aa"
+DEPLOY_ROOT="/srv/ellipseapp"
 BUILD_DIR="$DEPLOY_ROOT/$BUILD_ID"
 
 MODULES_CACHE_WEB="$DEPLOY_ROOT/node_modules_ui.tar"
@@ -14,7 +14,7 @@ function build_ui {
   #echo "Building UI"
   #cd $BUILD_DIR
   #sudo -u deploy tar xf $MODULES_CACHE_WEB
-  #sudo -u deploy ln -s /srv/aa/localConfig.json $BUILD_DIR/localConfig.json
+  #sudo -u deploy ln -s /srv/ellipseapp/localConfig.json $BUILD_DIR/localConfig.json
   #sudo -u deploy npm prune
   #sudo -u deploy npm install
   #sudo -u deploy npm install string-format moment-timezone html-pdf
@@ -47,6 +47,6 @@ sudo pm2 delete app
 sudo pm2 --node-args --harmony_destructuring start app.js
 
 # Update current symlink
-sudo -u deploy rm /srv/aa/current
-sudo -u deploy ln -s $BUILD_DIR /srv/aa/current
+sudo -u deploy rm /srv/ellipseapp/current
+sudo -u deploy ln -s $BUILD_DIR /srv/ellipseapp/current
 cd $SCRIPT_PWD
