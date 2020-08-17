@@ -35,7 +35,7 @@ cd $DEPLOY_ROOT
 
 # Pull latest changes.
 sudo -u deploy mkdir -p $BUILD_DIR
-sudo -u deploy git clone --branch master --depth 1 https://github.com/aattuluri/ellipse-web-server.git $BUILD_DIR
+sudo -u deploy git clone --branch master --depth 1 git://github.com/aattuluri/ellipse-web-server.git $BUILD_DIR
 
 # Build artifacts.
 #build_ui
