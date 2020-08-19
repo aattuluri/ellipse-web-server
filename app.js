@@ -35,9 +35,9 @@ const webSocketServer = new webSocket.Server({ server });
 webSocketServer.on('connection', (webSocketClient) => {
     // client.room = [];
     webSocketClient.on('message', (message) => {
-        console.log(message)
+        // console.log(message)
         let data = JSON.parse(message);
-        console.log(data);
+        // console.log(data);
         chatService.addChatMessage(data.event_id,JSON.stringify(data.msg),(value)=>{
             console.log("done");
         })

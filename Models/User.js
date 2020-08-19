@@ -39,7 +39,7 @@ const userSchema = mongoose.Schema({
     }],
     signup_time: {
         type: String,
-        default: Date.now
+        default: Date.now()
     },
     otp: {
         type: Number,
