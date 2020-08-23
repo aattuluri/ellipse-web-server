@@ -2,13 +2,16 @@ require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const fileUpload = require('express-fileupload');
+const cron = require('node-cron');
 // const redis = require("redis");
 const authRouter = require('./Routers/Authroute');
 const eventRouter = require('./Routers/Eventroute');
 const chatRouter = require('./Routers/ChatRoute');
 const registerRouter = require('./Routers/RegistrationRoute');
 const reportRouter = require('./Routers/ReportRoute');
+const notificationRouter = require('./Routers/NotificationRoute');
 // const client = redis.createClient();
+const Notifications = require('./Models/Notifications');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('./Models/User');
@@ -30,14 +33,13 @@ mongoose.connect(process.env.MONGODB_URL, {
 })
 
 const PORT = process.env.PORT || 4000;
+
+//Code for chat with web sockets
 const server = http.createServer(app);
 const webSocketServer = new webSocket.Server({ server });
 webSocketServer.on('connection', (webSocketClient) => {
-    // client.room = [];
     webSocketClient.on('message', (message) => {
-        // console.log(message)
         let data = JSON.parse(message);
-        // console.log(data);
         chatService.addChatMessage(data.event_id,JSON.stringify(data.msg),(value)=>{
             console.log("done");
         })
@@ -64,20 +66,12 @@ app.use(eventRouter);
 app.use(chatRouter);
 app.use(registerRouter);
 app.use(reportRouter);
+app.use(notificationRouter);
 server.listen(PORT, (req, res) => {
     console.log(`Server Started at PORT ${PORT}`);
 });
 
 
-
-// client.send(JSON.stringify({
-                        //     "action": "receive_message",
-                        //     "sender_type": data.sender_type,
-                        //     "event_id": data.event_id,
-                        //     "sender_id": data.sender_id,
-                        //     "message": data.message,
-                        //     "time": data.time
-                        // }));
 
 
 

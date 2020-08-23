@@ -5,7 +5,8 @@ const router = express.Router();
 const Events = require('../Models/Events');
 // const Registrations = require('../Models/Registrations');
 const Registration = require('../Models/Registrations');
-
+const cron = require('node-cron');
+   
 
 //register the event
 
@@ -14,9 +15,6 @@ router.post('/api/event/register', auth, async (req, res) => {
         const user = req.user;
         const { data } = req.body;
         const eventId = req.query.id;
-        console.log(data);
-        console.log(eventId);
-        console.log(user._id);
         const registration = new Registration({
             user_id: user._id,
             event_id: eventId,
