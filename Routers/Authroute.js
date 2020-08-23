@@ -408,7 +408,7 @@ router.post('/api/users/otpverified',auth, async (req, res) => {
         res.status(400).json(error.message);
     }
 })
-router.post('/api/users/emailverify',auth, async (req, res) => {
+router.post('/api/users/emailverify',async (req, res) => {
     try {
         const { email } = req.body;
         const otp = await otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false });
@@ -469,7 +469,32 @@ router.post('/api/users/emailverified',auth, async (req, res) => {
         res.status(400).json(error.message);
     }
 })
+router.post('/api/users/emailverified_forgot_password', async (req, res) => {
+    try {
+        const email = await req.body.email;
 
+        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'verified': true } }).then((val)=>{
+            console.log(val);
+        })
+        await UserLogin.updateOne(
+            {'email':email},
+            {$set:{
+                'is_verified': true
+            }})
+        const userdetails = await UserDetails.findOne({ otp: req.body.otp })
+        if (!userdetails) {
+            return res.status(404).send("The otp doesn't exists")
+        }
+        res.status(200).send("Verified")
+        console.log("Verified")
+        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'otp': '000000' } }).then((val)=>{
+            console.log(val);
+        })
+    }
+    catch (error) {
+        res.status(400).json(error.message);
+    }
+})
 router.route('/colleges')
     .get(collegeController.index)
 
