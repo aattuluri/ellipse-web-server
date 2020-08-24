@@ -337,6 +337,9 @@ router.post('/api/updateevent', auth, async (req, res) => {
                 'o_allowed': req.body.o_allowed,
                 'requirements': req.body.requirements,
                 'tags': req.body.tags,
+                'venue_type': req.body.venue_type,
+                'venue': req.body.venue,
+                'venue_college': req.body.venue_college
             }
         }).then(value => {
             // eId.destroy();
