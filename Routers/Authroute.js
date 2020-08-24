@@ -495,7 +495,7 @@ router.post('/api/users/emailverified_forgot_password', async (req, res) => {
         res.status(400).json(error.message);
     }
 })
-router.route('/colleges')
+router.route('/api/colleges')
     .get(collegeController.index)
 
 module.exports = router

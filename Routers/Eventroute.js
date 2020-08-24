@@ -132,14 +132,18 @@ router.post('/api/events', auth, async (req, res) => {
         const date = eventStartDate.getDate();
         const hour = eventStartDate.getHours();
         const min = eventStartDate.getMinutes();
-        const x = cron.schedule(`${min} ${hour} ${date - 1} ${mon + 1} ${day - 1}`, () => {
+        cron.schedule(`${min} ${hour} ${date - 1} ${mon + 1} ${day - 1}`, () => {
             console.log("hi there")
-            const notification = new Notifications({
-                user_id: user._id,
-                event_id: event._id,
-                title: "Event Reminder",
-                description: "Events starts at " + eventStartDate.toLocaleDateString(),
-                link: "nothing"
+            Registration.find({ event_id: event._id }).then((result) => {
+                result.forEach(value =>{
+                    const notification = new Notifications({
+                        user_id: value.user_id,
+                        event_id: event._id,
+                        title: `${event.name}`+" Event Reminder",
+                        description: "Events starts at " + eventStartDate.toDateString()+" " + eventStartDate.toLocaleTimeString(),
+                    })
+                    notification.save()
+                })
             })
         })
     } catch (error) {
@@ -346,13 +350,17 @@ router.post('/api/updateevent', auth, async (req, res) => {
                 const min = eventStartDate.getMinutes();
                 cron.schedule(`${min} ${hour} ${date - 1} ${mon + 1} ${day - 1}`, () => {
                     console.log("hi there")
-                    const notification = new Notifications({
-                        user_id: user._id,
-                        event_id: event._id,
-                        title: `${event.name}`+" Event Reminder",
-                        description: "Events starts at " + eventStartDate.toDateString()+" " + eventStartDate.toLocaleTimeString(),
+                    Registration.find({ event_id: event._id }).then((result) => {
+                        result.forEach(value =>{
+                            const notification = new Notifications({
+                                user_id: value.user_id,
+                                event_id: event._id,
+                                title: `${event.name}`+" Event Reminder",
+                                description: "Events starts at " + eventStartDate.toDateString()+" " + eventStartDate.toLocaleTimeString(),
+                            })
+                            notification.save()
+                        })
                     })
-                    notification.save()
                    
                 })
                 res.status(200).json({ event });
