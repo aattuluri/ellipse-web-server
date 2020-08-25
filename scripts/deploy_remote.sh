@@ -3,6 +3,7 @@
 BUILD_ID=`date +%s`
 DEPLOY_ROOT="/srv/ellipseapp"
 BUILD_DIR="$DEPLOY_ROOT/$BUILD_ID"
+APP_DIR="$BUILD_DIR/ellipse-web-server"
 
 MODULES_CACHE_WEB="$DEPLOY_ROOT/node_modules_ui.tar"
 MODULES_CACHE_ELLIPSEWEBSERVER="$DEPLOY_ROOT/node_modules_ellipse-web-server.tar"
@@ -23,30 +24,27 @@ SCRIPT_PWD=`pwd`
 
 function build_ellipse_web_server {
   echo "Building ellipseapp web server"
-  cd $BUILD_DIR/ellipse-web-server
-  sudo -u deploy tar xf $MODULES_CACHE_ELLIPSEWEBSERVER
-  sudo -u deploy npm prune
-  sudo -u deploy npm install
-  sudo -u deploy npm run build \
-    && sudo -u deploy tar cf $MODULES_CACHE_ELLIPSEWEBSERVER node_modules
+  cd $APP_DIR
+  npm prune
+  npm install
 }
 
 cd $DEPLOY_ROOT
 
 # Pull latest changes.
-sudo -u deploy mkdir -p $BUILD_DIR
-sudo -u deploy git clone --branch master --depth 1 git@github.com:aattuluri/ellipse-web-server.git $BUILD_DIR
+mkdir -p $APP_DIR
+git clone --branch master --depth 1 git@github.com:aattuluri/ellipse-web-server $APP_DIR
 
 # Build artifacts.
 #build_ui
 build_ellipse_web_server
 
 # Restart node process.
-cd $BUILD_DIR
-sudo pm2 delete app
-sudo pm2 --node-args --harmony_destructuring start app.js
+cd $APP_DIR
+pm2 delete app
+pm2 start app.js
 
 # Update current symlink
-sudo -u deploy rm /srv/ellipseapp/current
-sudo -u deploy ln -s $BUILD_DIR /srv/ellipseapp/current
+rm /srv/ellipseapp/current
+ln -sf $BUILD_DIR /srv/ellipseapp/current
 cd $SCRIPT_PWD
