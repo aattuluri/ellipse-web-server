@@ -410,7 +410,7 @@ router.post('/api/users/otpverified',auth, async (req, res) => {
 })
 router.post('/api/users/emailverify',async (req, res) => {
     try {
-        const { email } = req.body;
+        const email = req.query.email;
         const otp = await otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false });
         const userdetails = await UserDetails.findOne({ email: email })
         if (!userdetails) {
@@ -471,28 +471,36 @@ router.post('/api/users/emailverified',auth, async (req, res) => {
 })
 router.post('/api/users/emailverified_forgot_password', async (req, res) => {
     try {
-        const email = await req.body.email;
-
-        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'verified': true } }).then((val)=>{
-            console.log(val);
-        })
-        await UserLogin.updateOne(
-            {'email':email},
-            {$set:{
-                'is_verified': true
-            }})
-        const userdetails = await UserDetails.findOne({ otp: req.body.otp })
+        const otp = req.query.otp;
+        const userdetails = await UserDetails.findOne({ otp: otp })
         if (!userdetails) {
             return res.status(404).send("The otp doesn't exists")
         }
         res.status(200).send("Verified")
         console.log("Verified")
-        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'otp': '000000' } }).then((val)=>{
+        UserDetails.updateOne({ otp: otp }, { $set: { 'otp': '000000' } }).then((val)=>{
             console.log(val);
         })
     }
     catch (error) {
         res.status(400).json(error.message);
+    }
+})
+router.post('/api/users/reset_password',async(req,res)=>{
+    try {
+        const {email,password} = req.body;
+        console.log(email)
+        const user = await UserLogin.findOne({'email':email})
+        if (!user) {
+            return res.status(401).send({error: 'Reset failed'});
+        }
+            const hasedPassword = await bcrypt.hash(password, 8)
+        UserLogin.updateOne({'email':email},{$set:{'password':hasedPassword}}).then((val)=>{
+            res.status(200).json({message:"success"})
+        })
+       
+    } catch (error) {
+        res.status(500).send(error.message)
     }
 })
 router.route('/api/colleges')
