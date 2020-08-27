@@ -196,15 +196,16 @@ router.post('/api/post_event', auth, async (req, res) => {
 router.post('/api/event/uploadimage', auth, async (req, res) => {
     const user = req.user;
     const eventId = req.query.id;
+    const fileName = eventId + md5(Date.now())
     const event = await Events.findOne({ _id: eventId })
     if (event.poster_url != null) {
-        Files.deleteFile(event.poster_url, (result) => {
-            Files.saveFile(req.files.image, event.poster_url, user._id, "eventposter", function (err, result) {
+         Files.deleteFile(event.poster_url, (result) => {
+            Files.saveFile(req.files.image, fileName, user._id, "eventposter", function (err, result) {
                 if (!err) {
                     // console.log("aaxd")
                     res.status(200).json({
                         status: 'success',
-                        code: 200,
+                        code: 250,
                         message: 'image added successfully',
                     })
                 }
@@ -217,6 +218,14 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
                 }
             });
         })
+        Events.updateOne({ _id: eventId }, { $set: { 'poster_url': fileName } }).then((value) => {
+                    res.status(200).json({
+                        status: 'success',
+                        code: 200,
+                        message: 'image added successfully',
+                    })
+                })
+       
 
     }
     else {
