@@ -125,27 +125,27 @@ router.post('/api/events', auth, async (req, res) => {
             })
 
         })
-        const eventId = event._id;
-        const eventStartDate = new Date(event.start_time);
-        const day = eventStartDate.getDay();
-        const mon = eventStartDate.getMonth();
-        const date = eventStartDate.getDate();
-        const hour = eventStartDate.getHours();
-        const min = eventStartDate.getMinutes();
-        cron.schedule(`${min} ${hour} ${date - 1} ${mon + 1} ${day - 1}`, () => {
-            console.log("hi there")
-            Registration.find({ event_id: event._id }).then((result) => {
-                result.forEach(value =>{
-                    const notification = new Notifications({
-                        user_id: value.user_id,
-                        event_id: event._id,
-                        title: `${event.name}`+" Event Reminder",
-                        description: "Events starts at " + eventStartDate.toDateString()+" " + eventStartDate.toLocaleTimeString(),
-                    })
-                    notification.save()
-                })
-            })
-        })
+        // const eventId = event._id;
+        // const eventStartDate = new Date(event.start_time);
+        // const day = eventStartDate.getDay();
+        // const mon = eventStartDate.getMonth();
+        // const date = eventStartDate.getDate();
+        // const hour = eventStartDate.getHours();
+        // const min = eventStartDate.getMinutes();
+        // cron.schedule(`${min} ${hour} ${date - 1} ${mon + 1} ${day - 1}`, () => {
+        //     console.log("hi there")
+        //     Registration.find({ event_id: event._id }).then((result) => {
+        //         result.forEach(value =>{
+        //             const notification = new Notifications({
+        //                 user_id: value.user_id,
+        //                 event_id: event._id,
+        //                 title: `${event.name}`+" Event Reminder",
+        //                 description: "Events starts at " + eventStartDate.toDateString()+" " + eventStartDate.toLocaleTimeString(),
+        //             })
+        //             notification.save()
+        //         })
+        //     })
+        // })
     } catch (error) {
         res.status(400).json({ error: error.message })
     }
@@ -202,11 +202,12 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
          Files.deleteFile(event.poster_url, (result) => {
             Files.saveFile(req.files.image, fileName, user._id, "eventposter", function (err, result) {
                 if (!err) {
-                    // console.log("aaxd")
-                    res.status(200).json({
-                        status: 'success',
-                        code: 250,
-                        message: 'image added successfully',
+                    Events.updateOne({ _id: eventId }, { $set: { 'poster_url': fileName } }).then((value) => {
+                        res.status(200).json({
+                            status: 'success',
+                            code: 200,
+                            message: 'image added successfully',
+                        })
                     })
                 }
                 else {
@@ -218,13 +219,6 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
                 }
             });
         })
-        Events.updateOne({ _id: eventId }, { $set: { 'poster_url': fileName } }).then((value) => {
-                    res.status(200).json({
-                        status: 'success',
-                        code: 200,
-                        message: 'image added successfully',
-                    })
-                })
        
 
     }
@@ -329,6 +323,7 @@ router.post('/api/updateevent', auth, async (req, res) => {
     try {
         const user = req.user;
         const eId = req.body.eventId;
+        console.log(eId);
         Events.updateOne({ _id: eId }, {
             $set: {
                 'name': req.body.name,
@@ -352,7 +347,7 @@ router.post('/api/updateevent', auth, async (req, res) => {
             }
         }).then(value => {
             // eId.destroy();
-
+            console.log(value)
             Events.findOne({ _id: eId }).then(event => {
                 const eventStartDate = event.start_time;
                 const day = eventStartDate.getDay();
@@ -360,27 +355,28 @@ router.post('/api/updateevent', auth, async (req, res) => {
                 const date = eventStartDate.getDate();
                 const hour = eventStartDate.getHours();
                 const min = eventStartDate.getMinutes();
-                cron.schedule(`${min} ${hour} ${date - 1} ${mon + 1} ${day - 1}`, () => {
-                    console.log("hi there")
-                    Registration.find({ event_id: event._id }).then((result) => {
-                        result.forEach(value =>{
-                            const notification = new Notifications({
-                                user_id: value.user_id,
-                                event_id: event._id,
-                                title: `${event.name}`+" Event Reminder",
-                                description: "Events starts at " + eventStartDate.toDateString()+" " + eventStartDate.toLocaleTimeString(),
-                            })
-                            notification.save()
-                        })
-                    })
+                // cron.schedule(`${min} ${hour} ${date - 1} ${mon + 1} ${day - 1}`, () => {
+                //     console.log("hi there")
+                //     Registration.find({ event_id: event._id }).then((result) => {
+                //         result.forEach(value =>{
+                //             const notification = new Notifications({
+                //                 user_id: value.user_id,
+                //                 event_id: event._id,
+                //                 title: `${event.name}`+" Event Reminder",
+                //                 description: "Events starts at " + eventStartDate.toDateString()+" " + eventStartDate.toLocaleTimeString(),
+                //             })
+                //             notification.save()
+                //         })
+                //     })
                    
-                })
+                // })
                 res.status(200).json({ event });
 
             })
         })
     }
     catch (error) {
+        console.log(error);
         res.status(400).json({ error: error.message })
     }
 })

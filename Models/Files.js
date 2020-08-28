@@ -61,7 +61,7 @@ function deleteFileById(fileId, cb) {
     collection.findOne({filename: fileId}).then((result)=>{
         if(!result){
             //Do Nothing
-            cb(null,{"message": "success"})
+            cb(null,{"message": "failure"})
         }
         else{
             gridFSBucket.delete(result._id).then(()=>{
