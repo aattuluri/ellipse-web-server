@@ -4,9 +4,9 @@ server {
     include snippets/certs.conf;
     include snippets/ssl-params.conf;
 
-    server_name ellipseapp.com www.ellipseapp.com;
+    server_name staging.ellipseapp.com www.staging.ellipseapp.com;
 
-    root /var/www/ellipseapp.com/html;
+    root /var/www/staging.ellipseapp.com/html;
     index index.html index.htm index.nginx-debian.html;
     
     location / {
@@ -33,7 +33,7 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name ellipseapp.com www.ellipseapp.com;
+    server_name staging.ellipseapp.com staging.www.ellipseapp.com;
 
     return 302 https://$server_name$request_uri;
 }
