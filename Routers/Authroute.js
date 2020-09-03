@@ -19,6 +19,22 @@ router.get('/api',(req,res)=>{
     res.send("server is working");
 })
 
+router.post('/api/check_username', async (req,res)=>{
+    try{
+        const {username} = req.body;
+        const user = await UserLogin.findOne({username: username})
+        if(user){
+            res.status(200).json({message: "user already exists"});
+        }
+        else{
+            res.status(200).json({message: "no user found"});
+        }
+    }
+    catch(error){
+        res.status(400).json({ error: error.message})
+    }
+})
+
 router.post('/api/users/signup', async (req, res) => {
     // Create a new user
     try {
@@ -109,6 +125,7 @@ router.post('/api/users/verifyotp',auth, async (req,res)=>{
         res.status(400).json({ error: error.message})
     }
 })
+
 
 
 router.post('/api/users/updatepassword',auth,async(req,res)=>{

@@ -10,6 +10,7 @@ const chatRouter = require('./Routers/ChatRoute');
 const registerRouter = require('./Routers/RegistrationRoute');
 const reportRouter = require('./Routers/ReportRoute');
 const notificationRouter = require('./Routers/NotificationRoute');
+const Events = require('./Models/Events');
 // const client = redis.createClient();
 const Notifications = require('./Models/Notifications');
 const cors = require('cors');
@@ -60,6 +61,13 @@ webSocketServer.on('connection', (webSocketClient) => {
     });
 })
 
+
+//CRON TASKS FOR NOTIFICATIONS
+
+// cron.schedule('0 0 * * *',()=>{
+// const todayEvents = Events.find("")
+
+// })
 
 app.use(authRouter);
 app.use(eventRouter);
