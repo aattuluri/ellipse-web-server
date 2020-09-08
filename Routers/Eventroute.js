@@ -173,6 +173,7 @@ router.post('/api/post_event', auth, async (req, res) => {
     event.reg_link = req.body.regLink
     event.college_id = college._id
     event.venue = req.body.venue
+    event.platform_details = req.body.platform_details
     event.save(function (err) {
         if (err) {
             res.json({

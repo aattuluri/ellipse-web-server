@@ -114,11 +114,16 @@ let eventShema = mongoose.Schema({
         type: String,
         default: null
     },
-    // participants_type:{
-    //     type: String
-    // },
+    platform_details: {
+        type: String,
+        default: null
+    },
     registered: {
         type: bool,
+    },
+    status: {
+        type: String,
+        default: "pending"
     },
     posted_on: {
         type: Date,
