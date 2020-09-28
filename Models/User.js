@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 var otpGenerator = require("otp-generator");
 
+//mongoose schema for user
+
 const userSchema = mongoose.Schema({
     name: {
         type: String,
@@ -24,12 +26,12 @@ const userSchema = mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minLength: 8
+        minLength: 6
     },
     username: {
         type: String,
         // required: true,
-        // unique: true,
+        unique: true,
     },
     tokens: [{
         token: {
@@ -37,15 +39,15 @@ const userSchema = mongoose.Schema({
             required: true
         }
     }],
-    signupTime: {
+    signup_time: {
         type: String,
-        default: Date.now
+        default: Date.now()
     },
     otp: {
         type: Number,
         default: null
     },
-    isVerified: {
+    is_verified: {
         type: Boolean,
         default: false
     },

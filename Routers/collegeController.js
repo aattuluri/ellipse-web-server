@@ -1,5 +1,8 @@
 Colleges = require('../Models/CollegeModel');
-//get colleges
+
+
+
+//get all the colleges
 exports.index = (req, res) => {
     Colleges.get((err, college) => {
         if (err) {
