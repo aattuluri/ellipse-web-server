@@ -41,7 +41,7 @@ router.get('/api/update_notification_status',auth,async (req,res) => {
 router.get('/api/get_unseen_notifications_count',auth,async (req,res) => {
     try {
         const user = req.user;
-        Notification.find({user_id: id,status: 'sent'}).then((result)=>{
+        Notification.find({user_id: user._id,status: 'sent'}).then((result)=>{
             res.status(200).json(result.length);
         })
     }
