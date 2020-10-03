@@ -327,6 +327,7 @@ router.post('/api/updateevent', auth, async (req, res) => {
                 'venue_college': req.body.venue_college
             }
         }).then(value => {
+            const event = Events.findOne({_id: eId});
             res.status(200).json({ event });
         })
     }
