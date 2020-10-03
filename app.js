@@ -102,6 +102,7 @@ cron.schedule('00 9 * * *',()=>{
 
 
 //Routers initialization
+app.use('/files',express.static(__dirname +'/files'))
 app.use(authRouter);
 app.use(eventRouter);
 app.use(chatRouter);

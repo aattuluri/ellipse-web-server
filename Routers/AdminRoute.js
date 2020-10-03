@@ -4,7 +4,9 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const sgMail = require('@sendgrid/mail');
 
-const AdminLogin = require('../Models/AdminLogin')
+const AdminLogin = require('../Models/AdminLogin');
+const Events = require('../Models/Events');
+const adminAuth = require('../Middleware/AdminAuth');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
@@ -41,8 +43,29 @@ router.post('/api/admin/signin', async (req, res) => {
             return res.status(401).send({ error: 'Login failed! Check authentication credentials' })
         }
         const token = await admin.generateAuthToken();
-        
-        res.status(200).json({ username,token})
+
+        res.status(200).json({ username, token })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+router.get('/api/admin/get_all_events',adminAuth, async (req, res) => {
+    try {
+        Events.get((err, events) => {
+            console.log(events)
+            res.status(200).json(events)
+        })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+router.get('/api/admin/update_event_status',adminAuth, async (req, res) => {
+    try {
+        const eventId = req.body.eventId;
+        await Events.updateOne({_id:eventId},{$set:{status:req.body.status}})
+        res.status(200).json({"message": "success"});
     } catch (error) {
         res.status(400).json({ error: error.message })
     }

@@ -3,8 +3,7 @@ var Mongoose = require('mongoose');
 const { json } = require('body-parser');
 const md5 = require('md5');
 const sgMail = require('@sendgrid/mail');
-// const pdf = require('html-pdf');
-// const cron = require('node-cron');
+const pdf = require('html-pdf');
 
 
 const auth = require('../Middleware/Auth');
@@ -13,11 +12,20 @@ const Files = require('../Models/Files');
 const Registration = require('../Models/Registrations');
 const Colleges = require('../Models/CollegeModel');
 const Announcement = require('../Models/Announcements');
-// const Notifications = require('../Models/Notifications');
+const template = require('../certificatetemplate');
 
 
 const router = express.Router();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+router.post('/api/generate_certificate', async (req, res) => {
+    pdf.create(template(), {width: "2000px",height:"1500px"}).toFile('rezultati.pdf', (err) => {
+        if (err) {
+            return console.log('error');
+        }
+        res.send(Promise.resolve())
+    });
+})
 
 
 //Adding the announcement
@@ -98,7 +106,7 @@ router.post('/api/event/sendemail', auth, async (req, res) => {
 router.post('/api/events', auth, async (req, res) => {
     try {
         const event = new Events(req.body);
-        event.status="pending"
+        event.status = "pending"
         const college = await Colleges.findOne({ _id: req.body.college_id });
         event.college_name = college.name;
         const user = req.user;
@@ -173,7 +181,7 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
     const fileName = eventId + md5(Date.now())
     const event = await Events.findOne({ _id: eventId })
     if (event.poster_url != null) {
-         Files.deleteFile(event.poster_url, (result) => {
+        Files.deleteFile(event.poster_url, (result) => {
             Files.saveFile(req.files.image, fileName, user._id, "eventposter", function (err, result) {
                 if (!err) {
                     Events.updateOne({ _id: eventId }, { $set: { 'poster_url': fileName } }).then((value) => {
@@ -193,7 +201,7 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
                 }
             });
         })
-       
+
 
     }
     else {
@@ -319,7 +327,7 @@ router.post('/api/updateevent', auth, async (req, res) => {
                 'venue_college': req.body.venue_college
             }
         }).then(value => {
-                res.status(200).json({ event });
+            res.status(200).json({ event });
         })
     }
     catch (error) {

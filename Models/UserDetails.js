@@ -63,6 +63,9 @@ const userSchema = mongoose.Schema({
     otp: {
         type: String,
         default: "000000"  
+    },
+    notification_tokens: {
+        type: Array
     }
 })
 
