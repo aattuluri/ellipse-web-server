@@ -7,6 +7,7 @@ const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const cron = require('node-cron');
 const http = require("http");
+const https = require('https')
 const webSocket = require("ws");
 const mongoose = require('mongoose');
 
@@ -24,6 +25,7 @@ const Events = require('./Models/Events');
 const Notifications = require('./Models/Notifications');
 const User = require('./Models/User');
 const Registration = require('./Models/Registrations');
+const UserDetails = require('./Models/UserDetails');
 
 //importing functions for adding and deleting in redis chat
 const chatService = require('./Chat/ChatService');
@@ -50,7 +52,7 @@ const webSocketServer = new webSocket.Server({ server });
 webSocketServer.on('connection', (webSocketClient) => {
     webSocketClient.on('message', (message) => {
         let data = JSON.parse(message);
-        chatService.addChatMessage(data.event_id,JSON.stringify(data.msg),(value)=>{
+        chatService.addChatMessage(data.event_id, JSON.stringify(data.msg), (value) => {
             // console.log("done");
         })
         switch (data.action) {
@@ -73,36 +75,50 @@ webSocketServer.on('connection', (webSocketClient) => {
 
 //CRON TASKS FOR NOTIFICATIONS
 
-cron.schedule('00 9 * * *',()=>{
+const firebase_url = "https://us-central1-ellipse-e2428.cloudfunctions.net/sendNotification";
+
+
+cron.schedule('00 08 * * *', () => {
     const presentDate = new Date();
-    var newDate = new Date(Date.now() + 2 * 24*60*60*1000);
+    var newDate = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
     const todayEvents = Events.find({
         start_time: {
-            $gte:presentDate.toDateString(),
+            $gte: presentDate.toDateString(),
             $lt: newDate.toDateString()
         }
-    }).then((result)=>{
-        console.log(result);
-        result.forEach((e)=>{
-            Registration.find({ event_id: e._id}).then((res) => {
-                res.forEach((r)=>{
+    }).then((result) => {
+        // console.log(result);
+        result.forEach((e) => {
+            Registration.find({ event_id: e._id }).then((res) => {
+                res.forEach((r) => {
                     const notification = new Notifications();
                     notification.user_id = r.user_id;
                     notification.event_id = r.event_id;
                     notification.title = e.name;
-                    notification.description = "Starts at "+ e.start_time.toDateString()
+                    notification.description = "Starts at " + e.start_time.toDateString()
                     notification.save();
+                    UserDetails.findOne({user_id:r.user_id}).then((v)=>{
+                        const tokens = v.notification_tokens;
+                        tokens.forEach((t)=>{
+                            // console.log(t.token);
+                            https.get(`${firebase_url}?token=${t.token}&imageUrl=https://ellipseapp.com/api/image?id=${e.poster_url}&title=${e.name}&message=Starts at ${e.start_time.toDateString()}`, (resp) => {
+                            }).on("error", (err) => {
+                                console.log("Error: " + err.message);
+                            });
+                        })
+                    })   
                 })
             })
         })
-        
+
     })
 })
 
 
 
+
 //Routers initialization
-app.use('/files',express.static(__dirname +'/files'))
+app.use('/files', express.static(__dirname + '/files'))
 app.use(authRouter);
 app.use(eventRouter);
 app.use(chatRouter);
