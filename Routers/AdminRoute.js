@@ -7,6 +7,7 @@ const sgMail = require('@sendgrid/mail');
 const AdminLogin = require('../Models/AdminLogin');
 const Events = require('../Models/Events');
 const adminAuth = require('../Middleware/AdminAuth');
+const UserDetails = require('../Models/UserDetails');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
@@ -50,6 +51,19 @@ router.post('/api/admin/signin', async (req, res) => {
     }
 })
 
+//route for logout
+router.post('/api/admin/logout', adminAuth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token != req.token
+        })
+        await req.user.save()
+        res.status(200).json({message: "success"});
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
+
 router.get('/api/admin/get_all_events',adminAuth, async (req, res) => {
     try {
         Events.get((err, events) => {
@@ -61,7 +75,7 @@ router.get('/api/admin/get_all_events',adminAuth, async (req, res) => {
     }
 })
 
-router.get('/api/admin/update_event_status',adminAuth, async (req, res) => {
+router.post('/api/admin/update_event_status',adminAuth, async (req, res) => {
     try {
         const eventId = req.body.eventId;
         await Events.updateOne({_id:eventId},{$set:{status:req.body.status}})
@@ -69,6 +83,29 @@ router.get('/api/admin/update_event_status',adminAuth, async (req, res) => {
     } catch (error) {
         res.status(400).json({ error: error.message })
     }
+})
+
+router.post('/api/admin/event/sendemail', adminAuth, async (req, res) => {
+    try {
+        const userId = req.body.user_id;
+        const userDetails = await UserDetails.findOne({use_id: userId});
+        const email = userDetails.email;
+        const title = req.body.title;
+        const content = req.body.content;
+        const msg = {
+            to: email,
+            from: 'support@ellipseapp.com', // Use the email address or domain you verified above
+            subject: 'Information',
+            text: 'http://staging.ellipseapp.com/home',
+            html: `<h1>${title}</h1><h2>${content}</h2>`,
+        };
+        await sgMail.send(msg);
+        res.status(200).json({ message: "success" });
+    }
+    catch (error) {
+        res.status(400).json({ error: error });
+    }
+
 })
 
 
