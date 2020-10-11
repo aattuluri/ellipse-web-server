@@ -5,6 +5,7 @@ DEPLOY_ROOT="/srv/ellipseapp"
 BUILD_DIR="$DEPLOY_ROOT/$BUILD_ID"
 APP_DIR="$BUILD_DIR/ellipse-web-server"
 UI_DIR="$BUILD_DIR/ellipse-web-ui"
+ADMIN_DIR="$BUILD_DIR/ellipse-admin-ui"
 
 SCRIPT_PWD=`pwd`
 
@@ -25,6 +26,9 @@ git clone --branch master --depth 1 git@github.com:aattuluri/ellipse-web-server 
 mkdir -p $UI_DIR
 git clone --branch master --depth 1 git@github.com:aattuluri/ellipse-web-ui $UI_DIR
 
+mkdir -p $ADMIN_DIR
+git clone --branch master --depth 1 git@github.com:aattuluri/ellipse-admin-ui $ADMIN_DIR
+
 # Build artifacts.
 build_ellipse_web_server
 
@@ -36,6 +40,10 @@ pm2 start app.js
 # Copy ui build
 cd $UI_DIR
 cp -R ./build/* /var/www/$DOMAIN_NAME/html
+
+# Copy admin build
+cd $ADMIN_DIR
+cp -R ./build/* /var/www/$DOMAIN_NAME/admin/html
 
 # Update current symlink
 rm /srv/ellipseapp/current
