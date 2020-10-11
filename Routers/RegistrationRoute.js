@@ -1,12 +1,11 @@
 const express = require('express');
 var Mongoose = require('mongoose');
+
 const auth = require('../Middleware/Auth');
-const router = express.Router();
 const Events = require('../Models/Events');
-// const Registrations = require('../Models/Registrations');
 const Registration = require('../Models/Registrations');
-const cron = require('node-cron');
    
+const router = express.Router();
 
 //register the event
 

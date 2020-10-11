@@ -3,7 +3,7 @@ const auth = require('../Middleware/Auth');
 const router = express.Router();
 const chatService = require('../Chat/ChatService');
 
-
+//route for loading the past chat messages 
 router.get('/api/chat/load_messages',auth, (req, res) => {
     try {
         chatService.getChatMessages(req.query.id, function (data) {
@@ -19,10 +19,4 @@ router.get('/api/chat/load_messages',auth, (req, res) => {
 })
 
 
-
-
 module.exports = router
-
-
-
-

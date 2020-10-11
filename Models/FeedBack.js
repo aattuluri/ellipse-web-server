@@ -1,16 +1,8 @@
 const mongoose = require('mongoose');
 
 
-const reports = mongoose.Schema({
-    event_id: {
-        type: String,
-        default: null
-    },
+const feedback = mongoose.Schema({
     user_id: {
-        type: String,
-        default: null
-    },
-    title: {
         type: String,
         default: null
     },
@@ -25,6 +17,6 @@ const reports = mongoose.Schema({
 });
 
 
-const Report = mongoose.model('Report', reports);
+const Feedback = mongoose.model('Feedback', feedback);
 
-module.exports = Report;
+module.exports = Feedback;

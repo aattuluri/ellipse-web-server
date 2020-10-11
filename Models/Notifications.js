@@ -19,6 +19,10 @@ const notification = mongoose.Schema({
     time: {
         type: Date,
         default: Date.now
+    },
+    status: {
+        type: String,
+        default: "sent"
     }
 });
 

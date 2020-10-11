@@ -1,5 +1,7 @@
 let mongoose = require('mongoose');
-const { bool } = require('sharp');
+
+
+//mongoose schema for event
 
 let eventShema = mongoose.Schema({
     user_id: {
@@ -43,7 +45,7 @@ let eventShema = mongoose.Schema({
         default: null
     },
     o_allowed: {
-        type: bool,
+        type: Boolean,
         default: null
     },
     poster_url: {
@@ -119,11 +121,14 @@ let eventShema = mongoose.Schema({
         default: null
     },
     registered: {
-        type: bool,
+        type: Boolean,
     },
     status: {
         type: String,
         default: "pending"
+    },
+    share_link: {
+        type: String,
     },
     posted_on: {
         type: Date,

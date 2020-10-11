@@ -1,30 +1,42 @@
+
+//dependencies
 require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const fileUpload = require('express-fileupload');
+const cors = require('cors');
 const cron = require('node-cron');
-// const redis = require("redis");
+const http = require("http");
+const https = require('https')
+const webSocket = require("ws");
+const mongoose = require('mongoose');
+
+//Routers imports
 const authRouter = require('./Routers/Authroute');
 const eventRouter = require('./Routers/Eventroute');
 const chatRouter = require('./Routers/ChatRoute');
 const registerRouter = require('./Routers/RegistrationRoute');
 const reportRouter = require('./Routers/ReportRoute');
 const notificationRouter = require('./Routers/NotificationRoute');
+const adminRouter = require('./Routers/AdminRoute');
+const feedBackRouter = require('./Routers/FeedBackRoute');
+
+//Database models
 const Events = require('./Models/Events');
-// const client = redis.createClient();
 const Notifications = require('./Models/Notifications');
-const cors = require('cors');
-const mongoose = require('mongoose');
 const User = require('./Models/User');
-// const auth = require('./Middleware/Auth');
-// const socketIO = require("socket.io");
-const webSocket = require("ws");
-const http = require("http");
+const Registration = require('./Models/Registrations');
+const UserDetails = require('./Models/UserDetails');
+
+//importing functions for adding and deleting in redis chat
 const chatService = require('./Chat/ChatService');
 const app = express();
+const PORT = process.env.PORT || 4000;
+
+
 app.use(fileUpload());
 app.use(cors());
-app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.json({ limit: "40mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
@@ -33,7 +45,7 @@ mongoose.connect(process.env.MONGODB_URL, {
     useUnifiedTopology: true,
 })
 
-const PORT = process.env.PORT || 4000;
+
 
 //Code for chat with web sockets
 const server = http.createServer(app);
@@ -41,8 +53,8 @@ const webSocketServer = new webSocket.Server({ server });
 webSocketServer.on('connection', (webSocketClient) => {
     webSocketClient.on('message', (message) => {
         let data = JSON.parse(message);
-        chatService.addChatMessage(data.event_id,JSON.stringify(data.msg),(value)=>{
-            console.log("done");
+        chatService.addChatMessage(data.event_id, JSON.stringify(data.msg), (value) => {
+            // console.log("done");
         })
         switch (data.action) {
             case 'send_message':
@@ -64,46 +76,61 @@ webSocketServer.on('connection', (webSocketClient) => {
 
 //CRON TASKS FOR NOTIFICATIONS
 
-// cron.schedule('0 0 * * *',()=>{
-// const todayEvents = Events.find("")
+const firebase_url = "https://us-central1-ellipse-e2428.cloudfunctions.net/sendNotification";
 
-// })
 
+cron.schedule('00 08 * * *', () => {
+    const presentDate = new Date();
+    var newDate = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+    const todayEvents = Events.find({
+        start_time: {
+            $gte: presentDate.toDateString(),
+            $lt: newDate.toDateString()
+        }
+    }).then((result) => {
+        // console.log(result);
+        result.forEach((e) => {
+            Registration.find({ event_id: e._id }).then((res) => {
+                res.forEach((r) => {
+                    const notification = new Notifications();
+                    notification.user_id = r.user_id;
+                    notification.event_id = r.event_id;
+                    notification.title = e.name;
+                    notification.description = "Starts at " + e.start_time.toDateString()
+                    notification.save();
+                    UserDetails.findOne({user_id:r.user_id}).then((v)=>{
+                        const tokens = v.notification_tokens;
+                        tokens.forEach((t)=>{
+                            // console.log(t.token);
+                            https.get(`${firebase_url}?token=${t.token}&imageUrl=https://ellipseapp.com/api/image?id=${e.poster_url}&title=${e.name}&message=Starts at ${e.start_time.toDateString()}`, (resp) => {
+                            }).on("error", (err) => {
+                                console.log("Error: " + err.message);
+                            });
+                        })
+                    })   
+                })
+            })
+        })
+
+    })
+})
+
+
+
+
+//Routers initialization
+app.use('/files', express.static(__dirname + '/files'))
 app.use(authRouter);
 app.use(eventRouter);
 app.use(chatRouter);
 app.use(registerRouter);
 app.use(reportRouter);
 app.use(notificationRouter);
+app.use(adminRouter);
+app.use(feedBackRouter);
+
+
 server.listen(PORT, (req, res) => {
     console.log(`Server Started at PORT ${PORT}`);
 });
 
-
-
-
-
-
-
-//code for socket.io
-
-// const io = socketIO(server);
-
-// io.on("connection", socket => {
-//     // console.log("started")
-//     socket.on("initialdata", () => {
-//         console.log("hello");
-//       });
-//       socket.on("joinroom",(id)=>{
-//           socket.join(id+":room",()=>{
-//             //   console.log(Object.keys(socket.rooms));
-//           })
-//       })
-//       socket.on("newmessage",(roomid,data)=>{
-//           console.log(data);
-        // chatService.addChatMessage(roomid,JSON.stringify(data),(value)=>{
-        //     console.log("done");
-        // })
-//         io.to(roomid+":room").emit("message",data) 
-//       })
-// })

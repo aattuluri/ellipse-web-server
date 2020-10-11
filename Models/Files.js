@@ -1,8 +1,8 @@
 var Mongoose = require('mongoose');
-var Shortid = require('shortid');
-var Async = require('async');
-var Grid = require('gridfs-stream');
-const fs = require('fs');
+// var Shortid = require('shortid')
+// var Async = require('async');
+// var Grid = require('gridfs-stream');
+// const fs = require('fs');
 const stream = require('stream');
 const conn = Mongoose.connection;
 var gridFSBucket
@@ -28,7 +28,7 @@ async function getFileById(fileId, res, cb) {
             cb(error,fileId)
         }).
         on('finish', function () {
-            console.log('done!');
+            // console.log('done!');
         });
         }
     })   

@@ -1,30 +1,30 @@
 const express = require('express');
 var Mongoose = require('mongoose');
-const auth = require('../Middleware/Auth');
-const router = express.Router();
-const Events = require('../Models/Events');
 const { json } = require('body-parser');
-// const chatService = require('../Chat/ChatService');
-const Files = require('../Models/Files');
 const md5 = require('md5');
+const sgMail = require('@sendgrid/mail');
+const pdf = require('html-pdf');
+
+
+const auth = require('../Middleware/Auth');
+const Events = require('../Models/Events');
+const Files = require('../Models/Files');
 const Registration = require('../Models/Registrations');
-const e = require('express');
 const Colleges = require('../Models/CollegeModel');
 const Announcement = require('../Models/Announcements');
-const sgMail = require('@sendgrid/mail');
+const template = require('../certificatetemplate');
+
+
+const router = express.Router();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-const pdf = require('html-pdf');
-const cron = require('node-cron');
-const Notifications = require('../Models/Notifications');
 
-
-router.get('/api/generatepdf', async (req, res) => {
-    pdf.create('<!doctype html><html><head></head><body><h1>Lalith Reddy</h1></body></html>', {}).toFile('me.pdf', (err, result) => {
+router.post('/api/generate_certificate', async (req, res) => {
+    pdf.create(template(), {width: "2000px",height:"1200px"}).toFile('rezultati.pdf', (err) => {
         if (err) {
-            console.log(err);
+            return console.log('error');
         }
-        res.send(result);
-    })
+        res.send(Promise.resolve())
+    });
 })
 
 
@@ -62,7 +62,7 @@ router.post('/api/event/add_announcement', auth, async (req, res) => {
     }
 })
 
-//Retrieving announcements for a event
+//Retrieving announcements for a event with event id
 router.get('/api/event/get_announcements', auth, (req, res) => {
     try {
 
@@ -76,6 +76,8 @@ router.get('/api/event/get_announcements', auth, (req, res) => {
 
 })
 
+
+//sending group mails bu entering the title,content of mail and array of email
 router.post('/api/event/sendemail', auth, async (req, res) => {
     try {
         const emails = req.body.emails;
@@ -99,10 +101,12 @@ router.post('/api/event/sendemail', auth, async (req, res) => {
 
 })
 
+
+//route for posting the event with the details provided and model is in Events.js
 router.post('/api/events', auth, async (req, res) => {
     try {
         const event = new Events(req.body);
-        // const college = await Colleges.findOne({ name: req.body.college_name });
+        event.status = "pending"
         const college = await Colleges.findOne({ _id: req.body.college_id });
         event.college_name = college.name;
         const user = req.user;
@@ -114,9 +118,6 @@ router.post('/api/events', auth, async (req, res) => {
                     message: err
                 })
             }
-            // const event = await Events.findOne({_id: eventId})
-           
-
             res.status(200).json({
                 status: 'success',
                 code: 200,
@@ -125,33 +126,13 @@ router.post('/api/events', auth, async (req, res) => {
             })
 
         })
-        // const eventId = event._id;
-        // const eventStartDate = new Date(event.start_time);
-        // const day = eventStartDate.getDay();
-        // const mon = eventStartDate.getMonth();
-        // const date = eventStartDate.getDate();
-        // const hour = eventStartDate.getHours();
-        // const min = eventStartDate.getMinutes();
-        // cron.schedule(`${min} ${hour} ${date - 1} ${mon + 1} ${day - 1}`, () => {
-        //     console.log("hi there")
-        //     Registration.find({ event_id: event._id }).then((result) => {
-        //         result.forEach(value =>{
-        //             const notification = new Notifications({
-        //                 user_id: value.user_id,
-        //                 event_id: event._id,
-        //                 title: `${event.name}`+" Event Reminder",
-        //                 description: "Events starts at " + eventStartDate.toDateString()+" " + eventStartDate.toLocaleTimeString(),
-        //             })
-        //             notification.save()
-        //         })
-        //     })
-        // })
     } catch (error) {
         res.status(400).json({ error: error.message })
     }
 
 });
 
+//route for posting the event and it is used for flutter app and will be removed soon
 router.post('/api/post_event', auth, async (req, res) => {
     let event = new Events()
     const college = await Colleges.findOne({ name: req.body.college });
@@ -193,14 +174,14 @@ router.post('/api/post_event', auth, async (req, res) => {
 
 
 
-
+//route to add or update the event poster in mongodb gridfs
 router.post('/api/event/uploadimage', auth, async (req, res) => {
     const user = req.user;
     const eventId = req.query.id;
     const fileName = eventId + md5(Date.now())
     const event = await Events.findOne({ _id: eventId })
     if (event.poster_url != null) {
-         Files.deleteFile(event.poster_url, (result) => {
+        Files.deleteFile(event.poster_url, (result) => {
             Files.saveFile(req.files.image, fileName, user._id, "eventposter", function (err, result) {
                 if (!err) {
                     Events.updateOne({ _id: eventId }, { $set: { 'poster_url': fileName } }).then((value) => {
@@ -220,7 +201,7 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
                 }
             });
         })
-       
+
 
     }
     else {
@@ -248,6 +229,8 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
 
 })
 
+
+//route to retrive the poster from db with file name
 router.get('/api/image', (req, res) => {
     try {
         Files.getFile(req.query.id, res, function (err, result) {
@@ -263,11 +246,10 @@ router.get('/api/image', (req, res) => {
     }
 });
 
-
+//route to get all the events 
 router.get('/api/events', auth, async (req, res) => {
     const user = req.user;
     const finalEvents = [];
-    // const registeredEvents = await Registration.find({user_id: user._id})
     try {
         Events.get((err, events) => {
             if (err) {
@@ -281,7 +263,7 @@ router.get('/api/events', auth, async (req, res) => {
             var len = events.length;
             events.forEach(async (e, index, array) => {
                 const registeredEvent = await Registration.find({ user_id: user._id, event_id: e._id })
-                console.log(registeredEvent);
+                // console.log(registeredEvent);
                 if (registeredEvent.length === 0) {
                     e.registered = false;
                     finalEvents.push(e);
@@ -295,10 +277,7 @@ router.get('/api/events', auth, async (req, res) => {
                 if (count === len) {
                     res.status(200).json(finalEvents)
                 }
-
             })
-
-
         })
     }
     catch (error) {
@@ -307,6 +286,8 @@ router.get('/api/events', auth, async (req, res) => {
 
 });
 
+
+//route to get the particular event with event id
 router.get('/api/event', async (req, res) => {
     try {
         const event = await Events.findOne({ _id: req.query.id });
@@ -319,12 +300,11 @@ router.get('/api/event', async (req, res) => {
 })
 
 
-
+//route for updating the event details but not event poster
 router.post('/api/updateevent', auth, async (req, res) => {
     try {
         const user = req.user;
         const eId = req.body.eventId;
-        console.log(eId);
         Events.updateOne({ _id: eId }, {
             $set: {
                 'name': req.body.name,
@@ -347,33 +327,10 @@ router.post('/api/updateevent', auth, async (req, res) => {
                 'venue_college': req.body.venue_college
             }
         }).then(value => {
-            // eId.destroy();
-            console.log(value)
-            Events.findOne({ _id: eId }).then(event => {
-                const eventStartDate = event.start_time;
-                const day = eventStartDate.getDay();
-                const mon = eventStartDate.getMonth();
-                const date = eventStartDate.getDate();
-                const hour = eventStartDate.getHours();
-                const min = eventStartDate.getMinutes();
-                // cron.schedule(`${min} ${hour} ${date - 1} ${mon + 1} ${day - 1}`, () => {
-                //     console.log("hi there")
-                //     Registration.find({ event_id: event._id }).then((result) => {
-                //         result.forEach(value =>{
-                //             const notification = new Notifications({
-                //                 user_id: value.user_id,
-                //                 event_id: event._id,
-                //                 title: `${event.name}`+" Event Reminder",
-                //                 description: "Events starts at " + eventStartDate.toDateString()+" " + eventStartDate.toLocaleTimeString(),
-                //             })
-                //             notification.save()
-                //         })
-                //     })
-                   
-                // })
-                res.status(200).json({ event });
-
+            Events.findOne({_id: eId}).then((event)=>{
+                res.status(200).json({event});
             })
+            
         })
     }
     catch (error) {
@@ -383,100 +340,22 @@ router.post('/api/updateevent', auth, async (req, res) => {
 })
 
 
+
+//route for generating the pdf
+// router.get('/api/generatepdf', async (req, res) => {
+//     pdf.create('<!doctype html><html><head></head><body><h1>Lalith Reddy</h1></body></html>', {}).toFile('me.pdf', (err, result) => {
+//         if (err) {
+//             console.log(err);
+//         }
+//         res.send(result);
+//     })
+// })
+
+
 module.exports = router
 
 
-// const chatMessage = JSON.stringify({
-        //     uid:event.user_id,
-        //     message: "welcome",
-        //     sent_time: Date.now(),
-        // })
-        // chatService.addChatMessage(event._id,"lalith",(err,value)=>{
-        //     console.log(value);
-        // });
-        // eventsMedia.save((err)=>{
-        //     event.updateOne({})
-        // })
 
 
 
 
-
-
-
-// router.route('/events')
-//     .get(eventController.index)
-//     .post(eventController.new)
-
-// router.route('/event/:id')
-//     .get(eventController.view)
-//     .put(eventController.update)
-//     .delete(eventController.delete)
-
-
-//fucntion view events
-// exports.view = function(req, res) {
-//     Events.findById(req.params.id, function(err, event) {
-//         if (err) {
-//             res.json({
-//                 status: 'error',
-//                 code: 500,
-//                 message: err
-//             })
-//         }
-//         res.json({
-//             status: 'success',
-//             code: 200,
-//             message: '__',
-//             data: event
-//         })
-//     })
-// }
-
-// exports.update = function(req, res) {
-//     Events.findById(req.params.id, function(err, event) {
-//         if (err)
-//             res.json({
-//                 status: 'err',
-//                 code: 500,
-//                 message: err
-//             })
-//         event.name = req.body.name
-//         event.description = req.body.description
-//         event.start_time = req.body.start_time
-//         event.finish_time = req.body.finish_time
-//         event.save(function(err) {
-//             if (err)
-//                 res.json({
-//                     status: 'err',
-//                     code: 500,
-//                     message: err
-//                 })
-//             res.json({
-//                 status: 'success',
-//                 code: 200,
-//                 message: '__',
-//                 data: event
-//             })
-//         })
-//     })
-// }
-
-
-// exports.delete = function(req, res) {
-//     Events.remove({
-//         _id: req.params.id
-//     }, function(err) {
-//         if (err)
-//             res.json({
-//                 status: 'err',
-//                 code: 500,
-//                 message: err
-//             })
-//         res.json({
-//             status: 'success',
-//             code: 200,
-//             message: '__'
-//         })
-//     })
-// }

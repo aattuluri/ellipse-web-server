@@ -1,24 +1,29 @@
 const express = require('express');
-const UserLogin = require('../Models/User');
-const auth = require('../Middleware/Auth');
+const md5 = require('md5');
 var otpGenerator = require("otp-generator");
 const bcrypt = require('bcryptjs');
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-const router = express.Router();
+// var Grid = require('gridfs-stream');
+
+const UserLogin = require('../Models/User');
+const auth = require('../Middleware/Auth');
 const UserDetails = require('../Models/UserDetails');
 const collegeController = require('./collegeController');
-var Grid = require('gridfs-stream');
-const { route } = require('./ChatRoute');
 const Files = require('../Models/Files');
-const md5 = require('md5');
-// const ProfilePics = require('../Models/ProfilePics');
+// const { route } = require('./ChatRoute');
 
 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const router = express.Router();
+
+
+//route to ping for api if it working
 router.get('/api',(req,res)=>{
     res.send("server is working");
 })
 
+
+//route to check if username already exists 
 router.post('/api/check_username', async (req,res)=>{
     try{
         const {username} = req.body;
@@ -35,6 +40,8 @@ router.post('/api/check_username', async (req,res)=>{
     }
 })
 
+
+//route for user signup
 router.post('/api/users/signup', async (req, res) => {
     // Create a new user
     try {
@@ -65,10 +72,12 @@ router.post('/api/users/signup', async (req, res) => {
     }
 })
 
+
+//roite to send verification mail
 router.post('/api/users/sendverificationemail',async (req,res)=>{
     try{
         const {email} = req.body;
-        console.log(email);
+        // console.log(email);
         const otp = await otpGenerator.generate(4, {upperCase: false, specialChars: false,alphabets: false });
         const user = await UserLogin.findOne({email:email});
         const msg = {
@@ -97,6 +106,7 @@ router.post('/api/users/sendverificationemail',async (req,res)=>{
     }
 })
 
+//roputer to verify the otp
 router.post('/api/users/verifyotp',auth, async (req,res)=>{
     try{
         const {otp,email} = req.body;
@@ -110,7 +120,7 @@ router.post('/api/users/verifyotp',auth, async (req,res)=>{
                 }}).then((val)=>{
                 // console.log(val);
                 UserDetails.update({ 'email':user.email }, { $set: { 'verified': true } }).then((value)=>{
-                    console.log(val);
+                    // console.log(val);
                     res.status(200).json({"message":"verified"});
                 }) 
                 
@@ -127,7 +137,7 @@ router.post('/api/users/verifyotp',auth, async (req,res)=>{
 })
 
 
-
+//route to update password with current password
 router.post('/api/users/updatepassword',auth,async(req,res)=>{
     try {
         const {email,cPassword,nPassword} = req.body;
@@ -144,17 +154,17 @@ router.post('/api/users/updatepassword',auth,async(req,res)=>{
             // console.log(val);
             res.status(200).json({message:"success"})
         })
-        res.status(200).json({message: "success"});
+        // res.status(200).json({message: "success"});
     } catch (error) {
         res.status(500).send(error.message)
     }
 })
 
-
+//route to change password with otp
 router.post('/api/users/forgotpassword',async(req,res)=>{
     try {
         const {email,otp,nPassword} = req.body;
-        console.log(email)
+        // console.log(email)
         const user = await UserLogin.findOne({'email':email})
         if (!user) {
             return res.status(401).send({error: 'Login failed! Check authentication credentials'});
@@ -174,7 +184,7 @@ router.post('/api/users/forgotpassword',async(req,res)=>{
 })
 
 
-
+//route to get the userdetails
 router.get('/api/users/getuser',auth,async(req,res)=>{
     try{
         const userDetails = await UserDetails.findOne({user_id:req.query.id})
@@ -185,18 +195,17 @@ router.get('/api/users/getuser',auth,async(req,res)=>{
     }
 })
 
+//route to login
 router.post('/api/users/login', async(req, res) => {
     //Login a registered user
     try {
         const { email, password } = req.body
-        console.log(email);
-        console.log(password);
         const user = await UserLogin.findOne({ email} );
         if (!user) {
             throw new Error('Invalid login credentials')
         }
         const isPasswordMatch = await bcrypt.compare(password, user.password)
-        console.log(isPasswordMatch);
+        
         if (!isPasswordMatch) {
             throw new Error('Invalid login credentials')
         }
@@ -218,16 +227,13 @@ router.post('/api/users/login', async(req, res) => {
     }
 
 })
+
+//route to post the user details
 router.post('/api/users/userdetails',auth,async (req,res)=>{
     try{
         const {gender,college_id,designation,bio} = req.body;
         const user = await req.user;
-        console.log(user);
-        // console.log(collegeName);
-        // console.log(imageUrl);
-        console.log(college_id);
         const college = await Colleges.findOne({ _id: college_id });
-        console.log(college);
         UserDetails.updateOne({email: user.email},{$set:{
             'user_id': user._id,
             'bio': bio,
@@ -248,6 +254,8 @@ router.post('/api/users/userdetails',auth,async (req,res)=>{
     }
 })
 
+
+//route to update the user profile details
 router.post('/api/users/updateprofile',auth,async (req,res)=>{
     try{
         const {name,email,username,gender,college_id,designation,bio} = req.body;
@@ -272,6 +280,8 @@ router.post('/api/users/updateprofile',auth,async (req,res)=>{
     }
 })
 
+
+//route to add and update profile image for user
 router.post('/api/users/uploadimage', auth, async (req, res) => {
     const user = req.user;
     const fileName = user._id + md5(Date.now())
@@ -301,7 +311,6 @@ router.post('/api/users/uploadimage', auth, async (req, res) => {
             if (!err) {
                 // console.log("aaxd")
                 UserDetails.updateOne({ user_id: user._id  }, { $set: { 'profile_pic': fileName } }).then((value) => {
-                    console.log("done");
                     res.status(200).json({
                         status: 'success',
                         code: 200,
@@ -322,9 +331,8 @@ router.post('/api/users/uploadimage', auth, async (req, res) => {
 
 
 
-
+//view loggedin profile
 router.get('/api/users/me', auth, async(req, res) => {
-    // View logged in user profile
     try{
         const user = req.user;
         // console.log(user.email);
@@ -339,8 +347,8 @@ router.get('/api/users/me', auth, async(req, res) => {
 })
 
 
+//route for logout
 router.post('/api/users/logout', auth, async (req, res) => {
-    // Log user out of the application
     try {
         req.user.tokens = req.user.tokens.filter((token) => {
             return token.token != req.token
@@ -364,6 +372,8 @@ router.post('/api/users/logout', auth, async (req, res) => {
 // })
 
 
+
+//route to check the details in mobile application whether details are filled
 router.post('/api/users/check', auth, async (req, res) => {
     try {
         const userdetails = await UserDetails.findOne({ user_id: req.body.id })
@@ -383,7 +393,7 @@ router.post('/api/users/check', auth, async (req, res) => {
             const college_id=userDetails.college_id
             return res.status(403).send(college_id);
         }
-        console.log("Checked")
+        // console.log("Checked")
 
     } catch (e) {
         console.log(e)
@@ -398,10 +408,10 @@ router.post('/api/users/check_fill',auth, async (req, res) => {
         const colleges = await Colleges.findOne({ _id: req.body.college })
         const cname =colleges.name
         UserDetails.updateOne({ 'userid': req.body.id }, { $set: { 'college_id': req.body.college,'college_name':cname, 'profile_pic': req.body.image_url,'bio': req.body.bio,'designation': req.body.designation } }).then((val)=>{
-            console.log(val);
+            // console.log(val);
         })
 
-        console.log("Checked")
+        // console.log("Checked")
         res.status(200).send("success");
 
     } catch (e) {
@@ -409,6 +419,8 @@ router.post('/api/users/check_fill',auth, async (req, res) => {
         res.status(500).send('There was a problem in check');
     }
 })
+
+//route to verify otp in mobile application
 router.post('/api/users/otpverified',auth, async (req, res) => {
     try {
         const userdetails = await UserDetails.findOne({ otp: req.body.otp })
@@ -416,7 +428,7 @@ router.post('/api/users/otpverified',auth, async (req, res) => {
             return res.status(404).send("The otp doesn't exists")
         }
         res.status(200).send("Verified")
-        console.log("Verified")
+        // console.log("Verified")
         UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'otp': '000000' } }).then((val)=>{
             console.log(val);
         })
@@ -425,6 +437,8 @@ router.post('/api/users/otpverified',auth, async (req, res) => {
         res.status(400).json(error.message);
     }
 })
+
+//route for sending the email in mobile application
 router.post('/api/users/emailverify',async (req, res) => {
     try {
         const email = req.query.email;
@@ -443,9 +457,10 @@ router.post('/api/users/emailverify',async (req, res) => {
             try {
                 await sgMail.send(msg);
                 UserDetails.updateOne({ 'email': email }, { $set: { 'otp': otp } }).then((val)=>{
-                    console.log(val);
+                    // console.log(val);
+                    res.status(200).json({ otp });
                 })
-                res.status(200).json({ otp });
+                
             } catch (error) {
                 console.error(error);
 
@@ -460,6 +475,7 @@ router.post('/api/users/emailverify',async (req, res) => {
     }
 })
 
+//route for otp verification in mobile application
 router.post('/api/users/emailverified',auth, async (req, res) => {
     try {
         const user = await req.user;
@@ -477,15 +493,17 @@ router.post('/api/users/emailverified',auth, async (req, res) => {
             return res.status(404).send("The otp doesn't exists")
         }
         res.status(300).send("Verified")
-        console.log("Verified")
+        // console.log("Verified")
         UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'otp': '000000' } }).then((val)=>{
-            console.log(val);
+            // console.log(val);
         })
     }
     catch (error) {
         res.status(400).json(error.message);
     }
 })
+
+//route for forgot password in mobile application
 router.post('/api/users/emailverified_forgot_password', async (req, res) => {
     try {
         const otp = req.query.otp;
@@ -494,7 +512,7 @@ router.post('/api/users/emailverified_forgot_password', async (req, res) => {
             return res.status(404).send("The otp doesn't exists")
         }
         res.status(200).send("Verified")
-        console.log("Verified")
+        // console.log("Verified")
         UserDetails.updateOne({ otp: otp }, { $set: { 'otp': '000000' } }).then((val)=>{
             console.log(val);
         })
@@ -503,6 +521,8 @@ router.post('/api/users/emailverified_forgot_password', async (req, res) => {
         res.status(400).json(error.message);
     }
 })
+
+//route to reset password in mobile application
 router.post('/api/users/reset_password',async(req,res)=>{
     try {
         const {email,password} = req.body;
@@ -520,6 +540,8 @@ router.post('/api/users/reset_password',async(req,res)=>{
         res.status(500).send(error.message)
     }
 })
+
+//route fro all the colleges
 router.route('/api/colleges')
     .get(collegeController.index)
 

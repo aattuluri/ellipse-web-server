@@ -1,6 +1,7 @@
-
 const redis = require("redis");
 const redisClient = redis.createClient();
+
+
 redisClient.on('connect',()=>{
   console.log("rdis client connected")
 })
@@ -9,21 +10,22 @@ redisClient.on('error',(err)=>{
   console.log(err);
 })
 
+
+//function for creating chat which is not used now
 function createChatForEvent(eventId,message,cb){
-  console.log(eventId);
   redisClient.LPUSH(eventId+":messages",message,cb);
 }
+
+//function for getting chat messages
 function getChatMessages(chatId,callback){
-  // console.log(chatId);
   redisClient.lrange(chatId + ":messages", 0, -1, (error,data)=>{
-    // console.log(data);
     callback(data);
   });
 }
 
+
+//function for adding chat message
 function addChatMessage(eventId,message,cb){
-  console.log(eventId);
-  console.log("sksk")
   redisClient.RPUSH(eventId+":messages",message,cb);
 }
 module.exports = {
@@ -87,5 +89,8 @@ module.exports = {
 //     cback (err);
 //   });
 // }
+
+
+
 
 
