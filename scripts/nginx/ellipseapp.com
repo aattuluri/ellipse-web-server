@@ -16,10 +16,8 @@ server {
     }
     
     location /admin {
-        # First attempt to serve request as file, then
-        # as directory, then fall back to displaying a 404.
-        try_files $uri $uri/ /index.html;
-        root /var/www/ellipseapp.com/admin/html
+       root /var/www/ellipseapp.com/admin/html;
+       try_files $uri $uri/ /index.html;
     }
     
     location /api {
