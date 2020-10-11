@@ -8,6 +8,8 @@ const AdminLogin = require('../Models/AdminLogin');
 const Events = require('../Models/Events');
 const adminAuth = require('../Middleware/AdminAuth');
 const UserDetails = require('../Models/UserDetails');
+const Reports = require('../Models/Reports');
+const FeedBack = require('../Models/FeedBack');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
@@ -67,7 +69,7 @@ router.post('/api/admin/logout', adminAuth, async (req, res) => {
 router.get('/api/admin/get_all_events',adminAuth, async (req, res) => {
     try {
         Events.get((err, events) => {
-            console.log(events)
+            // console.log(events)
             res.status(200).json(events)
         })
     } catch (error) {
@@ -87,8 +89,8 @@ router.post('/api/admin/update_event_status',adminAuth, async (req, res) => {
 
 router.post('/api/admin/event/sendemail', adminAuth, async (req, res) => {
     try {
-        const userId = req.body.user_id;
-        const userDetails = await UserDetails.findOne({use_id: userId});
+        const userId = req.body.userId;
+        const userDetails = await UserDetails.findOne({user_id: userId});
         const email = userDetails.email;
         const title = req.body.title;
         const content = req.body.content;
@@ -107,6 +109,40 @@ router.post('/api/admin/event/sendemail', adminAuth, async (req, res) => {
     }
 
 })
+
+//route for all users
+router.get('/api/admin/get_all_users',adminAuth, async (req, res) => {
+    try {
+        UserDetails.find().then(users=>{
+            res.status(200).json(users)
+        })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+//route for reports
+
+router.get('/api/admin/reports',adminAuth,async (req,res)=>{
+    try {
+        Reports.find().then(reports=>{
+            res.status(200).json(reports)
+        })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+router.get('/api/admin/feedback',adminAuth,async (req,res)=>{
+    try {
+        FeedBack.find().then(feedbacks=>{
+            res.status(200).json(feedbacks)
+        })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
 
 
 

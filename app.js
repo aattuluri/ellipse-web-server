@@ -19,6 +19,7 @@ const registerRouter = require('./Routers/RegistrationRoute');
 const reportRouter = require('./Routers/ReportRoute');
 const notificationRouter = require('./Routers/NotificationRoute');
 const adminRouter = require('./Routers/AdminRoute');
+const feedBackRouter = require('./Routers/FeedBackRoute');
 
 //Database models
 const Events = require('./Models/Events');
@@ -126,6 +127,7 @@ app.use(registerRouter);
 app.use(reportRouter);
 app.use(notificationRouter);
 app.use(adminRouter);
+app.use(feedBackRouter);
 
 
 server.listen(PORT, (req, res) => {

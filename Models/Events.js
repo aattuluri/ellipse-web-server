@@ -127,6 +127,9 @@ let eventShema = mongoose.Schema({
         type: String,
         default: "pending"
     },
+    share_link: {
+        type: String,
+    },
     posted_on: {
         type: Date,
         default: Date.now()

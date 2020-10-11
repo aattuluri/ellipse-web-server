@@ -13,6 +13,10 @@ const registration = mongoose.Schema({
     data:{
         type: Object,
     },
+    status: {
+        type: String,
+        default: "registered"
+    },
     time: {
         type: Date,
         default: Date.now
