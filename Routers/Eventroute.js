@@ -65,9 +65,23 @@ router.post('/api/event/add_announcement', auth, async (req, res) => {
 //Retrieving announcements for a event with event id
 router.get('/api/event/get_announcements', auth, (req, res) => {
     try {
-
         Announcement.find({ event_id: req.query.id }).then((result) => {
             res.status(200).json(result);
+        })
+    }
+    catch (error) {
+        res.status(400).json({ 'error': error })
+    }
+
+})
+
+//deleting announcement
+router.post('/api/event/delete_announcement', auth, (req, res) => {
+    try {
+        Announcement.deleteOne({_id:req.query.id}).then((result)=>{
+            Announcement.find({ event_id: req.query.event_id }).then((response) => {
+                res.status(200).json(response);
+            })
         })
     }
     catch (error) {
@@ -287,10 +301,30 @@ router.get('/api/events', auth, async (req, res) => {
 });
 
 
-//route to get the particular event with event id
-router.get('/api/event', async (req, res) => {
+//route to get the particular event with event id for unregisterd users
+router.get('/api/unregistered/event', async (req, res) => {
     try {
         const event = await Events.findOne({ _id: req.query.id });
+        res.status(200).json({ event });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+
+})
+
+//route to get the particular event with event id
+router.get('/api/event',auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const event = await Events.findOne({ _id: req.query.id });
+        const registeredEvent = await Registration.find({user_id: user._id,event_id: event._id});
+        if (registeredEvent.length === 0) {
+            event.registered = false;
+        }
+        else{
+            event.registered = true;
+        }
         res.status(200).json({ event });
     }
     catch (error) {
