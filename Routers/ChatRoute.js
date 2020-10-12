@@ -20,7 +20,3 @@ router.get('/api/chat/load_messages',auth, (req, res) => {
 
 
 module.exports = router
-
-
-
-
