@@ -4,6 +4,7 @@ const { json } = require('body-parser');
 const md5 = require('md5');
 const sgMail = require('@sendgrid/mail');
 const pdf = require('html-pdf');
+const https = require('https');
 
 
 const auth = require('../Middleware/Auth');
@@ -15,11 +16,12 @@ const Announcement = require('../Models/Announcements');
 const template = require('../certificatetemplate');
 
 
+
 const router = express.Router();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 router.post('/api/generate_certificate', async (req, res) => {
-    pdf.create(template(), {width: "2000px",height:"1200px"}).toFile('rezultati.pdf', (err) => {
+    pdf.create(template(), { width: "2000px", height: "1200px" }).toFile('rezultati.pdf', (err) => {
         if (err) {
             return console.log('error');
         }
@@ -78,7 +80,7 @@ router.get('/api/event/get_announcements', auth, (req, res) => {
 //deleting announcement
 router.post('/api/event/delete_announcement', auth, (req, res) => {
     try {
-        Announcement.deleteOne({_id:req.query.id}).then((result)=>{
+        Announcement.deleteOne({ _id: req.query.id }).then((result) => {
             Announcement.find({ event_id: req.query.event_id }).then((response) => {
                 res.status(200).json(response);
             })
@@ -132,6 +134,34 @@ router.post('/api/events', auth, async (req, res) => {
                     message: err
                 })
             }
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+            const data = JSON.stringify({
+                "dynamicLinkInfo": {
+                    "domainUriPrefix": "https://ellipseapp.page.link",
+                    "link": `http://staging.ellipseapp.com/un/event/${event._id}`,
+                    "androidInfo": {
+                        "androidPackageName": "com.guna0027.ellipse"
+                    },
+                }
+            });
+            const r = https.request(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=AIzaSyBSsNp2tdDveI2A4EhAJ_ZF0GyrmdTaQYA`, options, (result) => {
+                result.setEncoding('utf8');
+                result.on('data', (d) => {
+                    const parsedData = JSON.parse(d);
+                    event.share_link = parsedData.shortLink;
+                    event.save();
+                })
+            })
+            r.on('error', (error) => {
+                console.error(error)
+            })
+            r.write(data)
+            r.end()
             res.status(200).json({
                 status: 'success',
                 code: 200,
@@ -314,15 +344,15 @@ router.get('/api/unregistered/event', async (req, res) => {
 })
 
 //route to get the particular event with event id
-router.get('/api/event',auth, async (req, res) => {
+router.get('/api/event', auth, async (req, res) => {
     try {
         const user = req.user;
         const event = await Events.findOne({ _id: req.query.id });
-        const registeredEvent = await Registration.find({user_id: user._id,event_id: event._id});
+        const registeredEvent = await Registration.find({ user_id: user._id, event_id: event._id });
         if (registeredEvent.length === 0) {
             event.registered = false;
         }
-        else{
+        else {
             event.registered = true;
         }
         res.status(200).json({ event });
@@ -361,10 +391,10 @@ router.post('/api/updateevent', auth, async (req, res) => {
                 'venue_college': req.body.venue_college
             }
         }).then(value => {
-            Events.findOne({_id: eId}).then((event)=>{
-                res.status(200).json({event});
+            Events.findOne({ _id: eId }).then((event) => {
+                res.status(200).json({ event });
             })
-            
+
         })
     }
     catch (error) {

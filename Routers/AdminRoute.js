@@ -10,6 +10,7 @@ const adminAuth = require('../Middleware/AdminAuth');
 const UserDetails = require('../Models/UserDetails');
 const Reports = require('../Models/Reports');
 const FeedBack = require('../Models/FeedBack');
+const EventKeywords = require('../Models/EventKeywords');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
@@ -133,11 +134,54 @@ router.get('/api/admin/reports',adminAuth,async (req,res)=>{
     }
 })
 
+//route for feeedback
 router.get('/api/admin/feedback',adminAuth,async (req,res)=>{
     try {
         FeedBack.find().then(feedbacks=>{
             res.status(200).json(feedbacks)
         })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+//route for adding event types and tags
+
+router.post('/api/admin/add_event_tags',adminAuth, async (req, res) => {
+    try {
+        const eventKeywords = new EventKeywords(req.body);
+        await eventKeywords.save()
+        EventKeywords.find().then(eventKeywords=>{
+            res.status(200).json(eventKeywords)
+        })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+//route for getting all keywords
+router.get('/api/admin/event/get_event_keywords',adminAuth, async (req, res) => {
+    try {
+        EventKeywords.find().then(eventKeywords=>{
+            res.status(200).json(eventKeywords)
+        })
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+});
+
+//route for adding event types and tags
+
+router.post('/api/admin/delete_event_keywords',adminAuth, async (req, res) => {
+    try {
+        const id = req.body.id;
+        EventKeywords.deleteOne({_id: id}).then(r=>{
+            EventKeywords.find().then(eventKeywords=>{
+                res.status(200).json(eventKeywords)
+            })
+        })
+        
     } catch (error) {
         res.status(400).json({ error: error.message })
     }
