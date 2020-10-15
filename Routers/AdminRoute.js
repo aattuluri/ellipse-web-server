@@ -67,6 +67,7 @@ router.post('/api/admin/logout', adminAuth, async (req, res) => {
     }
 })
 
+//rroute forr getting all events
 router.get('/api/admin/get_all_events',adminAuth, async (req, res) => {
     try {
         Events.get((err, events) => {
@@ -78,6 +79,7 @@ router.get('/api/admin/get_all_events',adminAuth, async (req, res) => {
     }
 })
 
+//route for updating event status
 router.post('/api/admin/update_event_status',adminAuth, async (req, res) => {
     try {
         const eventId = req.body.eventId;
@@ -88,6 +90,7 @@ router.post('/api/admin/update_event_status',adminAuth, async (req, res) => {
     }
 })
 
+//route fo sending email to admin
 router.post('/api/admin/event/sendemail', adminAuth, async (req, res) => {
     try {
         const userId = req.body.userId;

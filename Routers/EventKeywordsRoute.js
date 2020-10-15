@@ -19,6 +19,7 @@ router.get('/api/event/get_event_keywords',auth, async (req, res) => {
     }
 });
 
+
 //route for getting onlu event types in event keywords
 router.get('/api/event/get_event_types',auth, async (req, res) => {
     try {
