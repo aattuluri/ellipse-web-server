@@ -2,7 +2,6 @@ const express = require('express');
 var Mongoose = require('mongoose');
 const auth = require('../Middleware/Auth');
 const Events = require('../Models/Events');
-const Certificates = require('../Models/Certificates');
 const pdf = require('html-pdf');
 const router = express.Router();
 const template = require('../certificatetemplate');
