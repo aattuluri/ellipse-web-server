@@ -21,6 +21,7 @@ const notificationRouter = require('./Routers/NotificationRoute');
 const adminRouter = require('./Routers/AdminRoute');
 const feedBackRouter = require('./Routers/FeedBackRoute');
 const EventKeywordsRouter = require('./Routers/EventKeywordsRoute');
+const CertificateRouter = require('./Routers/CertificateRoute');
 
 //Database models
 const Events = require('./Models/Events');
@@ -117,6 +118,8 @@ cron.schedule('00 08 * * *', () => {
     })
 })
 
+// const dattt = new Date();
+// console.log(dattt.toLocaleDateString())
 
 //Routers initialization
 app.use('/files', express.static(__dirname + '/files'))
@@ -129,6 +132,7 @@ app.use(notificationRouter);
 app.use(adminRouter);
 app.use(feedBackRouter);
 app.use(EventKeywordsRouter);
+app.use(CertificateRouter);
 
 
 server.listen(PORT, (req, res) => {

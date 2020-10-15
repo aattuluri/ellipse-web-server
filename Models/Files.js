@@ -55,6 +55,19 @@ async function saveFile(rs,fileName,userId,purpose, cb) {
     
 }
 
+async function saveCertifiate(stream,fileName,userId,purpose, cb) {
+
+    var ws = await gridFSBucket.openUploadStream(fileName,
+        { "metadata": { "contentType": "application/pdf", "userId": userId,"purpose": purpose } });
+    await stream.pipe(ws).on('error', function (error) {
+        cb(error, {"message": "fail"});
+    }).
+    on('finish', function () {
+        cb(null, {"message": "success"});
+    });
+    
+}
+
 function deleteFileById(fileId, cb) {
     const db = conn.db;
     const collection = db.collection('fs.files'); 
@@ -96,4 +109,5 @@ module.exports = {
     getFile: getFileById,
     saveFile: saveFile,
     deleteFile: deleteFileById,
+    saveCertificate: saveCertifiate,
 };

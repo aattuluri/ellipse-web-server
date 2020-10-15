@@ -405,21 +405,23 @@ router.post('/api/updateevent', auth, async (req, res) => {
 })
 
 
-router.get('/api/event/get_organizer_details',auth, async(req,res)=>{
+router.get('/api/event/get_organizer_details',auth, async (req,res)=>{
     try {
         const user = req.user;
-        const event_id = req.query.eventId;
+        const event_id = await req.query.eventId;
+        // console.log(event_id)
+        // console.log("event"+req.query.eventId)
         const user_id = req.query.userId;
         const event = await Events.findOne({_id:event_id});
         if(event.user_id === user_id){
             UserDetails.findOne({user_id:user_id}).then(value=>{
-                console.log(value);
+                // console.log(value);
                 res.status(200).json({name:value.name,profile_pic:value.profile_pic,college_name:value.college_name});
             })
         }
     }
     catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(400).json({ error: error.message })
     }
 })

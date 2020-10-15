@@ -1,5 +1,5 @@
 // const cer = require('./certificatebackground.png');
-module.exports = () => {
+module.exports = (organizer_name,participant_name,date,event_name) => {
     const today = new Date();
     return `
     <!DOCTYPE html>
@@ -84,11 +84,11 @@ module.exports = () => {
     </head>
     <body>
     <img class="bgimage" src="http://localhost:4000/files/certificatebackground.png" height="1180px" width="1950px">
-    <p class="one">CodeChef VIT</p> 
+    <p class="one">${organizer_name}</p> 
     <p class="two">01/10/2020</p>
-    <p class="three">PUNEPALLE R LALITH SAGAR</p>
+    <p class="three">${participant_name}</p>
     <p class="four">has participated in</p>
-    <p class="five">DevHack</p>
+    <p class="five">${event_name}</p>
     <p class="six">an hackathon organized by CodechefVIT<br>
         hosted on ellipseapp.com</p>
     <p class="seven">CodeChef VIT <br>Organizer<br>VIT Univeristy</p>
