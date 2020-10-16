@@ -118,8 +118,7 @@ cron.schedule('00 08 * * *', () => {
     })
 })
 
-// const dattt = new Date();
-// console.log(dattt.toLocaleDateString())
+
 
 //Routers initialization
 app.use('/files', express.static(__dirname + '/files'))

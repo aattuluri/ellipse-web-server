@@ -14,13 +14,13 @@ const UserDetails = require('../Models/UserDetails');
 
 //post the report for the event
 
-router.post('/api/event/generate_certificates', async (req, res) => {
+router.post('/api/event/generate_certificates',auth, async (req, res) => {
     try {
         const user = req.user;
         const event_id = req.body.eventId;
         const participants = req.body.participants;
-        console.log(event_id);
-        console.log(participants);
+        // console.log(event_id);
+        // console.log(participants);
         const event = await Events.findOne({_id:event_id});
         const adminUser = await UserDetails.findOne({user_id:event.user_id});
         var count = 0;
@@ -28,29 +28,35 @@ router.post('/api/event/generate_certificates', async (req, res) => {
             count++;
             const participantUser = await UserDetails.findOne({email: part});
             const fileName = randomstring.generate(6) + md5(Date.now())
-            await pdf.create(template(adminUser.name, participantUser.name, '12/10/2020', event.name), { width: "2000px", height: "1200px" }).toStream(async (err, stream) => {
-                if (err) {
-                    return console.log('error');
-                }
-                await Files.saveCertificate(stream, fileName, participantUser.user_id, "participation_certificate",async function (err, result) {
-                    if (!err) {
-                        await Registrations.updateOne(
-                            {event_id:event_id,user_id:participantUser.user_id},
-                            {$set:{certificate_status:"generated",certificate_url:fileName}})
+            const dattt = new Date();
+            const share_id = await randomstring.generate(11);
+            const r = await Registrations.findOne({share_id:share_id})
+            if(!r){
+                await pdf.create(template(adminUser.name, participantUser.name, dattt.toLocaleDateString(), event.name,share_id,event.college_name), { width: "2000px", height: "1200px" }).toStream(async (err, stream) => {
+                    if (err) {
+                        return console.log('error');
                     }
-                    else {
-                        res.status(400).json({
-                            status: 'error',
-                            code: 500,
-                            message: err
-                        })
-                    }
-                })
-                // res.send(Promise.resolve())
-            });
-            if(count === participants.length){
-                res.send(200).json({message:"success"})
+                    await Files.saveCertificate(stream, fileName, participantUser.user_id, "participation_certificate",async function (err, result) {
+                        if (!err) {
+                            await Registrations.updateOne(
+                                {event_id:event_id,user_id:participantUser.user_id},
+                                {$set:{certificate_status:"generated",certificate_url:fileName,share_id: share_id}})
+                        }
+                        else {
+                            res.status(400).json({
+                                status: 'error',
+                                code: 400,
+                                message: err
+                            })
+                        }
+                    })
+                    // res.send(Promise.resolve())
+                });
             }
+            if(count === participants.length){
+                res.status(200).json({message:"success"})
+            }
+            
         });
 
     }
@@ -94,13 +100,43 @@ router.get('/api/user/certificate',async (req,res)=>{
 
 
 //route to get the event name
-router.get('/api/event/get_event_name',(req,res)=>{
+router.get('/api/event/get_event_name',auth,(req,res)=>{
     try {
         const user = req.user;
         const eventId = req.query.eventId;
         Events.findOne({_id: eventId}).then(result=>{
             res.status(200).json(result.name);
         })
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+//route to verify the certificate
+router.get('/api/event/verify_certificate',async (req,res)=>{
+    try {
+        const id = req.query.id;
+        const reg = await Registrations.findOne({share_id: id})
+        if(reg){
+            const data = {};
+            Events.findOne({_id:reg.event_id}).then(result=>{
+                data.event_name = result.name;
+                UserDetails.findOne({user_id:result.user_id}).then((admin)=>{
+                    data.organizer = admin.name+","+admin.college_name;
+                    data.date = result.start_time;
+                    UserDetails.findOne({user_id: reg.user_id}).then(participant=>{
+                        data.participantname = participant.name;
+                        data.participant_college = participant.college_name;
+                        res.status(200).json(data);
+                    })
+                    
+                })
+            })
+        }
+        else{
+            res.status(400).json({"message":"not found"});
+        }
     }
     catch (error) {
         res.status(400).json({ error: error.message })
