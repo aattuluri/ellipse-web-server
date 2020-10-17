@@ -98,26 +98,70 @@ router.post('/api/users/sendverificationemail',async (req,res)=>{
         // console.log(email);
         const otp = await otpGenerator.generate(4, {upperCase: false, specialChars: false,alphabets: false });
         const user = await UserLogin.findOne({email:email});
-        const msg = {
-            to: email,
-            from: 'support@ellipseapp.com', // Use the email address or domain you verified above
-            subject: 'Ellipse OTP Authentication',
-            text: `${otp}`,
-            html: `<h1>your otp is ${otp}</h1>`,
-          };
-          try {
-            await sgMail.send(msg);
-            UserLogin.updateOne({'email':email},{$set:{'otp': otp}}).then((val)=>{
-                console.log(val);
-            })
-            res.status(200).json({message:"success"});
-          } catch (error) {
-            console.error(error);
+        if(user){
+            const msg = {
+                to: email,
+                from: 'support@ellipseapp.com', // Use the email address or domain you verified above
+                subject: 'Ellipse OTP Authentication',
+                text: `${otp}`,
+                html: `<h1>your otp is ${otp}</h1>`,
+              };
+              try {
+                await sgMail.send(msg);
+                UserLogin.updateOne({'email':email},{$set:{'otp': otp}}).then((val)=>{
+                    console.log(val);
+                })
+                res.status(200).json({message:"success"});
+              } catch (error) {
+                console.error(error);
+            
+                if (error.response) {
+                  console.error(error.response.body)
+                }
+              }
+        }
+        else{
+            res.status(401).json({message:"user not found"});
+        }
         
-            if (error.response) {
-              console.error(error.response.body)
-            }
-          }
+    }
+    catch(error){
+        res.status(400).json(error.message);
+    }
+})
+
+
+//roite to send verification mail with auth
+router.post('/api/users/sendverificationemailwithauth',auth,async (req,res)=>{
+    try{
+        const user = req.user;
+        const otp = await otpGenerator.generate(4, {upperCase: false, specialChars: false,alphabets: false });
+        if(user){
+            const msg = {
+                to: user.email,
+                from: 'support@ellipseapp.com', // Use the email address or domain you verified above
+                subject: 'Ellipse OTP Authentication',
+                text: `${otp}`,
+                html: `<h1>your otp is ${otp}</h1>`,
+              };
+              try {
+                await sgMail.send(msg);
+                UserLogin.updateOne({'email':user.email},{$set:{'otp': otp}}).then((val)=>{
+                    console.log(val);
+                })
+                res.status(200).json({message:"success"});
+              } catch (error) {
+                console.error(error);
+            
+                if (error.response) {
+                  console.error(error.response.body)
+                }
+              }
+        }
+        else{
+            res.status(401).json({message:"user not found"});
+        }
+        
     }
     catch(error){
         res.status(400).json(error.message);
@@ -131,13 +175,13 @@ router.post('/api/users/verifyotp',auth, async (req,res)=>{
         const user = await req.user;
         if(user.otp == otp){
             // console.log("Verified");
-            UserLogin.update(
+            UserLogin.updateOne(
                 {'email':user.email},
                 {$set:{
                     'is_verified': true
                 }}).then((val)=>{
                 // console.log(val);
-                UserDetails.update({ 'email':user.email }, { $set: { 'verified': true } }).then((value)=>{
+                UserDetails.updateOne({ 'email':user.email }, { $set: { 'verified': true } }).then((value)=>{
                     // console.log(val);
                     res.status(200).json({"message":"verified"});
                 }) 
@@ -168,7 +212,7 @@ router.post('/api/users/updatepassword',auth,async(req,res)=>{
             return res.status(401).send({error: 'Login failed! Check authentication credentials'});
         }
         const hasedPassword = await bcrypt.hash(nPassword, 8)
-        UserLogin.update({'email':user.email},{$set:{'password':hasedPassword}}).then((val)=>{
+        UserLogin.updateOne({'email':user.email},{$set:{'password':hasedPassword}}).then((val)=>{
             // console.log(val);
             res.status(200).json({message:"success"})
         })

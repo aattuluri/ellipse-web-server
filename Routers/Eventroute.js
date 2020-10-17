@@ -21,14 +21,14 @@ const UserDetails = require('../Models/UserDetails');
 const router = express.Router();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-router.post('/api/generate_certificate', async (req, res) => {
-    pdf.create(template("Title","Organizer_name","Participant _name","12/20/2020","Event name","scfjdsvn","host_college"), { width: "2000px", height: "1200px" }).toFile('rezultati.pdf', (err) => {
-        if (err) {
-            return console.log('error');
-        }
-        res.send(Promise.resolve())
-    });
-})
+// router.post('/api/generate_certificate', async (req, res) => {
+//     pdf.create(template("Title","Organizer_name","Participant _name","12/20/2020","Event name","scfjdsvn","host_college"), { width: "2000px", height: "1200px" }).toFile('rezultati.pdf', (err) => {
+//         if (err) {
+//             return console.log('error');
+//         }
+//         res.send(Promise.resolve())
+//     });
+// })
 
 
 //Adding the announcement
