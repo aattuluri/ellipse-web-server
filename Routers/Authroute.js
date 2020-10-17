@@ -17,7 +17,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
 
 
-//route to ping for api if it working
+//route to ping for api if it is working
 router.get('/api',(req,res)=>{
     res.send("server is working");
 })
@@ -32,7 +32,25 @@ router.post('/api/check_username', async (req,res)=>{
             res.status(200).json({message: "user already exists"});
         }
         else{
-            res.status(200).json({message: "no user found"});
+            res.status(401).json({message: "no user found"});
+        }
+    }
+    catch(error){
+        res.status(400).json({ error: error.message})
+    }
+})
+
+//route to check if email is already registered
+
+router.post('/api/check_email_exists', async (req,res)=>{
+    try{
+        const {email} = req.body;
+        const user = await UserLogin.findOne({email: email})
+        if(user){
+            res.status(200).json({message: "email already exists"});
+        }
+        else{
+            res.status(201).json({message: "no user found"});
         }
     }
     catch(error){

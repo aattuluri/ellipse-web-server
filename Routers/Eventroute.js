@@ -21,14 +21,14 @@ const UserDetails = require('../Models/UserDetails');
 const router = express.Router();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// router.post('/api/generate_certificate', async (req, res) => {
-//     pdf.create(template(), { width: "2000px", height: "1200px" }).toFile('rezultati.pdf', (err) => {
-//         if (err) {
-//             return console.log('error');
-//         }
-//         res.send(Promise.resolve())
-//     });
-// })
+router.post('/api/generate_certificate', async (req, res) => {
+    pdf.create(template("Title","Organizer_name","Participant _name","12/20/2020","Event name","scfjdsvn","host_college"), { width: "2000px", height: "1200px" }).toFile('rezultati.pdf', (err) => {
+        if (err) {
+            return console.log('error');
+        }
+        res.send(Promise.resolve())
+    });
+})
 
 
 //Adding the announcement
@@ -127,6 +127,7 @@ router.post('/api/events', auth, async (req, res) => {
         const college = await Colleges.findOne({ _id: req.body.college_id });
         event.college_name = college.name;
         const user = req.user;
+        event.certificate = {"title":req.body.name}
         await event.save(function (err) {
             if (err) {
                 res.status(400).json({
@@ -226,6 +227,7 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
     const fileName = eventId + md5(Date.now())
     const event = await Events.findOne({ _id: eventId })
     if (event.poster_url != null) {
+        if(event.user_id == user._id){
         Files.deleteFile(event.poster_url, (result) => {
             Files.saveFile(req.files.image, fileName, user._id, "eventposter", function (err, result) {
                 if (!err) {
@@ -246,6 +248,7 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
                 }
             });
         })
+    }
 
 
     }
@@ -370,33 +373,40 @@ router.post('/api/updateevent', auth, async (req, res) => {
     try {
         const user = req.user;
         const eId = req.body.eventId;
-        Events.updateOne({ _id: eId }, {
-            $set: {
-                'name': req.body.name,
-                'description': req.body.description,
-                'start_time': req.body.start_time,
-                'finish_time': req.body.finish_time,
-                'registration_end_time': req.body.registration_end_time,
-                'event_mode': req.body.event_mode,
-                'event_type': req.body.event_type,
-                'reg_link': req.body.reg_link,
-                'fee': req.body.fee,
-                'about': req.body.about,
-                'fee_type': req.body.fee_type,
-                // 'college': req.body.college,
-                'o_allowed': req.body.o_allowed,
-                'requirements': req.body.requirements,
-                'tags': req.body.tags,
-                'venue_type': req.body.venue_type,
-                'venue': req.body.venue,
-                'venue_college': req.body.venue_college
-            }
-        }).then(value => {
-            Events.findOne({ _id: eId }).then((event) => {
-                res.status(200).json({ event });
+        const event = await Events.findOne({_id: eId})
+        if(event.user_id == user._id){
+            Events.updateOne({ _id: eId }, {
+                $set: {
+                    'name': req.body.name,
+                    'description': req.body.description,
+                    'start_time': req.body.start_time,
+                    'finish_time': req.body.finish_time,
+                    'registration_end_time': req.body.registration_end_time,
+                    'event_mode': req.body.event_mode,
+                    'event_type': req.body.event_type,
+                    'reg_link': req.body.reg_link,
+                    'fee': req.body.fee,
+                    'about': req.body.about,
+                    'fee_type': req.body.fee_type,
+                    // 'college': req.body.college,
+                    'o_allowed': req.body.o_allowed,
+                    'requirements': req.body.requirements,
+                    'tags': req.body.tags,
+                    'venue_type': req.body.venue_type,
+                    'venue': req.body.venue,
+                    'venue_college': req.body.venue_college
+                }
+            }).then(value => {
+                Events.findOne({ _id: eId }).then((event) => {
+                    res.status(200).json({ event });
+                })
+    
             })
-
-        })
+        }
+        else{
+            res.status(401).json({error:"not authorized"})
+        }
+        
     }
     catch (error) {
         console.log(error);

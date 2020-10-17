@@ -32,7 +32,7 @@ router.post('/api/event/generate_certificates',auth, async (req, res) => {
             const share_id = await randomstring.generate(11);
             const r = await Registrations.findOne({share_id:share_id})
             if(!r){
-                await pdf.create(template(adminUser.name, participantUser.name, dattt.toLocaleDateString(), event.name,share_id,event.college_name), { width: "2000px", height: "1200px" }).toStream(async (err, stream) => {
+                await pdf.create(template(event.certificate.title,adminUser.name, participantUser.name, dattt.toLocaleDateString(), event.name,share_id,event.college_name), { width: "2000px", height: "1200px" }).toStream(async (err, stream) => {
                     if (err) {
                         return console.log('error');
                     }
@@ -142,5 +142,28 @@ router.get('/api/event/verify_certificate',async (req,res)=>{
         res.status(400).json({ error: error.message })
     }
 })
+
+router.post('/api/event/update_certificate_title',auth,async (req,res)=>{
+    try {
+        const user = req.user;
+        const event_id = req.body.eventId;
+        const title = req.body.title;
+        const cert = {"title": title}
+        const event = await Events.findOne({_id: event_id});
+        if(event.user_id == user._id){
+            Events.updateOne({_id:event_id},{$set:{certificate: cert}}).then(value=>{
+                res.status(200).json({"message":"success"});
+            })
+        }
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+
+//route to change certificate title
+
+
 
 module.exports = router
