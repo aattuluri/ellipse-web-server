@@ -21,6 +21,7 @@
     "express-validator": "^6.5.0",
     "gridfs-stream": "^1.1.1",
     "html-pdf": "^2.2.0",
+    "phantomjs-prebuilt": "^2.1.16",
     "http": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "md5": "^2.2.1",
