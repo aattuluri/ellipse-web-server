@@ -22,14 +22,13 @@ cd $DEPLOY_ROOT
 
 # Pull latest changes.
 mkdir -p $APP_DIR
-git clone --branch master --depth 1 git@github.com:aattuluri/ellipse-web-server $APP_DIR
+git clone --branch $GIT_BRANCH --depth 1 git@github.com:aattuluri/ellipse-web-server $APP_DIR
 
 mkdir -p $UI_DIR
-git clone --branch master --depth 1 git@github.com:aattuluri/ellipse-web-ui $UI_DIR
-
+git clone --branch $GIT_BRANCH --depth 1 git@github.com:aattuluri/ellipse-web-ui $UI_DIR
 
 mkdir -p $ADMIN_DIR
-git clone --branch master --depth 1 git@github.com:aattuluri/ellipse-admin-ui $ADMIN_DIR
+git clone --branch $GIT_BRANCH --depth 1 git@github.com:aattuluri/ellipse-admin-ui $ADMIN_DIR
 
 
 # Build artifacts.
