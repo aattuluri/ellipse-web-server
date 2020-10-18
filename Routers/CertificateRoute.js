@@ -32,7 +32,7 @@ router.post('/api/event/generate_certificates',auth, async (req, res) => {
             const share_id = await randomstring.generate(11);
             const r = await Registrations.findOne({share_id:share_id})
             if(!r){
-                await pdf.create(template(event.certificate.title,adminUser.name, participantUser.name, dattt.toLocaleDateString(), event.name,share_id,event.college_name), { width: "2000px", height: "1200px" }).toStream(async (err, stream) => {
+                await pdf.create(template(event.certificate.title,adminUser.name, participantUser.name, dattt.toLocaleDateString(), event.name,share_id,event.college_name), { width: "2000px", height: "1200px",phantomArgs: ['--local-url-access=false']}).toStream(async (err, stream) => {
                     if (err) {
                         return console.log('error');
                     }
