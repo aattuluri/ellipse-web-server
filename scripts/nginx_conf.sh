@@ -8,7 +8,7 @@ sudo chown -R root:root /etc/nginx/ssl
 sudo chmod -R 600 /etc/nginx/ssl
 sudo cp ./nginx/certs.conf /etc/nginx/snippets/
 sudo cp ./nginx/ssl-params.conf /etc/nginx/snippets/
-sudo openssl dhparam -out /etc/nginx/ssl.crt/dhparam.pem 2048;
+sudo openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048;
 #Copy certs/key to /etc/nginx/ssl
 echo "Y" | sudo apt install unzip
 unzip $DOMAIN_NAME.zip
