@@ -47,7 +47,7 @@ cp -R ./build/* /var/www/$DOMAIN_NAME/html
 
 # Copy admin build
 cd $ADMIN_DIR
-cp -R ./build/* /var/www/$DOMAIN_NAME/admin/html
+cp -R ./build/* /var/www/admin.$DOMAIN_NAME/html
 
 
 # Update current symlink
