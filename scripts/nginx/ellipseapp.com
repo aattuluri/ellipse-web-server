@@ -7,32 +7,33 @@ server {
     server_name ellipseapp.com www.ellipseapp.com;
 
     root /var/www/ellipseapp.com/html;
+
+    # Add index.php to the list if you are using PHP
     index index.html index.htm index.nginx-debian.html;
-    
+
     location / {
-        # First attempt to serve request as file, then
-        # as directory, then fall back to displaying a 404.
-        try_files $uri $uri/ /index.html;
+	# First attempt to serve request as file, then
+	# as directory, then fall back to displaying a 404.
+	try_files $uri $uri/ /index.html;
     }
-    
+
     location /admin {
        root /var/www/ellipseapp.com/admin/html;
        try_files $uri $uri/ /index.html;
     }
-    
+
+    location /ws {
+        rewrite  ^/ws/(.*) /$1 break;
+    	proxy_pass http://127.0.0.1:4000;
+    	proxy_http_version 1.1;
+    	proxy_set_header Upgrade $http_upgrade;
+    	proxy_set_header Connection "Upgrade";
+    	proxy_set_header Host $host;
+    }
+
     location /api {
         proxy_pass http://127.0.0.1:4000;
     }
-    
-    location /ws {
-        rewrite  ^/ws/(.*) /$1 break; 
-        proxy_pass http://127.0.0.1:4000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
-        proxy_set_header Host $host;
-    }
-    
 }
 
 server {
