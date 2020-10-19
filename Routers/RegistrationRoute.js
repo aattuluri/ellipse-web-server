@@ -4,26 +4,32 @@ var Mongoose = require('mongoose');
 const auth = require('../Middleware/Auth');
 const Events = require('../Models/Events');
 const Registration = require('../Models/Registrations');
+const randomstring = require('randomstring');
    
 const router = express.Router();
 
 //register the event
 
-router.post('/api/event/register', auth, async (req, res) => {
+router.post('/api/event/register',auth, async (req, res) => {
     try {
         const user = req.user;
-        const { data } = req.body;
+        const { data} = req.body;
         const eventId = req.query.id;
+        const shareId = randomstring.generate(10);
         const registration = new Registration({
             user_id: user._id,
             event_id: eventId,
-            data: data
+            data: data,
+            share_id: shareId
         })
-        await registration.save((err) => {
+        registration.save((err) => {
             if (err) {
                 res.status(400).json({ error: err.message })
             }
-            res.status(200).json({ message: "success" })
+            else{
+                res.status(200).json({ message: "success" })
+            }
+            
         })
 
     }
