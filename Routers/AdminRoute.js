@@ -11,6 +11,7 @@ const UserDetails = require('../Models/UserDetails');
 const Reports = require('../Models/Reports');
 const FeedBack = require('../Models/FeedBack');
 const EventKeywords = require('../Models/EventKeywords');
+const Colleges = require('../Models/CollegeModel');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
@@ -186,6 +187,46 @@ router.post('/api/admin/delete_event_keywords',adminAuth, async (req, res) => {
         })
         
     } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+router.post('/api/admin/add_college',adminAuth,async (req,res)=>{
+    try{
+        const college = new Colleges(req.body);
+        await college.save();
+        Colleges.find().then(value =>{
+            res.status(200).json(value);
+        })
+        
+
+    }catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+
+router.post('/api/admin/delete_college',adminAuth,async (req,res)=>{
+    try{
+        const id = req.body.id;
+        Colleges.deleteOne({_id: id}).then(r=>{
+            Colleges.find().then(value =>{
+                res.status(200).json(value);
+            })
+        }) 
+
+    }catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+
+router.get('/api/admin/get_all_colleges',adminAuth,async (req,res)=>{
+    try{
+        Colleges.find().then(value =>{
+            res.status(200).json(value);
+        })
+    }catch (error) {
         res.status(400).json({ error: error.message })
     }
 })
