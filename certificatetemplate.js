@@ -102,7 +102,7 @@ module.exports = (title,organizer_name,participant_name,date,event_name,share_id
         .bottomDiv {
             position: absolute;
             left: 1400px;
-            top: 1000px;
+            top: 1035px;
         }
         .organizerDiv {
             position: absolute;
