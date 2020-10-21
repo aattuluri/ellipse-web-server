@@ -326,7 +326,7 @@ router.get('/api/events', auth, async (req, res) => {
                         finalEvents.push(e);
                         count = count + 1;
                     }
-                    if (count === len-1) {
+                    if (count === len) {
                         // console.log(finalEvents)
                         res.status(200).json(finalEvents)
                     }
