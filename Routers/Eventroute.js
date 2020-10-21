@@ -309,23 +309,30 @@ router.get('/api/events', auth, async (req, res) => {
             }
             var count = 0;
             var len = events.length;
-            events.forEach(async (e, index, array) => {
-                const registeredEvent = await Registration.find({ user_id: user._id, event_id: e._id })
-                // console.log(registeredEvent);
-                if (registeredEvent.length === 0) {
-                    e.registered = false;
-                    finalEvents.push(e);
-                    count = count + 1;
-                }
-                else {
-                    e.registered = true;
-                    finalEvents.push(e);
-                    count = count + 1;
-                }
-                if (count === len) {
-                    res.status(200).json(finalEvents)
-                }
-            })
+            if(events.length === 0){
+                // console.log(events)
+                res.status(200).json(events)
+            }else{
+                events.forEach(async (e, index, array) => {
+                    const registeredEvent = await Registration.find({ user_id: user._id, event_id: e._id })
+                    // console.log(registeredEvent);
+                    if (registeredEvent.length === 0) {
+                        e.registered = false;
+                        finalEvents.push(e);
+                        count = count + 1;
+                    }
+                    else {
+                        e.registered = true;
+                        finalEvents.push(e);
+                        count = count + 1;
+                    }
+                    if (count === len-1) {
+                        // console.log(finalEvents)
+                        res.status(200).json(finalEvents)
+                    }
+                })
+            }
+            
         })
     }
     catch (error) {
@@ -333,6 +340,32 @@ router.get('/api/events', auth, async (req, res) => {
     }
 
 });
+
+
+//route to get all the events for website home page without login
+router.get('/api/get_events',async (req, res) => {
+    // const user = req.user;
+    console.log("dshvc")
+    // const finalEvents = [];
+    try {
+        Events.get((err, events) => {
+            // console.log(events)
+            if (err) {
+                res.json({
+                    status: 'error',
+                    code: 500,
+                    message: err
+                });
+            }
+            res.status(200).json(events);   
+        })
+    }
+    catch (error) {
+        res.status(400).json({ 'error': error });
+    }
+
+});
+
 
 
 //route to get the particular event with event id for unregisterd users
