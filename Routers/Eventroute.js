@@ -427,7 +427,8 @@ router.post('/api/updateevent', auth, async (req, res) => {
                     'tags': req.body.tags,
                     'venue_type': req.body.venue_type,
                     'venue': req.body.venue,
-                    'venue_college': req.body.venue_college
+                    'venue_college': req.body.venue_college,
+                    'platform_details': req.body.platform_details
                 }
             }).then(value => {
                 Events.findOne({ _id: eId }).then((event) => {

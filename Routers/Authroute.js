@@ -22,6 +22,10 @@ router.get('/api',(req,res)=>{
     res.send("server is working");
 })
 
+router.get('/api/get_version',(req,res)=>{
+    res.send("1.0.0")
+})
+
 
 //route to check if username already exists 
 router.post('/api/check_username', async (req,res)=>{
