@@ -133,7 +133,10 @@ let eventShema = mongoose.Schema({
     posted_on: {
         type: Date,
         default: Date.now()
-    }
+    },
+    certificate:{
+        type: Object,
+    },
 
 });
 

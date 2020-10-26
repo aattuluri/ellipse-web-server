@@ -5,6 +5,24 @@ let collegeShema = mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    code: {
+        type: String,
+    },
+    city: {
+        type: String
+    },
+    state: {
+        type: String,
+    },
+    pin_code: {
+        type: String,
+    },
+    address: {
+        type: String,
+    },
+    college_type: {
+        type: String,
     }
 });
 

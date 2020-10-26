@@ -7,7 +7,7 @@ const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const cron = require('node-cron');
 const http = require("http");
-const https = require('https')
+const https = require('https');
 const webSocket = require("ws");
 const mongoose = require('mongoose');
 
@@ -20,6 +20,8 @@ const reportRouter = require('./Routers/ReportRoute');
 const notificationRouter = require('./Routers/NotificationRoute');
 const adminRouter = require('./Routers/AdminRoute');
 const feedBackRouter = require('./Routers/FeedBackRoute');
+const EventKeywordsRouter = require('./Routers/EventKeywordsRoute');
+const CertificateRouter = require('./Routers/CertificateRoute');
 
 //Database models
 const Events = require('./Models/Events');
@@ -30,6 +32,7 @@ const UserDetails = require('./Models/UserDetails');
 
 //importing functions for adding and deleting in redis chat
 const chatService = require('./Chat/ChatService');
+const { Console } = require('console');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -117,7 +120,6 @@ cron.schedule('00 08 * * *', () => {
 
 
 
-
 //Routers initialization
 app.use('/files', express.static(__dirname + '/files'))
 app.use(authRouter);
@@ -128,6 +130,8 @@ app.use(reportRouter);
 app.use(notificationRouter);
 app.use(adminRouter);
 app.use(feedBackRouter);
+app.use(EventKeywordsRouter);
+app.use(CertificateRouter);
 
 
 server.listen(PORT, (req, res) => {

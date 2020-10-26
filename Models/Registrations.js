@@ -17,6 +17,17 @@ const registration = mongoose.Schema({
         type: String,
         default: "registered"
     },
+    certificate_url: {
+        type: String,
+    },
+    certificate_status: {
+        type: String,
+        default: "not_generated"
+    },
+    share_id: {
+        type: String,
+        unique: true,
+    },
     time: {
         type: Date,
         default: Date.now

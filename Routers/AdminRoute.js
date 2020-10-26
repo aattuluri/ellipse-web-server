@@ -10,6 +10,8 @@ const adminAuth = require('../Middleware/AdminAuth');
 const UserDetails = require('../Models/UserDetails');
 const Reports = require('../Models/Reports');
 const FeedBack = require('../Models/FeedBack');
+const EventKeywords = require('../Models/EventKeywords');
+const Colleges = require('../Models/CollegeModel');
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
@@ -66,6 +68,7 @@ router.post('/api/admin/logout', adminAuth, async (req, res) => {
     }
 })
 
+//rroute forr getting all events
 router.get('/api/admin/get_all_events',adminAuth, async (req, res) => {
     try {
         Events.get((err, events) => {
@@ -77,6 +80,7 @@ router.get('/api/admin/get_all_events',adminAuth, async (req, res) => {
     }
 })
 
+//route for updating event status
 router.post('/api/admin/update_event_status',adminAuth, async (req, res) => {
     try {
         const eventId = req.body.eventId;
@@ -87,6 +91,7 @@ router.post('/api/admin/update_event_status',adminAuth, async (req, res) => {
     }
 })
 
+//route fo sending email to admin
 router.post('/api/admin/event/sendemail', adminAuth, async (req, res) => {
     try {
         const userId = req.body.userId;
@@ -133,12 +138,95 @@ router.get('/api/admin/reports',adminAuth,async (req,res)=>{
     }
 })
 
+//route for feeedback
 router.get('/api/admin/feedback',adminAuth,async (req,res)=>{
     try {
         FeedBack.find().then(feedbacks=>{
             res.status(200).json(feedbacks)
         })
     } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+//route for adding event types and tags
+
+router.post('/api/admin/add_event_tags',adminAuth, async (req, res) => {
+    try {
+        const eventKeywords = new EventKeywords(req.body);
+        await eventKeywords.save()
+        EventKeywords.find().then(eventKeywords=>{
+            res.status(200).json(eventKeywords)
+        })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+//route for getting all keywords
+router.get('/api/admin/event/get_event_keywords',adminAuth, async (req, res) => {
+    try {
+        EventKeywords.find().then(eventKeywords=>{
+            res.status(200).json(eventKeywords)
+        })
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+});
+
+//route for adding event types and tags
+
+router.post('/api/admin/delete_event_keywords',adminAuth, async (req, res) => {
+    try {
+        const id = req.body.id;
+        EventKeywords.deleteOne({_id: id}).then(r=>{
+            EventKeywords.find().then(eventKeywords=>{
+                res.status(200).json(eventKeywords)
+            })
+        })
+        
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+router.post('/api/admin/add_college',adminAuth,async (req,res)=>{
+    try{
+        const college = new Colleges(req.body);
+        await college.save();
+        Colleges.find().then(value =>{
+            res.status(200).json(value);
+        })
+        
+
+    }catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+
+router.post('/api/admin/delete_college',adminAuth,async (req,res)=>{
+    try{
+        const id = req.body.id;
+        Colleges.deleteOne({_id: id}).then(r=>{
+            Colleges.find().then(value =>{
+                res.status(200).json(value);
+            })
+        }) 
+
+    }catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+
+router.get('/api/admin/get_all_colleges',adminAuth,async (req,res)=>{
+    try{
+        Colleges.find().then(value =>{
+            res.status(200).json(value);
+        })
+    }catch (error) {
         res.status(400).json({ error: error.message })
     }
 })

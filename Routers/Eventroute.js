@@ -4,6 +4,7 @@ const { json } = require('body-parser');
 const md5 = require('md5');
 const sgMail = require('@sendgrid/mail');
 const pdf = require('html-pdf');
+const https = require('https');
 
 
 const auth = require('../Middleware/Auth');
@@ -13,19 +14,21 @@ const Registration = require('../Models/Registrations');
 const Colleges = require('../Models/CollegeModel');
 const Announcement = require('../Models/Announcements');
 const template = require('../certificatetemplate');
+const UserDetails = require('../Models/UserDetails');
+
 
 
 const router = express.Router();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-router.post('/api/generate_certificate', async (req, res) => {
-    pdf.create(template(), {width: "2000px",height:"1200px"}).toFile('rezultati.pdf', (err) => {
-        if (err) {
-            return console.log('error');
-        }
-        res.send(Promise.resolve())
-    });
-})
+// router.post('/api/generate_certificate', async (req, res) => {
+//     pdf.create(template("Title","Organizer_name","Participant _name","12/20/2020","Event name","scfjdsvn","host_college"), { width: "2000px", height: "1200px" }).toFile('rezultati.pdf', (err) => {
+//         if (err) {
+//             return console.log('error');
+//         }
+//         res.send(Promise.resolve())
+//     });
+// })
 
 
 //Adding the announcement
@@ -65,9 +68,23 @@ router.post('/api/event/add_announcement', auth, async (req, res) => {
 //Retrieving announcements for a event with event id
 router.get('/api/event/get_announcements', auth, (req, res) => {
     try {
-
         Announcement.find({ event_id: req.query.id }).then((result) => {
             res.status(200).json(result);
+        })
+    }
+    catch (error) {
+        res.status(400).json({ 'error': error })
+    }
+
+})
+
+//deleting announcement
+router.post('/api/event/delete_announcement', auth, (req, res) => {
+    try {
+        Announcement.deleteOne({ _id: req.query.id }).then((result) => {
+            Announcement.find({ event_id: req.query.event_id }).then((response) => {
+                res.status(200).json(response);
+            })
         })
     }
     catch (error) {
@@ -110,6 +127,7 @@ router.post('/api/events', auth, async (req, res) => {
         const college = await Colleges.findOne({ _id: req.body.college_id });
         event.college_name = college.name;
         const user = req.user;
+        event.certificate = {"title":req.body.name}
         await event.save(function (err) {
             if (err) {
                 res.status(400).json({
@@ -118,6 +136,34 @@ router.post('/api/events', auth, async (req, res) => {
                     message: err
                 })
             }
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+            const data = JSON.stringify({
+                "dynamicLinkInfo": {
+                    "domainUriPrefix": "https://ellipseapp.page.link",
+                    "link": `http://ellipseapp.com/un/event/${event._id}`,
+                    "androidInfo": {
+                        "androidPackageName": "com.ellipse.ellipseapp"
+                    },
+                }
+            });
+            const r = https.request(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=AIzaSyBSsNp2tdDveI2A4EhAJ_ZF0GyrmdTaQYA`, options, (result) => {
+                result.setEncoding('utf8');
+                result.on('data', (d) => {
+                    const parsedData = JSON.parse(d);
+                    event.share_link = parsedData.shortLink;
+                    event.save();
+                })
+            })
+            r.on('error', (error) => {
+                console.error(error)
+            })
+            r.write(data)
+            r.end()
             res.status(200).json({
                 status: 'success',
                 code: 200,
@@ -181,6 +227,7 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
     const fileName = eventId + md5(Date.now())
     const event = await Events.findOne({ _id: eventId })
     if (event.poster_url != null) {
+        if(event.user_id == user._id){
         Files.deleteFile(event.poster_url, (result) => {
             Files.saveFile(req.files.image, fileName, user._id, "eventposter", function (err, result) {
                 if (!err) {
@@ -201,6 +248,7 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
                 }
             });
         })
+    }
 
 
     }
@@ -261,23 +309,30 @@ router.get('/api/events', auth, async (req, res) => {
             }
             var count = 0;
             var len = events.length;
-            events.forEach(async (e, index, array) => {
-                const registeredEvent = await Registration.find({ user_id: user._id, event_id: e._id })
-                // console.log(registeredEvent);
-                if (registeredEvent.length === 0) {
-                    e.registered = false;
-                    finalEvents.push(e);
-                    count = count + 1;
-                }
-                else {
-                    e.registered = true;
-                    finalEvents.push(e);
-                    count = count + 1;
-                }
-                if (count === len) {
-                    res.status(200).json(finalEvents)
-                }
-            })
+            if(events.length === 0){
+                // console.log(events)
+                res.status(200).json(events)
+            }else{
+                events.forEach(async (e, index, array) => {
+                    const registeredEvent = await Registration.find({ user_id: user._id, event_id: e._id })
+                    // console.log(registeredEvent);
+                    if (registeredEvent.length === 0) {
+                        e.registered = false;
+                        finalEvents.push(e);
+                        count = count + 1;
+                    }
+                    else {
+                        e.registered = true;
+                        finalEvents.push(e);
+                        count = count + 1;
+                    }
+                    if (count === len) {
+                        // console.log(finalEvents)
+                        res.status(200).json(finalEvents)
+                    }
+                })
+            }
+            
         })
     }
     catch (error) {
@@ -287,10 +342,56 @@ router.get('/api/events', auth, async (req, res) => {
 });
 
 
-//route to get the particular event with event id
-router.get('/api/event', async (req, res) => {
+//route to get all the events for website home page without login
+router.get('/api/get_events',async (req, res) => {
+    // const user = req.user;
+    console.log("dshvc")
+    // const finalEvents = [];
+    try {
+        Events.get((err, events) => {
+            // console.log(events)
+            if (err) {
+                res.json({
+                    status: 'error',
+                    code: 500,
+                    message: err
+                });
+            }
+            res.status(200).json(events);   
+        })
+    }
+    catch (error) {
+        res.status(400).json({ 'error': error });
+    }
+
+});
+
+
+
+//route to get the particular event with event id for unregisterd users
+router.get('/api/unregistered/event', async (req, res) => {
     try {
         const event = await Events.findOne({ _id: req.query.id });
+        res.status(200).json({ event });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+
+})
+
+//route to get the particular event with event id
+router.get('/api/event', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const event = await Events.findOne({ _id: req.query.id });
+        const registeredEvent = await Registration.find({ user_id: user._id, event_id: event._id });
+        if (registeredEvent.length === 0) {
+            event.registered = false;
+        }
+        else {
+            event.registered = true;
+        }
         res.status(200).json({ event });
     }
     catch (error) {
@@ -305,36 +406,66 @@ router.post('/api/updateevent', auth, async (req, res) => {
     try {
         const user = req.user;
         const eId = req.body.eventId;
-        Events.updateOne({ _id: eId }, {
-            $set: {
-                'name': req.body.name,
-                'description': req.body.description,
-                'start_time': req.body.start_time,
-                'finish_time': req.body.finish_time,
-                'registration_end_time': req.body.registration_end_time,
-                'event_mode': req.body.event_mode,
-                'event_type': req.body.event_type,
-                'reg_link': req.body.reg_link,
-                'fee': req.body.fee,
-                'about': req.body.about,
-                'fee_type': req.body.fee_type,
-                // 'college': req.body.college,
-                'o_allowed': req.body.o_allowed,
-                'requirements': req.body.requirements,
-                'tags': req.body.tags,
-                'venue_type': req.body.venue_type,
-                'venue': req.body.venue,
-                'venue_college': req.body.venue_college
-            }
-        }).then(value => {
-            Events.findOne({_id: eId}).then((event)=>{
-                res.status(200).json({event});
+        const event = await Events.findOne({_id: eId})
+        if(event.user_id == user._id){
+            Events.updateOne({ _id: eId }, {
+                $set: {
+                    'name': req.body.name,
+                    'description': req.body.description,
+                    'start_time': req.body.start_time,
+                    'finish_time': req.body.finish_time,
+                    'registration_end_time': req.body.registration_end_time,
+                    'event_mode': req.body.event_mode,
+                    'event_type': req.body.event_type,
+                    'reg_link': req.body.reg_link,
+                    'fee': req.body.fee,
+                    'about': req.body.about,
+                    'fee_type': req.body.fee_type,
+                    // 'college': req.body.college,
+                    'o_allowed': req.body.o_allowed,
+                    'requirements': req.body.requirements,
+                    'tags': req.body.tags,
+                    'venue_type': req.body.venue_type,
+                    'venue': req.body.venue,
+                    'venue_college': req.body.venue_college,
+                    'platform_details': req.body.platform_details
+                }
+            }).then(value => {
+                Events.findOne({ _id: eId }).then((event) => {
+                    res.status(200).json({ event });
+                })
+    
             })
-            
-        })
+        }
+        else{
+            res.status(401).json({error:"not authorized"})
+        }
+        
     }
     catch (error) {
         console.log(error);
+        res.status(400).json({ error: error.message })
+    }
+})
+
+
+router.get('/api/event/get_organizer_details',auth, async (req,res)=>{
+    try {
+        const user = req.user;
+        const event_id = await req.query.eventId;
+        // console.log(event_id)
+        // console.log("event"+req.query.eventId)
+        const user_id = req.query.userId;
+        const event = await Events.findOne({_id:event_id});
+        if(event.user_id === user_id){
+            UserDetails.findOne({user_id:user_id}).then(value=>{
+                // console.log(value);
+                res.status(200).json({name:value.name,profile_pic:value.profile_pic,college_name:value.college_name});
+            })
+        }
+    }
+    catch (error) {
+        // console.log(error);
         res.status(400).json({ error: error.message })
     }
 })
