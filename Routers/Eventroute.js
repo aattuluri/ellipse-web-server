@@ -145,9 +145,9 @@ router.post('/api/events', auth, async (req, res) => {
             const data = JSON.stringify({
                 "dynamicLinkInfo": {
                     "domainUriPrefix": "https://ellipseapp.page.link",
-                    "link": `http://staging.ellipseapp.com/un/event/${event._id}`,
+                    "link": `http://ellipseapp.com/un/event/${event._id}`,
                     "androidInfo": {
-                        "androidPackageName": "com.guna0027.ellipse"
+                        "androidPackageName": "com.ellipse.ellipseapp"
                     },
                 }
             });
