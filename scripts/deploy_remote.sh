@@ -17,6 +17,7 @@ function build_ellipse_web_server {
   npm install
   npm build
   npm install phantomjs-prebuilt
+  cp ~/.env .
 }
 
 cd $DEPLOY_ROOT
