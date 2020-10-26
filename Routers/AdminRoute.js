@@ -19,15 +19,15 @@ const router = express.Router();
 
 //user only when user is required to be created 
 
-// router.post('/api/admin/signup', async (req, res) => {
-//     try {
-//         const adminLogin = new AdminLogin(req.body);
-//         await adminLogin.save();
-//         res.status(200).json({ "message": "success" })
-//     } catch (error) {
-//         res.status(400).json({ error: error.message })
-//     }
-// })
+router.post('/api/admin/signup', async (req, res) => {
+    try {
+        const adminLogin = new AdminLogin(req.body);
+        await adminLogin.save();
+        res.status(200).json({ "message": "success" })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
 
 
 //Signing in of the admin
