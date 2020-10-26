@@ -19,15 +19,15 @@ const router = express.Router();
 
 //user only when user is required to be created 
 
-router.post('/api/admin/signup', async (req, res) => {
-    try {
-        const adminLogin = new AdminLogin(req.body);
-        await adminLogin.save();
-        res.status(200).json({ "message": "success" })
-    } catch (error) {
-        res.status(400).json({ error: error.message })
-    }
-})
+// router.post('/api/admin/signup', async (req, res) => {
+//     try {
+//         const adminLogin = new AdminLogin(req.body);
+//         await adminLogin.save();
+//         res.status(200).json({ "message": "success" })
+//     } catch (error) {
+//         res.status(400).json({ error: error.message })
+//     }
+// })
 
 
 //Signing in of the admin
@@ -230,6 +230,29 @@ router.get('/api/admin/get_all_colleges',adminAuth,async (req,res)=>{
         res.status(400).json({ error: error.message })
     }
 })
+
+
+router.get('/api/admin/event/get_organizer_details',adminAuth, async (req,res)=>{
+    try {
+        // const user = req.user;
+        const event_id = await req.query.eventId;
+        // console.log(event_id)
+        // console.log("event"+req.query.eventId)
+        const user_id = req.query.userId;
+        const event = await Events.findOne({_id:event_id});
+        if(event.user_id === user_id){
+            UserDetails.findOne({user_id:user_id}).then(value=>{
+                // console.log(value);
+                res.status(200).json({name:value.name,profile_pic:value.profile_pic,college_name:value.college_name});
+            })
+        }
+    }
+    catch (error) {
+        // console.log(error);
+        res.status(400).json({ error: error.message })
+    }
+})
+
 
 
 
