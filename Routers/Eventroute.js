@@ -145,13 +145,14 @@ router.post('/api/events', auth, async (req, res) => {
             const data = JSON.stringify({
                 "dynamicLinkInfo": {
                     "domainUriPrefix": "https://ellipseapp.page.link",
-                    "link": `http://ellipseapp.com/un/event/${event._id}`,
+                    "link": `https://ellipseapp.com/un/event/${event._id}`,
                     "androidInfo": {
                         "androidPackageName": "com.ellipse.ellipseapp"
                     },
                 }
             });
             const r = https.request(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=${process.env.FIREBASE_DLINKS_API_KEY}`, options, (result) => {
+                console.log(result);
                 result.setEncoding('utf8');
                 result.on('data', (d) => {
                     const parsedData = JSON.parse(d);
