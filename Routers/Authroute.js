@@ -18,47 +18,47 @@ const router = express.Router();
 
 
 //route to ping for api if it is working
-router.get('/api',(req,res)=>{
+router.get('/api', (req, res) => {
     res.send("server is working");
 })
 
-router.get('/api/get_version',(req,res)=>{
+router.get('/api/get_version', (req, res) => {
     res.send("1.0.0")
 })
 
 
 //route to check if username already exists 
-router.post('/api/check_username', async (req,res)=>{
-    try{
-        const {username} = req.body;
-        const user = await UserLogin.findOne({username: username})
-        if(user){
-            res.status(200).json({message: "user already exists"});
+router.post('/api/check_username', async (req, res) => {
+    try {
+        const { username } = req.body;
+        const user = await UserLogin.findOne({ username: username })
+        if (user) {
+            res.status(200).json({ message: "user already exists" });
         }
-        else{
-            res.status(401).json({message: "no user found"});
+        else {
+            res.status(401).json({ message: "no user found" });
         }
     }
-    catch(error){
-        res.status(400).json({ error: error.message})
+    catch (error) {
+        res.status(400).json({ error: error.message })
     }
 })
 
 //route to check if email is already registered
 
-router.post('/api/check_email_exists', async (req,res)=>{
-    try{
-        const {email} = req.body;
-        const user = await UserLogin.findOne({email: email})
-        if(user){
-            res.status(200).json({message: "email already exists"});
+router.post('/api/check_email_exists', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await UserLogin.findOne({ email: email })
+        if (user) {
+            res.status(200).json({ message: "email already exists" });
         }
-        else{
-            res.status(201).json({message: "no user found"});
+        else {
+            res.status(201).json({ message: "no user found" });
         }
     }
-    catch(error){
-        res.status(400).json({ error: error.message})
+    catch (error) {
+        res.status(400).json({ error: error.message })
     }
 })
 
@@ -67,17 +67,17 @@ router.post('/api/check_email_exists', async (req,res)=>{
 router.post('/api/users/signup', async (req, res) => {
     // Create a new user
     try {
-        const {email} = req.body;
-        const user = await UserLogin.findOne({email:email});
-        if(!user){
+        const { email } = req.body;
+        const user = await UserLogin.findOne({ email: email });
+        if (!user) {
             const user = new UserLogin(req.body)
             await user.save()
             const token = await user.generateAuthToken()
             const userDetails = new UserDetails({
                 'user_id': user._id,
                 'username': user.username,
-            'email': user.email,
-            'name': user.name,
+                'email': user.email,
+                'name': user.name,
             })
             await userDetails.save();
             const userid = user._id;
@@ -85,10 +85,10 @@ router.post('/api/users/signup', async (req, res) => {
             res.status(200).json({ userid, useremail, token })
             // res.status(200).json({ user, token })
         }
-        else{
-            res.status(401).json({error: "email is already registered"})
+        else {
+            res.status(401).json({ error: "email is already registered" })
         }
-        
+
     } catch (error) {
         res.status(400).json(error.message)
     }
@@ -96,129 +96,133 @@ router.post('/api/users/signup', async (req, res) => {
 
 
 //roite to send verification mail
-router.post('/api/users/sendverificationemail',async (req,res)=>{
-    try{
-        const {email} = req.body;
+router.post('/api/users/sendverificationemail', async (req, res) => {
+    try {
+        const { email } = req.body;
         // console.log(email);
-        const otp = await otpGenerator.generate(4, {upperCase: false, specialChars: false,alphabets: false });
-        const user = await UserLogin.findOne({email:email});
-        if(user){
+        const otp = await otpGenerator.generate(4, { upperCase: false, specialChars: false, alphabets: false });
+        const user = await UserLogin.findOne({ email: email });
+        if (user) {
             const msg = {
                 to: email,
                 from: 'support@ellipseapp.com', // Use the email address or domain you verified above
-                subject: 'Ellipse OTP Authentication',
-                text: `${otp}`,
-                html: `<h1>your otp is ${otp}</h1>`,
-              };
-              try {
+                templateId: 'd-25c76e60f9f146b78dc11e2ad9bdb62f',
+                dynamic_template_data: {
+                    OTP: otp
+                },
+            };
+            try {
                 await sgMail.send(msg);
-                UserLogin.updateOne({'email':email},{$set:{'otp': otp}}).then((val)=>{
+                UserLogin.updateOne({ 'email': email }, { $set: { 'otp': otp } }).then((val) => {
                     console.log(val);
                 })
-                res.status(200).json({message:"success"});
-              } catch (error) {
+                res.status(200).json({ message: "success" });
+            } catch (error) {
                 console.error(error);
-            
+
                 if (error.response) {
-                  console.error(error.response.body)
+                    console.error(error.response.body)
                 }
-              }
+            }
         }
-        else{
-            res.status(401).json({message:"user not found"});
+        else {
+            res.status(401).json({ message: "user not found" });
         }
-        
+
     }
-    catch(error){
+    catch (error) {
         res.status(400).json(error.message);
     }
 })
 
 
 //roite to send verification mail with auth
-router.post('/api/users/sendverificationemailwithauth',auth,async (req,res)=>{
-    try{
+router.post('/api/users/sendverificationemailwithauth', auth, async (req, res) => {
+    try {
         const user = req.user;
-        const otp = await otpGenerator.generate(4, {upperCase: false, specialChars: false,alphabets: false });
-        if(user){
+        const otp = await otpGenerator.generate(4, { upperCase: false, specialChars: false, alphabets: false });
+        if (user) {
             const msg = {
                 to: user.email,
                 from: 'support@ellipseapp.com', // Use the email address or domain you verified above
-                subject: 'Ellipse OTP Authentication',
-                text: `${otp}`,
-                html: `<h1>your otp is ${otp}</h1>`,
-              };
-              try {
+                templateId: 'd-25c76e60f9f146b78dc11e2ad9bdb62f',
+                dynamic_template_data: {
+                    OTP: otp
+                },
+            };
+            try {
                 await sgMail.send(msg);
-                UserLogin.updateOne({'email':user.email},{$set:{'otp': otp}}).then((val)=>{
+                UserLogin.updateOne({ 'email': user.email }, { $set: { 'otp': otp } }).then((val) => {
                     console.log(val);
                 })
-                res.status(200).json({message:"success"});
-              } catch (error) {
+                res.status(200).json({ message: "success" });
+            } catch (error) {
                 console.error(error);
-            
+
                 if (error.response) {
-                  console.error(error.response.body)
+                    console.error(error.response.body)
                 }
-              }
+            }
         }
-        else{
-            res.status(401).json({message:"user not found"});
+        else {
+            res.status(401).json({ message: "user not found" });
         }
-        
+
     }
-    catch(error){
+    catch (error) {
         res.status(400).json(error.message);
     }
 })
 
 //roputer to verify the otp
-router.post('/api/users/verifyotp',auth, async (req,res)=>{
-    try{
-        const {otp,email} = req.body;
+router.post('/api/users/verifyotp', auth, async (req, res) => {
+    try {
+        const { otp, email } = req.body;
         const user = await req.user;
-        if(user.otp == otp){
+        if (user.otp == otp) {
             // console.log("Verified");
             UserLogin.updateOne(
-                {'email':user.email},
-                {$set:{
-                    'is_verified': true
-                }}).then((val)=>{
-                // console.log(val);
-                UserDetails.updateOne({ 'email':user.email }, { $set: { 'verified': true } }).then((value)=>{
+                { 'email': user.email },
+                {
+                    $set: {
+                        'is_verified': true
+                    }
+                }).then((val) => {
                     // console.log(val);
-                    res.status(200).json({"message":"verified"});
-                }) 
-                
-            })
-              
+                    UserDetails.updateOne({ 'email': user.email }, { $set: { 'verified': true } }).then((value) => {
+                        // console.log(val);
+                        res.status(200).json({ "message": "verified" });
+                    })
+
+                })
+
         }
-        else{
-            res.status(400).json({"message":"Not verified"});
+        else {
+            res.status(400).json({ "message": "Not verified" });
         }
     }
-    catch(error){
-        res.status(400).json({ error: error.message})
+    catch (error) {
+        res.status(400).json({ error: error.message })
     }
 })
 
 
 //route to update password with current password
-router.post('/api/users/updatepassword',auth,async(req,res)=>{
+router.post('/api/users/updatepassword', auth, async (req, res) => {
     try {
-        const {email,cPassword,nPassword} = req.body;
+        const { email, cPassword, nPassword } = req.body;
         const user = await req.user;
         const isPasswordMatch = await bcrypt.compare(cPassword, user.password)
         if (!isPasswordMatch) {
-            return res.status(401).send({error: 'Incorrect current Password'});
+            return res.status(401).send({ error: 'Incorrect current Password' });
         }
         if (!user) {
-            return res.status(401).send({error: 'Login failed! Check authentication credentials'});
+            return res.status(401).send({ error: 'Login failed! Check authentication credentials' });
         }
         const hasedPassword = await bcrypt.hash(nPassword, 8)
-        UserLogin.updateOne({'email':user.email},{$set:{'password':hasedPassword}}).then((val)=>{
+        UserLogin.updateOne({ 'email': user.email }, { $set: { 'password': hasedPassword } }).then((val) => {
             // console.log(val);
-            res.status(200).json({message:"success"})
+            res.status(200).json({ message: "success" })
         })
         // res.status(200).json({message: "success"});
     } catch (error) {
@@ -227,22 +231,22 @@ router.post('/api/users/updatepassword',auth,async(req,res)=>{
 })
 
 //route to change password with otp
-router.post('/api/users/forgotpassword',async(req,res)=>{
+router.post('/api/users/forgotpassword', async (req, res) => {
     try {
-        const {email,otp,nPassword} = req.body;
+        const { email, otp, nPassword } = req.body;
         // console.log(email)
-        const user = await UserLogin.findOne({'email':email})
+        const user = await UserLogin.findOne({ 'email': email })
         if (!user) {
-            return res.status(401).send({error: 'Login failed! Check authentication credentials'});
+            return res.status(401).send({ error: 'Login failed! Check authentication credentials' });
         }
         // console.log(otp == user.otp);
         // console.log(user.otp)
-        if(user.otp == otp){
+        if (user.otp == otp) {
             const hasedPassword = await bcrypt.hash(nPassword, 8)
-        UserLogin.updateOne({'email':email},{$set:{'password':hasedPassword}}).then((val)=>{
-            // console.log(val);
-            res.status(200).json({message:"success"})
-        })
+            UserLogin.updateOne({ 'email': email }, { $set: { 'password': hasedPassword } }).then((val) => {
+                // console.log(val);
+                res.status(200).json({ message: "success" })
+            })
         }
     } catch (error) {
         res.status(500).send(error.message)
@@ -251,10 +255,10 @@ router.post('/api/users/forgotpassword',async(req,res)=>{
 
 
 //route to get the userdetails
-router.get('/api/users/getuser',auth,async(req,res)=>{
-    try{
-        const userDetails = await UserDetails.findOne({user_id:req.query.id})
-        res.send({'name': userDetails.name,'image': userDetails.profile_pic})
+router.get('/api/users/getuser', auth, async (req, res) => {
+    try {
+        const userDetails = await UserDetails.findOne({ user_id: req.query.id })
+        res.send({ 'name': userDetails.name, 'image': userDetails.profile_pic })
     }
     catch (error) {
         res.status(400).json({ error: error.message })
@@ -262,21 +266,21 @@ router.get('/api/users/getuser',auth,async(req,res)=>{
 })
 
 //route to login
-router.post('/api/users/login', async(req, res) => {
+router.post('/api/users/login', async (req, res) => {
     //Login a registered user
     try {
         const { email, password } = req.body
-        const user = await UserLogin.findOne({ email} );
+        const user = await UserLogin.findOne({ email });
         if (!user) {
             throw new Error('Invalid login credentials')
         }
         const isPasswordMatch = await bcrypt.compare(password, user.password)
-        
+
         if (!isPasswordMatch) {
-            return res.status(401).send({error: 'Invalid login credentials'})
+            return res.status(401).send({ error: 'Invalid login credentials' })
         }
         if (!user) {
-            return res.status(401).send({error: 'Login failed! Check authentication credentials'})
+            return res.status(401).send({ error: 'Login failed! Check authentication credentials' })
         }
         const token = await user.generateAuthToken();
         // const userDetails = await UserDetails.findOne({email});
@@ -286,7 +290,7 @@ router.post('/api/users/login', async(req, res) => {
         const userid = user._id;
         const useremail = user.email;
         const isVerified = user.is_verified;
-        res.status(200).json({userid, useremail, token,isVerified})
+        res.status(200).json({ userid, useremail, token, isVerified })
         // res.status(200).json({ user,userDetails, token })
     } catch (error) {
         res.status(400).json({ error: error.message })
@@ -295,54 +299,56 @@ router.post('/api/users/login', async(req, res) => {
 })
 
 //route to post the user details
-router.post('/api/users/userdetails',auth,async (req,res)=>{
-    try{
-        const {gender,college_id,designation,bio} = req.body;
+router.post('/api/users/userdetails', auth, async (req, res) => {
+    try {
+        const { gender, college_id, designation, bio } = req.body;
         const user = await req.user;
         const college = await Colleges.findOne({ _id: college_id });
-        UserDetails.updateOne({email: user.email},{$set:{
-            'user_id': user._id,
-            'bio': bio,
-            'name': user.name,
-            'gender': gender,
-            'college_name': college.name,
-            'designation': designation,
-            'college_id': college_id
-        }
-            
-        }).then(val =>{
-            res.status(200).json({message: "success"});
+        UserDetails.updateOne({ email: user.email }, {
+            $set: {
+                'user_id': user._id,
+                'bio': bio,
+                'name': user.name,
+                'gender': gender,
+                'college_name': college.name,
+                'designation': designation,
+                'college_id': college_id
+            }
+
+        }).then(val => {
+            res.status(200).json({ message: "success" });
         })
-        
+
     }
-    catch(err){
-        res.status(400).json({ error: err.message }) 
+    catch (err) {
+        res.status(400).json({ error: err.message })
     }
 })
 
 
 //route to update the user profile details
-router.post('/api/users/updateprofile',auth,async (req,res)=>{
-    try{
-        const {name,email,username,gender,college_id,designation,bio} = req.body;
+router.post('/api/users/updateprofile', auth, async (req, res) => {
+    try {
+        const { name, email, username, gender, college_id, designation, bio } = req.body;
         const user = await req.user;
         const college = await Colleges.findOne({ _id: college_id });
-        UserDetails.updateOne({email: user.email},{$set:{
-            'bio': bio,
-            'name': name,
-            'username': username,
-            'gender': gender,
-            'college_name': college.name,
-            'designation': designation,
-            'college_id': college_id,
-        }
-            
-        }).then(val =>{
-            res.status(200).json({message: "success"});
+        UserDetails.updateOne({ email: user.email }, {
+            $set: {
+                'bio': bio,
+                'name': name,
+                'username': username,
+                'gender': gender,
+                'college_name': college.name,
+                'designation': designation,
+                'college_id': college_id,
+            }
+
+        }).then(val => {
+            res.status(200).json({ message: "success" });
         })
     }
-    catch(err){
-        res.status(400).json({ error: err.message }) 
+    catch (err) {
+        res.status(400).json({ error: err.message })
     }
 })
 
@@ -351,10 +357,10 @@ router.post('/api/users/updateprofile',auth,async (req,res)=>{
 router.post('/api/users/uploadimage', auth, async (req, res) => {
     const user = req.user;
     const fileName = user._id + md5(Date.now())
-    const userDetails = await UserDetails.findOne({user_id: user._id});
-    if(userDetails.profile_pic != null){
-        Files.deleteFile(userDetails.profile_pic,(result)=>{
-            Files.saveFile(req.files.image, userDetails.profile_pic, user._id,"userprofilepic", function (err, result) {
+    const userDetails = await UserDetails.findOne({ user_id: user._id });
+    if (userDetails.profile_pic != null) {
+        Files.deleteFile(userDetails.profile_pic, (result) => {
+            Files.saveFile(req.files.image, userDetails.profile_pic, user._id, "userprofilepic", function (err, result) {
                 if (!err) {
                     res.status(200).json({
                         status: 'success',
@@ -372,11 +378,11 @@ router.post('/api/users/uploadimage', auth, async (req, res) => {
             });
         })
     }
-    else{
-        Files.saveFile(req.files.image, fileName, user._id,"userprofilepic", function (err, result) {
+    else {
+        Files.saveFile(req.files.image, fileName, user._id, "userprofilepic", function (err, result) {
             if (!err) {
                 // console.log("aaxd")
-                UserDetails.updateOne({ user_id: user._id  }, { $set: { 'profile_pic': fileName } }).then((value) => {
+                UserDetails.updateOne({ user_id: user._id }, { $set: { 'profile_pic': fileName } }).then((value) => {
                     res.status(200).json({
                         status: 'success',
                         code: 200,
@@ -398,14 +404,14 @@ router.post('/api/users/uploadimage', auth, async (req, res) => {
 
 
 //view loggedin profile
-router.get('/api/users/me', auth, async(req, res) => {
-    try{
+router.get('/api/users/me', auth, async (req, res) => {
+    try {
         const user = req.user;
         // console.log(user.email);
-       const userDetails = await UserDetails.findOne({email:user.email})
-    //    console.log(userDetails);
-       var list =[userDetails];
-       res.status(200).json(list);
+        const userDetails = await UserDetails.findOne({ email: user.email })
+        //    console.log(userDetails);
+        var list = [userDetails];
+        res.status(200).json(list);
     }
     catch (err) {
         res.status(400).json({ error: err.message })
@@ -420,7 +426,7 @@ router.post('/api/users/logout', auth, async (req, res) => {
             return token.token != req.token
         })
         await req.user.save()
-        res.status(200).json({message: "success"});
+        res.status(200).json({ message: "success" });
     } catch (error) {
         res.status(500).send(error.message)
     }
@@ -456,7 +462,7 @@ router.post('/api/users/check', auth, async (req, res) => {
         if (userdetails.college_id != null && userdetails.profile_pic != null && userdetails.verified != false) {
             const user = req.user;
             const userDetails = await UserDetails.findOne({ email: user.email })
-            const college_id=userDetails.college_id
+            const college_id = userDetails.college_id
             return res.status(403).send(college_id);
         }
         // console.log("Checked")
@@ -469,11 +475,11 @@ router.post('/api/users/check', auth, async (req, res) => {
 
 
 
-router.post('/api/users/check_fill',auth, async (req, res) => {
+router.post('/api/users/check_fill', auth, async (req, res) => {
     try {
         const colleges = await Colleges.findOne({ _id: req.body.college })
-        const cname =colleges.name
-        UserDetails.updateOne({ 'userid': req.body.id }, { $set: { 'college_id': req.body.college,'college_name':cname, 'profile_pic': req.body.image_url,'bio': req.body.bio,'designation': req.body.designation } }).then((val)=>{
+        const cname = colleges.name
+        UserDetails.updateOne({ 'userid': req.body.id }, { $set: { 'college_id': req.body.college, 'college_name': cname, 'profile_pic': req.body.image_url, 'bio': req.body.bio, 'designation': req.body.designation } }).then((val) => {
             // console.log(val);
         })
 
@@ -487,7 +493,7 @@ router.post('/api/users/check_fill',auth, async (req, res) => {
 })
 
 //route to verify otp in mobile application
-router.post('/api/users/otpverified',auth, async (req, res) => {
+router.post('/api/users/otpverified', auth, async (req, res) => {
     try {
         const userdetails = await UserDetails.findOne({ otp: req.body.otp })
         if (!userdetails) {
@@ -495,7 +501,7 @@ router.post('/api/users/otpverified',auth, async (req, res) => {
         }
         res.status(200).send("Verified")
         // console.log("Verified")
-        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'otp': '000000' } }).then((val)=>{
+        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'otp': '000000' } }).then((val) => {
             console.log(val);
         })
     }
@@ -505,7 +511,7 @@ router.post('/api/users/otpverified',auth, async (req, res) => {
 })
 
 //route for sending the email in mobile application
-router.post('/api/users/emailverify',async (req, res) => {
+router.post('/api/users/emailverify', async (req, res) => {
     try {
         const email = req.query.email;
         const otp = await otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false });
@@ -522,11 +528,11 @@ router.post('/api/users/emailverify',async (req, res) => {
             };
             try {
                 await sgMail.send(msg);
-                UserDetails.updateOne({ 'email': email }, { $set: { 'otp': otp } }).then((val)=>{
+                UserDetails.updateOne({ 'email': email }, { $set: { 'otp': otp } }).then((val) => {
                     // console.log(val);
                     res.status(200).json({ otp });
                 })
-                
+
             } catch (error) {
                 console.error(error);
 
@@ -542,25 +548,27 @@ router.post('/api/users/emailverify',async (req, res) => {
 })
 
 //route for otp verification in mobile application
-router.post('/api/users/emailverified',auth, async (req, res) => {
+router.post('/api/users/emailverified', auth, async (req, res) => {
     try {
         const user = await req.user;
 
-        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'verified': true } }).then((val)=>{
+        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'verified': true } }).then((val) => {
             console.log(val);
         })
         await UserLogin.updateOne(
-            {'email':user.email},
-            {$set:{
-                'is_verified': true
-            }})
+            { 'email': user.email },
+            {
+                $set: {
+                    'is_verified': true
+                }
+            })
         const userdetails = await UserDetails.findOne({ otp: req.body.otp })
         if (!userdetails) {
             return res.status(404).send("The otp doesn't exists")
         }
         res.status(300).send("Verified")
         // console.log("Verified")
-        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'otp': '000000' } }).then((val)=>{
+        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'otp': '000000' } }).then((val) => {
             // console.log(val);
         })
     }
@@ -579,7 +587,7 @@ router.post('/api/users/emailverified_forgot_password', async (req, res) => {
         }
         res.status(200).send("Verified")
         // console.log("Verified")
-        UserDetails.updateOne({ otp: otp }, { $set: { 'otp': '000000' } }).then((val)=>{
+        UserDetails.updateOne({ otp: otp }, { $set: { 'otp': '000000' } }).then((val) => {
             console.log(val);
         })
     }
@@ -589,19 +597,19 @@ router.post('/api/users/emailverified_forgot_password', async (req, res) => {
 })
 
 //route to reset password in mobile application
-router.post('/api/users/reset_password',async(req,res)=>{
+router.post('/api/users/reset_password', async (req, res) => {
     try {
-        const {email,password} = req.body;
+        const { email, password } = req.body;
         console.log(email)
-        const user = await UserLogin.findOne({'email':email})
+        const user = await UserLogin.findOne({ 'email': email })
         if (!user) {
-            return res.status(401).send({error: 'Reset failed'});
+            return res.status(401).send({ error: 'Reset failed' });
         }
-            const hasedPassword = await bcrypt.hash(password, 8)
-        UserLogin.updateOne({'email':email},{$set:{'password':hasedPassword}}).then((val)=>{
-            res.status(200).json({message:"success"})
+        const hasedPassword = await bcrypt.hash(password, 8)
+        UserLogin.updateOne({ 'email': email }, { $set: { 'password': hasedPassword } }).then((val) => {
+            res.status(200).json({ message: "success" })
         })
-       
+
     } catch (error) {
         res.status(500).send(error.message)
     }

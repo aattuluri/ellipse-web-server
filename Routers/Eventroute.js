@@ -151,7 +151,7 @@ router.post('/api/events', auth, async (req, res) => {
                     },
                 }
             });
-            const r = https.request(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=AIzaSyBSsNp2tdDveI2A4EhAJ_ZF0GyrmdTaQYA`, options, (result) => {
+            const r = https.request(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=${process.env.FIREBASE_DLINKS_API_KEY}`, options, (result) => {
                 result.setEncoding('utf8');
                 result.on('data', (d) => {
                     const parsedData = JSON.parse(d);
