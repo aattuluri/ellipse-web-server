@@ -344,7 +344,15 @@ router.post('/api/users/updateprofile', auth, async (req, res) => {
             }
 
         }).then(val => {
-            res.status(200).json({ message: "success" });
+            UserLogin.updateOne({email: user.email},{
+                $set: {
+                    'name': name,
+                    'username': username
+                }
+            }).then(val =>{
+                res.status(200).json({ message: "success" });
+            })
+            
         })
     }
     catch (err) {
