@@ -1,3 +1,5 @@
+//schema for notification token in mobile app
+
 const mongoose = require('mongoose');
 
 

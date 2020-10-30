@@ -455,11 +455,11 @@ router.post('/api/users/check', auth, async (req, res) => {
         if (userdetails.verified == false) {
             return res.status(401).send("empty");
         }
-        if (userdetails.college_id == null || userdetails.profile_pic == null) {
+        if (userdetails.college_id == null){
             return res.status(402).send("empty");
         }
 
-        if (userdetails.college_id != null && userdetails.profile_pic != null && userdetails.verified != false) {
+        if (userdetails.college_id != null  && userdetails.verified != false) {
             const user = req.user;
             const userDetails = await UserDetails.findOne({ email: user.email })
             const college_id = userDetails.college_id
@@ -522,9 +522,10 @@ router.post('/api/users/emailverify', async (req, res) => {
             const msg = {
                 to: email,
                 from: 'support@ellipseapp.com', // Use the email address or domain you verified above
-                subject: 'OTP to verify your mail',
-                text: `${otp}`,
-                html: `<h1>your otp is ${otp}</h1>`,
+                templateId: 'd-25c76e60f9f146b78dc11e2ad9bdb62f',
+                dynamic_template_data: {
+                    OTP: otp
+                },
             };
             try {
                 await sgMail.send(msg);

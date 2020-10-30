@@ -1,3 +1,5 @@
+//schema for announcements
+
 const mongoose = require('mongoose');
 
 

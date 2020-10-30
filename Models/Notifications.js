@@ -1,3 +1,5 @@
+//schema for notifications
+
 const mongoose = require('mongoose');
 
 

@@ -1,8 +1,7 @@
+//methods for gridfs file saving extracting and deleting
+
+
 var Mongoose = require('mongoose');
-// var Shortid = require('shortid')
-// var Async = require('async');
-// var Grid = require('gridfs-stream');
-// const fs = require('fs');
 const stream = require('stream');
 const conn = Mongoose.connection;
 var gridFSBucket
@@ -12,6 +11,7 @@ conn.on('open', () => {
 })
 
 
+//method to get file by id
 async function getFileById(fileId, res, cb) {
 
     const db = conn.db;
@@ -36,10 +36,9 @@ async function getFileById(fileId, res, cb) {
 
 }
 
-
+//method to save file
 async function saveFile(rs, fileName, userId, purpose, cb) {
 
-    // var filename = Shortid.generate();
     var contentType = rs.mimetype;
     var origFilename = rs.name;
     var bufferStream = new stream.PassThrough();
@@ -56,6 +55,7 @@ async function saveFile(rs, fileName, userId, purpose, cb) {
 
 }
 
+//method to save certificate
 async function saveCertifiate(stream, fileName, userId, purpose, cb) {
 
     var ws = await gridFSBucket.openUploadStream(fileName,
@@ -69,6 +69,8 @@ async function saveCertifiate(stream, fileName, userId, purpose, cb) {
 
 }
 
+
+//method to delete file by id
 function deleteFileById(fileId, cb) {
     const db = conn.db;
     const collection = db.collection('fs.files');
@@ -84,27 +86,9 @@ function deleteFileById(fileId, cb) {
 
         }
     })
-    // const db = conn.db;
-    // gridFSBucket.delete(fileId).on('finish',()=>{
-    //     cb(null,{"message": "success"})
-    // })
-    // gfs.remove({
-    //     filename: fileId
-    // }, function (err) {
-    //     if (err) return cb(err);
-    //     cb(null);
-    // });
 }
 
-// function deleteUserFileById(fileId, userId, cb) {
-//     gfs.remove({
-//         filename: fileId,
-//         "metadata.userId": userId,
-//     }, function (err) {
-//         if (err) return cb(err);
-//         cb(null);
-//     });
-// }
+
 
 module.exports = {
     getFile: getFileById,

@@ -191,6 +191,7 @@ router.post('/api/admin/delete_event_keywords',adminAuth, async (req, res) => {
     }
 })
 
+//route to add new college to database
 router.post('/api/admin/add_college',adminAuth,async (req,res)=>{
     try{
         const college = new Colleges(req.body);
@@ -205,7 +206,7 @@ router.post('/api/admin/add_college',adminAuth,async (req,res)=>{
     }
 })
 
-
+//route to delete college from data base
 router.post('/api/admin/delete_college',adminAuth,async (req,res)=>{
     try{
         const id = req.body.id;
@@ -220,7 +221,7 @@ router.post('/api/admin/delete_college',adminAuth,async (req,res)=>{
     }
 })
 
-
+//route to get all colleges
 router.get('/api/admin/get_all_colleges',adminAuth,async (req,res)=>{
     try{
         Colleges.find().then(value =>{
@@ -231,30 +232,22 @@ router.get('/api/admin/get_all_colleges',adminAuth,async (req,res)=>{
     }
 })
 
-
+//route to get organizer details for event details page
 router.get('/api/admin/event/get_organizer_details',adminAuth, async (req,res)=>{
     try {
-        // const user = req.user;
         const event_id = await req.query.eventId;
-        // console.log(event_id)
-        // console.log("event"+req.query.eventId)
         const user_id = req.query.userId;
         const event = await Events.findOne({_id:event_id});
         if(event.user_id === user_id){
             UserDetails.findOne({user_id:user_id}).then(value=>{
-                // console.log(value);
                 res.status(200).json({name:value.name,profile_pic:value.profile_pic,college_name:value.college_name});
             })
         }
     }
     catch (error) {
-        // console.log(error);
         res.status(400).json({ error: error.message })
     }
 })
-
-
-
 
 
 module.exports = router
