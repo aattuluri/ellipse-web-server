@@ -1,3 +1,5 @@
+//schema for event post keywords like event types,event tags and requirements
+
 const mongoose = require('mongoose');
 
 

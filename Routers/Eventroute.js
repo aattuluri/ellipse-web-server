@@ -448,18 +448,15 @@ router.post('/api/updateevent', auth, async (req, res) => {
     }
 })
 
-
+//route for getting organizer details with event id
 router.get('/api/event/get_organizer_details',auth, async (req,res)=>{
     try {
         const user = req.user;
         const event_id = await req.query.eventId;
-        // console.log(event_id)
-        // console.log("event"+req.query.eventId)
         const user_id = req.query.userId;
         const event = await Events.findOne({_id:event_id});
         if(event.user_id === user_id){
             UserDetails.findOne({user_id:user_id}).then(value=>{
-                // console.log(value);
                 res.status(200).json({name:value.name,profile_pic:value.profile_pic,college_name:value.college_name});
             })
         }
@@ -469,18 +466,6 @@ router.get('/api/event/get_organizer_details',auth, async (req,res)=>{
         res.status(400).json({ error: error.message })
     }
 })
-
-
-
-//route for generating the pdf
-// router.get('/api/generatepdf', async (req, res) => {
-//     pdf.create('<!doctype html><html><head></head><body><h1>Lalith Reddy</h1></body></html>', {}).toFile('me.pdf', (err, result) => {
-//         if (err) {
-//             console.log(err);
-//         }
-//         res.send(result);
-//     })
-// })
 
 
 module.exports = router

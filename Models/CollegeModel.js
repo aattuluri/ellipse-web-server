@@ -1,3 +1,5 @@
+//schema for colleges
+
 let mongoose = require('mongoose')
 
 let collegeShema = mongoose.Schema({

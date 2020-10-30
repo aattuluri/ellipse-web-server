@@ -1,3 +1,5 @@
+//schema for admin login
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -27,6 +29,8 @@ const adminLoginSchema = mongoose.Schema({
         default: Date.now()
     },
 })
+
+//method to generate hash every time password is changed
 adminLoginSchema.pre('save', async function (next) {
     // Hash the password before saving the user model
     const user = this
@@ -36,7 +40,7 @@ adminLoginSchema.pre('save', async function (next) {
     next()
 })
 
-
+//method for generating jwt token
 adminLoginSchema.methods.generateAuthToken = async function() {
     // Generate an auth token for the user
     const user = this

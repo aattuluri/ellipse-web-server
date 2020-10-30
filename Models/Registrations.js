@@ -1,3 +1,5 @@
+//schema for event registration
+
 const mongoose = require('mongoose');
 
 

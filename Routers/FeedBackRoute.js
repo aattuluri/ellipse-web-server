@@ -7,7 +7,7 @@ const FeedBack = require('../Models/FeedBack');
 const router = express.Router();
 
 
-//post the report for the event
+//post the feedback for the application
 
 router.post('/api/event/send_feedback', auth, async (req, res) => {
     try {

@@ -12,7 +12,7 @@ const Registrations = require('../Models/Registrations');
 const UserDetails = require('../Models/UserDetails');
 
 
-//post the report for the event
+//generate certificates for selected participants
 
 router.post('/api/event/generate_certificates',auth, async (req, res) => {
     try {
@@ -143,6 +143,8 @@ router.get('/api/event/verify_certificate',async (req,res)=>{
     }
 })
 
+
+//route to update title certificate
 router.post('/api/event/update_certificate_title',auth,async (req,res)=>{
     try {
         const user = req.user;

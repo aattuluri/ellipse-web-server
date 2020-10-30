@@ -1,3 +1,5 @@
+//schema for feedback of application
+
 const mongoose = require('mongoose');
 
 

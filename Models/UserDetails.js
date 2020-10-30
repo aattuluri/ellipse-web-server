@@ -1,3 +1,5 @@
+//user all details schema
+
 const mongoose = require('mongoose');
 
 
