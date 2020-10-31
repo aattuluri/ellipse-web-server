@@ -440,16 +440,16 @@ router.post('/api/users/logout', auth, async (req, res) => {
     }
 })
 
-// router.post('/api/users/logoutall', auth, async(req, res) => {
-//     // Log user out of all devices
-//     try {
-//         req.user.tokens.splice(0, req.user.tokens.length)
-//         await req.user.save()
-//         res.send()
-//     } catch (error) {
-//         res.status(500).send(error.message)
-//     }
-// })
+ // Log user out of all devices
+router.post('/api/users/logoutall', auth, async(req, res) => {
+    try {
+        req.user.tokens.splice(0, req.user.tokens.length)
+        await req.user.save()
+        res.status(200).json({ message: "success" });
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+})
 
 
 
