@@ -10,15 +10,23 @@ const auth = require('../Middleware/Auth');
 const UserDetails = require('../Models/UserDetails');
 const collegeController = require('./collegeController');
 const Files = require('../Models/Files');
+const LoginActivity = require('../Models/LoginActivity');
 // const { route } = require('./ChatRoute');
 
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const router = express.Router();
+// var os = require("os");
+// var geoip = require('geoip-lite');
+
 
 
 //route to ping for api if it is working
-router.get('/api', (req, res) => {
+router.get('/api', async (req, res) => {
+    console.log(req.connection.remoteAddress);
+    // var ip = '192.168.0.101';
+    // var geo = await geoip.lookup(ip);
+    // console.log(geo);
     res.send("server is working");
 })
 
@@ -82,7 +90,26 @@ router.post('/api/users/signup', async (req, res) => {
             await userDetails.save();
             const userid = user._id;
             const useremail = user.email;
-            res.status(200).json({ userid, useremail, token })
+            res.status(200).json({ userid, useremail, token });
+            console.log(req.connection.remoteAddress);
+            const ipAdress = req.connection.remoteAddress;
+            const loginActivity = new LoginActivity();
+            loginActivity.user_id = user._id;
+            loginActivity.ip_address = ipAdress;
+            if (req.body.type === "browser") {
+                loginActivity.type = req.body.type;
+                loginActivity.browser_name = req.body.browser_name;
+                loginActivity.device_os = req.body.device_os;
+                loginActivity.status = "success";
+                loginActivity.save();
+            }
+            else if (req.body.type === "app") {
+                loginActivity.type = req.body.type;
+                loginActivity.device_os = req.body.device_os;
+                loginActivity.device_name = req.body.device_name;
+                loginActivity.status = "success";
+                loginActivity.save();
+            }
             // res.status(200).json({ user, token })
         }
         else {
@@ -269,14 +296,31 @@ router.get('/api/users/getuser', auth, async (req, res) => {
 router.post('/api/users/login', async (req, res) => {
     //Login a registered user
     try {
-        const { email, password } = req.body
+        const { email, password } = req.body;
+        console.log(req.connection.remoteAddress);
+        const ipAdress = req.connection.remoteAddress;
+        const loginActivity = new LoginActivity();
         const user = await UserLogin.findOne({ email });
         if (!user) {
             throw new Error('Invalid login credentials')
         }
+        loginActivity.user_id = user._id;
+        loginActivity.ip_address = ipAdress;
+        if (req.body.type === "browser") {
+            loginActivity.type = req.body.type;
+            loginActivity.browser_name = req.body.browser_name;
+            loginActivity.device_os = req.body.device_os;
+        }
+        else if (req.body.type === "app") {
+            loginActivity.type = req.body.type;
+            loginActivity.device_os = req.body.device_os;
+            loginActivity.device_name = req.body.device_name;
+        }
         const isPasswordMatch = await bcrypt.compare(password, user.password)
 
         if (!isPasswordMatch) {
+            loginActivity.status = "failed";
+            loginActivity.save()
             return res.status(401).send({ error: 'Invalid login credentials' })
         }
         if (!user) {
@@ -290,8 +334,9 @@ router.post('/api/users/login', async (req, res) => {
         const userid = user._id;
         const useremail = user.email;
         const isVerified = user.is_verified;
-        res.status(200).json({ userid, useremail, token, isVerified })
-        // res.status(200).json({ user,userDetails, token })
+        res.status(200).json({ userid, useremail, token, isVerified });
+        loginActivity.status = "success";
+        loginActivity.save();
     } catch (error) {
         res.status(400).json({ error: error.message })
     }
@@ -344,15 +389,15 @@ router.post('/api/users/updateprofile', auth, async (req, res) => {
             }
 
         }).then(val => {
-            UserLogin.updateOne({email: user.email},{
+            UserLogin.updateOne({ email: user.email }, {
                 $set: {
                     'name': name,
                     'username': username
                 }
-            }).then(val =>{
+            }).then(val => {
                 res.status(200).json({ message: "success" });
             })
-            
+
         })
     }
     catch (err) {
@@ -440,8 +485,8 @@ router.post('/api/users/logout', auth, async (req, res) => {
     }
 })
 
- // Log user out of all devices
-router.post('/api/users/logoutall', auth, async(req, res) => {
+// Log user out of all devices
+router.post('/api/users/logoutall', auth, async (req, res) => {
     try {
         req.user.tokens.splice(0, req.user.tokens.length)
         await req.user.save()
@@ -463,11 +508,11 @@ router.post('/api/users/check', auth, async (req, res) => {
         if (userdetails.verified == false) {
             return res.status(401).send("empty");
         }
-        if (userdetails.college_id == null){
+        if (userdetails.college_id == null) {
             return res.status(402).send("empty");
         }
 
-        if (userdetails.college_id != null  && userdetails.verified != false) {
+        if (userdetails.college_id != null && userdetails.verified != false) {
             const user = req.user;
             const userDetails = await UserDetails.findOne({ email: user.email })
             const college_id = userDetails.college_id
