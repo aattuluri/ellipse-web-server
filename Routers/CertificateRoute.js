@@ -144,6 +144,31 @@ router.get('/api/event/verify_certificate',async (req,res)=>{
 })
 
 
+//certificate for certificate verification page with share url
+router.get('/api/verify/get_certificate',async (req,res)=>{
+    try {
+        const id = req.query.id;
+        const reg = await Registrations.findOne({share_id: id})
+        if(reg){
+            Files.getFile(reg.certificate_url, res, function (err, result) {
+                if (!err) {
+                    //Do Nothing
+                }
+                console.log(err);
+                res.send(new Error("Failed to find a file."));
+            });
+            
+        }
+        else{
+            res.status(400).json({"message":"not found"});
+        }
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+
 //route to update title certificate
 router.post('/api/event/update_certificate_title',auth,async (req,res)=>{
     try {
