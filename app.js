@@ -99,13 +99,14 @@ cron.schedule('00 08 * * *', () => {
                     notification.user_id = r.user_id;
                     notification.event_id = r.event_id;
                     notification.title = e.name;
-                    notification.description = "Starts at " + e.start_time.toDateString()
+                    // {endDate.toDateString()}{" "+endDate.toLocaleTimeString()}
+                    notification.description = "Starts at " + e.start_time.toDateString() + " " + e.start_time.toLocaleTimeString() + " IST"
                     notification.save();
                     UserDetails.findOne({user_id:r.user_id}).then((v)=>{
                         const tokens = v.notification_tokens;
                         tokens.forEach((t)=>{
                             // console.log(t.token);
-                            https.get(`${firebase_url}?token=${t.token}&imageUrl=https://ellipseapp.com/api/image?id=${e.poster_url}&title=${e.name}&message=Starts at ${e.start_time.toDateString()}`, (resp) => {
+                            https.get(`${firebase_url}?token=${t.token}&imageUrl=https://ellipseapp.com/api/image?id=${e.poster_url}&title=${e.name}&message=Starts at ${e.start_time.toDateString()} ${e.start_time.toLocaleTimeString()} IST`, (resp) => {
                             }).on("error", (err) => {
                                 console.log("Error: " + err.message);
                             });
