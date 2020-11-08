@@ -69,7 +69,7 @@ router.post('/api/event/add_announcement', auth, async (req, res) => {
 router.get('/api/event/get_announcements', auth, (req, res) => {
     try {
         Announcement.find({ event_id: req.query.id }).then((result) => {
-            res.status(200).json(result);
+            res.status(200).json(result.reverse());
         })
     }
     catch (error) {

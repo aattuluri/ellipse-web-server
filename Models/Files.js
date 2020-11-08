@@ -33,7 +33,6 @@ async function getFileById(fileId, res, cb) {
                 });
         }
     })
-
 }
 
 //method to save file
