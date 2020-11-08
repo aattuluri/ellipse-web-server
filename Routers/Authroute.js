@@ -24,6 +24,8 @@ const router = express.Router();
 //route to ping for api if it is working
 router.get('/api', async (req, res) => {
     console.log(req.connection.remoteAddress);
+    console.log(request.headers['x-forwarded-for'])
+    console.log(request.headers['x-forwarded-for'][0])
     // var ip = '192.168.0.101';
     // var geo = await geoip.lookup(ip);
     // console.log(geo);
@@ -554,7 +556,7 @@ router.post('/api/users/otpverified', auth, async (req, res) => {
         }
         res.status(200).send("Verified")
         // console.log("Verified")
-        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'otp': '000000' } }).then((val) => {
+        UserDetails.updateOne({ otp: req.body.otp }, { $set: { 'otp': '0000' } }).then((val) => {
             console.log(val);
         })
     }
@@ -567,7 +569,7 @@ router.post('/api/users/otpverified', auth, async (req, res) => {
 router.post('/api/users/emailverify', async (req, res) => {
     try {
         const email = req.query.email;
-        const otp = await otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets: false });
+        const otp = await otpGenerator.generate(4, { upperCase: false, specialChars: false, alphabets: false });
         const userdetails = await UserDetails.findOne({ email: email })
         if (!userdetails) {
             return res.status(404).send("The email doesn't exists")

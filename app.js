@@ -39,7 +39,7 @@ const PORT = process.env.PORT || 4000;
 
 app.use(fileUpload());
 app.use(cors());
-app.use(bodyParser.json({ limit: "40mb" }));
+app.use(bodyParser.json({ limit: "400mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
