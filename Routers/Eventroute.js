@@ -281,13 +281,19 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
 //route to retrive the poster from db with file name
 router.get('/api/image', (req, res) => {
     try {
-        Files.getFile(req.query.id, res, function (err, result) {
-            if (!err) {
-                //Do Nothing
-            }
-            console.log(err);
+        if(req.query.id == 'undefined'){
             res.send(new Error("Failed to find a file."));
-        });
+        }
+        else{
+            Files.getFile(req.query.id, res, function (err, result) {
+                if (!err) {
+                    //Do Nothing
+                }
+                console.log(err);
+                res.send(new Error("Failed to find a file."));
+            });
+        }
+        
     }
     catch (error) {
         res.status(400).json({ error: error.message })
