@@ -13,7 +13,7 @@ router.get('/api/get_notifications', auth, async (req, res) => {
     try {
         const user = req.user;
         Notification.find({ user_id: user._id }).then((result) => {
-            res.status(200).json(result);
+            res.status(200).json(result.reverse());
         })
     }
     catch (error) {
