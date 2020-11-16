@@ -13,6 +13,20 @@ router.get('/api/get_notifications', auth, async (req, res) => {
     try {
         const user = req.user;
         Notification.find({ user_id: user._id }).then((result) => {
+            res.status(200).json(result);
+        })
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+
+});
+
+//route to get all the notifications for a user with user id in desending order
+router.get('/api/get_notifications_desc', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        Notification.find({ user_id: user._id }).then((result) => {
             res.status(200).json(result.reverse());
         })
     }
