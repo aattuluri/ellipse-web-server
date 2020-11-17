@@ -123,6 +123,25 @@ router.post('/api/users/signup', async (req, res) => {
     }
 })
 
+router.get('/api/testemail',async (req,res)=>{
+    const msg = {
+        to: 'lalithpunepalli@gmail.com',
+        from: { "email":'support@ellipseapp.com','name': "Ellipse Support"}, // Use the email address or domain you verified above
+        // subject: 'Information',
+        //     text: 'Nothing 2',
+        //     html: `<h1>testing</h1><h2>nothing</h2>`,
+        templateId: 'd-c3456f977aca444cb52e0ad002d737d8',
+        dynamic_template_data: {
+            subject: "important",
+            pre_header: "important",
+            title: "nothing 2",
+            content: "nothing 3",
+        },
+    };
+    await sgMail.send(msg);
+    res.send("success")
+})
+
 
 //roite to send verification mail
 router.post('/api/users/sendverificationemail', async (req, res) => {
@@ -134,7 +153,7 @@ router.post('/api/users/sendverificationemail', async (req, res) => {
         if (user) {
             const msg = {
                 to: email,
-                from: 'support@ellipseapp.com', // Use the email address or domain you verified above
+                from: { "email":'support@ellipseapp.com','name': "Ellipse Support"}, // Use the email address or domain you verified above
                 templateId: 'd-25c76e60f9f146b78dc11e2ad9bdb62f',
                 dynamic_template_data: {
                     OTP: otp
@@ -173,7 +192,7 @@ router.post('/api/users/sendverificationemailwithauth', auth, async (req, res) =
         if (user) {
             const msg = {
                 to: user.email,
-                from: 'support@ellipseapp.com', // Use the email address or domain you verified above
+                from: { "email":'support@ellipseapp.com','name': "Ellipse Support"}, // Use the email address or domain you verified above
                 templateId: 'd-25c76e60f9f146b78dc11e2ad9bdb62f',
                 dynamic_template_data: {
                     OTP: otp
@@ -576,7 +595,7 @@ router.post('/api/users/emailverify', async (req, res) => {
         } else {
             const msg = {
                 to: email,
-                from: 'support@ellipseapp.com', // Use the email address or domain you verified above
+                from: { "email":'support@ellipseapp.com','name': "Ellipse Support"}, // Use the email address or domain you verified above
                 templateId: 'd-25c76e60f9f146b78dc11e2ad9bdb62f',
                 dynamic_template_data: {
                     OTP: otp
