@@ -99,7 +99,7 @@ router.post('/api/admin/event/sendemail', adminAuth, async (req, res) => {
         const email = userDetails.email;
         const title = req.body.title;
         const content = req.body.content;
-        const event_name = request.body.event_name;
+        const event_name = req.body.event_name;
         const msg = {
             to: email,
             from: { "email": 'support@ellipseapp.com', 'name': "Ellipse Support" }, // Use the email address or domain you verified above
