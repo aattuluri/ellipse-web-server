@@ -154,10 +154,30 @@ router.post('/api/users/sendverificationemail', async (req, res) => {
             const msg = {
                 to: email,
                 from: { "email":'support@ellipseapp.com','name': "Ellipse Support"}, // Use the email address or domain you verified above
-                templateId: 'd-25c76e60f9f146b78dc11e2ad9bdb62f',
-                dynamic_template_data: {
-                    OTP: otp
-                },
+                // templateId: 'd-25c76e60f9f146b78dc11e2ad9bdb62f',
+                subject: 'OTP Verifiation',
+            // text: 'https://staging.ellipseapp.com/home',
+                html: `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>OTP Verification</title>
+                </head>
+                <body>
+                    <div style="background-color: #00bdaa;border-radius: 30px;padding: 20px;">
+                        <h1 style="text-align: center;font-size: 2.5em;color: #000000;">EllipseApp</h1>
+                        <div style="background-color: #ffffff;text-align: center;border-radius: 30px;padding: 20px;">
+                            <h3 style="text-align: center;color: #000000;">Your OTP is</h3>
+                            <h1 style="text-align: center;font-size: 4.5em;color: #000000;">${otp}</h1>
+                            <a href="https://ellipseapp.page.link/app" style="text-decoration: none;color: #000000;margin: auto;background-color: #00bdaa;height: 50px;width: 100px;border-radius: 20px;padding: 10px;">Open App</a>
+                        </div>
+                    </div>
+                </body>
+                </html>`,
+                // dynamic_template_data: {
+                //     OTP: otp
+                // },
             };
             try {
                 await sgMail.send(msg);
