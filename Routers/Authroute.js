@@ -3,6 +3,7 @@ const md5 = require('md5');
 var otpGenerator = require("otp-generator");
 const bcrypt = require('bcryptjs');
 const sgMail = require('@sendgrid/mail');
+const https = require('https');
 // var Grid = require('gridfs-stream');
 
 const UserLogin = require('../Models/User');
@@ -20,6 +21,33 @@ const router = express.Router();
 // var geoip = require('geoip-lite');
 
 
+router.post('/api/verify_recaptcha', async (req, res) => {
+    console.log(req.body.recaptcha_token);
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    }
+    // const data = JSON.stringify({
+
+    // });
+    const r = https.request(`https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_SITE_KEY}&response=${req.body.recaptcha_token}`, options, (result) => {
+        result.setEncoding('utf8');
+        result.on('data', (d) => {
+            const parsedData = JSON.parse(d);
+            // console.log(parsedData);
+            res.json(parsedData);
+        })
+    })
+    r.on('error', (error) => {
+        console.error(error)
+    })
+    // r.write(data)
+    r.end()
+
+}, [])
+
 
 //route to ping for api if it is working
 router.get('/api', async (req, res) => {
@@ -33,7 +61,7 @@ router.get('/api', async (req, res) => {
 })
 
 router.get('/api/get_version', (req, res) => {
-    res.status(200).json({version_name:"1.0.2",required:true});
+    res.status(200).json({ version_name: "1.0.2", required: true });
 })
 
 
@@ -123,10 +151,10 @@ router.post('/api/users/signup', async (req, res) => {
     }
 })
 
-router.get('/api/testemail',async (req,res)=>{
+router.get('/api/testemail', async (req, res) => {
     const msg = {
         to: 'lalithpunepalli@gmail.com',
-        from: { "email":'support@ellipseapp.com','name': "Ellipse Support"}, // Use the email address or domain you verified above
+        from: { "email": 'support@ellipseapp.com', 'name': "Ellipse Support" }, // Use the email address or domain you verified above
         // subject: 'Information',
         //     text: 'Nothing 2',
         //     html: `<h1>testing</h1><h2>nothing</h2>`,
@@ -153,10 +181,10 @@ router.post('/api/users/sendverificationemail', async (req, res) => {
         if (user) {
             const msg = {
                 to: email,
-                from: { "email":'support@ellipseapp.com','name': "Ellipse Support"}, // Use the email address or domain you verified above
+                from: { "email": 'support@ellipseapp.com', 'name': "Ellipse Support" }, // Use the email address or domain you verified above
                 // templateId: 'd-25c76e60f9f146b78dc11e2ad9bdb62f',
                 subject: 'OTP Verifiation',
-            // text: 'https://staging.ellipseapp.com/home',
+                // text: 'https://staging.ellipseapp.com/home',
                 html: `<!DOCTYPE html>
                 <html lang="en">
                 <head>
@@ -212,7 +240,7 @@ router.post('/api/users/sendverificationemailwithauth', auth, async (req, res) =
         if (user) {
             const msg = {
                 to: user.email,
-                from: { "email":'support@ellipseapp.com','name': "Ellipse Support"}, // Use the email address or domain you verified above
+                from: { "email": 'support@ellipseapp.com', 'name': "Ellipse Support" }, // Use the email address or domain you verified above
                 templateId: 'd-25c76e60f9f146b78dc11e2ad9bdb62f',
                 dynamic_template_data: {
                     OTP: otp
@@ -615,7 +643,7 @@ router.post('/api/users/emailverify', async (req, res) => {
         } else {
             const msg = {
                 to: email,
-                from: { "email":'support@ellipseapp.com','name': "Ellipse Support"}, // Use the email address or domain you verified above
+                from: { "email": 'support@ellipseapp.com', 'name': "Ellipse Support" }, // Use the email address or domain you verified above
                 templateId: 'd-25c76e60f9f146b78dc11e2ad9bdb62f',
                 dynamic_template_data: {
                     OTP: otp
