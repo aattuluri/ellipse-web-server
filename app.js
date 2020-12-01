@@ -54,7 +54,7 @@ mongoose.connect(process.env.MONGODB_URL, {
 const server = http.createServer(app);
 var io = require('socket.io')(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "https://staging.ellipseapp.com/api/",
         credentials: true
     }
 });
@@ -67,7 +67,7 @@ io.on('connection', (socket) => {
     })
     socket.on('chatmessage', (message) => {
         let data = JSON.parse(message);
-        // console.log(data.event_id);
+        console.log(data.event_id);
         chatService.addChatMessage(data.event_id, JSON.stringify(data.msg), (value) => {
             // console.log("done");
         })
