@@ -52,12 +52,7 @@ mongoose.connect(process.env.MONGODB_URL, {
 
 //Code for chat with socket.io
 const server = http.createServer(app);
-var io = require('socket.io')(server, {
-    cors: {
-        origin: "https://staging.ellipseapp.com/api/",
-        credentials: true
-    }
-});
+var io = require('socket.io')(server);
 
 
 io.on('connection', (socket) => {
@@ -81,6 +76,8 @@ io.on('connection', (socket) => {
         console.log('user disconnected');
     });
 });
+
+io.on('error')
 
 
 //Code for chat with web sockets
