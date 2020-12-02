@@ -52,35 +52,36 @@ mongoose.connect(process.env.MONGODB_URL, {
 
 //Code for chat with socket.io
 const server = http.createServer(app);
-var io = require('socket.io')(server,{
+var io = require('socket.io')(server, {
+    path: '/api',
     cors: {
-      origin: "http://localhost:3000",
-      credentials: true
+        origin: "http://localhost:3000",
+        credentials: true
     }
 });
 
 
 io.on('connection', (socket) => {
     console.log('a user connected');
-    socket.on('initial_room',(room_id)=>{
-        socket.join(room_id+":eventroom");
+    socket.on('initial_room', (room_id) => {
+        socket.join(room_id + ":eventroom");
     })
-    socket.on('chatmessage',(message)=>{
+    socket.on('chatmessage', (message) => {
         let data = JSON.parse(message);
         console.log(data.event_id);
-                chatService.addChatMessage(data.event_id, JSON.stringify(data.msg), (value) => {
+        chatService.addChatMessage(data.event_id, JSON.stringify(data.msg), (value) => {
             // console.log("done");
         })
-        io.in(data.event_id+":eventroom").emit('chatmessage',JSON.stringify({
-                                        action: "receive_message",
-                                        event_id: data.event_id,
-                                        msg: data.msg
-                                    }));
+        io.in(data.event_id + ":eventroom").emit('chatmessage', JSON.stringify({
+            action: "receive_message",
+            event_id: data.event_id,
+            msg: data.msg
+        }));
     })
     socket.on('disconnect', () => {
-      console.log('user disconnected');
+        console.log('user disconnected');
     });
-  });
+});
 
 
 //Code for chat with web sockets
@@ -138,16 +139,16 @@ cron.schedule('00 08 * * *', () => {
                     // {endDate.toDateString()}{" "+endDate.toLocaleTimeString()}
                     notification.description = "Starts at " + e.start_time.toDateString() + " " + e.start_time.toLocaleTimeString() + " IST"
                     notification.save();
-                    UserDetails.findOne({user_id:r.user_id}).then((v)=>{
+                    UserDetails.findOne({ user_id: r.user_id }).then((v) => {
                         const tokens = v.notification_tokens;
-                        tokens.forEach((t)=>{
+                        tokens.forEach((t) => {
                             // console.log(t.token);
                             https.get(`${firebase_url}?token=${t.token}&imageUrl=https://ellipseapp.com/api/image?id=${e.poster_url}&title=${e.name}&message=Starts at ${e.start_time.toDateString()} ${e.start_time.toLocaleTimeString()} IST`, (resp) => {
                             }).on("error", (err) => {
                                 console.log("Error: " + err.message);
                             });
                         })
-                    })   
+                    })
                 })
             })
         })
