@@ -53,11 +53,10 @@ mongoose.connect(process.env.MONGODB_URL, {
 //Code for chat with socket.io
 const server = http.createServer(app);
 var io = require('socket.io')(server, {
-    path: '/api',
+    path: '/ws',
     cors: {
-        origin: "http://localhost:3000",
-        credentials: true
-    }
+        origin: '*',
+      }
 });
 
 
