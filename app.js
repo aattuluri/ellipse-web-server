@@ -49,65 +49,68 @@ mongoose.connect(process.env.MONGODB_URL, {
 })
 
 
-
-//Code for chat with socket.io
-const server = http.createServer(app);
-var io = require('socket.io')(server, {
-    path: '/ws',
-    cors: {
-        origin: '*',
-      }
-});
-
-
-io.on('connection', (socket) => {
-    console.log('a user connected');
-    socket.on('initial_room', (room_id) => {
-        socket.join(room_id + ":eventroom");
-    })
-    socket.on('chatmessage', (message) => {
-        let data = JSON.parse(message);
-        console.log(data.event_id);
-        chatService.addChatMessage(data.event_id, JSON.stringify(data.msg), (value) => {
-            // console.log("done");
-        })
-        io.in(data.event_id + ":eventroom").emit('chatmessage', JSON.stringify({
-            action: "receive_message",
-            event_id: data.event_id,
-            msg: data.msg
-        }));
-    })
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    });
-});
-
-
 //Code for chat with web sockets
-// const server = http.createServer(app);
-// const webSocketServer = new webSocket.Server({ server });
-// webSocketServer.on('connection', (webSocketClient) => {
-//     webSocketClient.on('message', (message) => {
-//         let data = JSON.parse(message);
-//         chatService.addChatMessage(data.event_id, JSON.stringify(data.msg), (value) => {
-//             // console.log("done");
-//         })
-//         switch (data.action) {
-//             case 'send_message':
-//                 webSocketServer
-//                     .clients
-//                     .forEach(client => {
-//                         client.send(JSON.stringify({
-//                             action: "receive_message",
-//                             event_id: data.event_id,
-//                             msg: data.msg
-//                         }))
+const server = http.createServer(app);
+const webSocketServer = new webSocket.Server({ server });
+var rooms = [];
+webSocketServer.on('connection', (webSocketClient) => {
+    // webSocketClient.on('close',(m,b)=>{
+    //     console.log(m);
+    //     console.log(b);
+    // })
+    webSocketClient.on('message', (message) => {
+        let data = JSON.parse(message);
 
-//                     });
-//                 break;
-//         }
-//     });
-// })
+        switch (data.action) {
+            case 'send_message':
+                
+                const uid = data.msg.user_id;
+                chatService.addChatMessage(data.event_id, JSON.stringify(data.msg), (value) => {
+                    // console.log("done");
+                })
+                if(!rooms[data.event_id+":eventroom"]){
+                    rooms[data.event_id+":eventroom"] = {};
+                }
+                // if(!rooms[data.event_id+":eventroom"][uid]){
+                    rooms[data.event_id+":eventroom"][uid] = webSocketClient
+                // }
+                Object.entries(rooms[data.event_id+":eventroom"]).forEach(([, client]) => {
+                    // console.log(client);
+                    client.send(JSON.stringify({
+                        action: "receive_message",
+                        event_id: data.event_id,
+                        msg: data.msg
+                    }))
+
+                });
+                // webSocketServer
+                //     .clients
+                //     .forEach(client => {
+                //         client.send(JSON.stringify({
+                //             action: "receive_message",
+                //             event_id: data.event_id,
+                //             msg: data.msg
+                //         }))
+
+                //     });
+                break;
+            case 'close_socket':
+                const uuid = data.user_id;
+                if(!rooms[data.event_id+":eventroom"][uuid]){
+                    // rooms[data.event_id+":eventroom"][uid] = webSocketClient
+                }
+                else{
+                    if(Object.keys(rooms[data.event_id+":eventroom"]).length === 1) {
+                        delete rooms[data.event_id+":eventroom"];
+                    }
+                    else {
+                        delete rooms[data.event_id+":eventroom"][uuid];
+                    }
+                }
+
+        }
+    });
+})
 
 
 
@@ -175,3 +178,34 @@ server.listen(PORT, (req, res) => {
     console.log(`Server Started at PORT ${PORT}`);
 });
 
+//Code for chat with socket.io
+// const server = http.createServer(app);
+// var io = require('socket.io')(server, {
+//     path: '/w',
+//     cors: {
+//         origin: '*',
+//       }
+// });
+// io.on('connection', (socket) => {
+//     console.log('a user connected');
+//     socket.on('initial_room', (room_id) => {
+//         console.log(room_id);
+//         socket.join(room_id + ":eventroom");
+//     })
+//     // io.emit('news',"hjsk");
+//     socket.on('chatmessage', (message) => {
+//         let data = JSON.parse(message);
+//         console.log(data.event_id);
+//         chatService.addChatMessage(data.event_id, JSON.stringify(data.msg), (value) => {
+//             // console.log("done");
+//         })
+//         io.in(data.event_id + ":eventroom").emit('chatmessage', JSON.stringify({
+//             action: "receive_message",
+//             event_id: data.event_id,
+//             msg: data.msg
+//         }));
+//     })
+//     socket.on('disconnect', () => {
+//         console.log('user disconnected');
+//     });
+// });
