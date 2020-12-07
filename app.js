@@ -22,6 +22,7 @@ const adminRouter = require('./Routers/AdminRoute');
 const feedBackRouter = require('./Routers/FeedBackRoute');
 const EventKeywordsRouter = require('./Routers/EventKeywordsRoute');
 const CertificateRouter = require('./Routers/CertificateRoute');
+const teamRoute = require('./Routers/TeamRoute');
 
 //Database models
 const Events = require('./Models/Events');
@@ -172,6 +173,7 @@ app.use(adminRouter);
 app.use(feedBackRouter);
 app.use(EventKeywordsRouter);
 app.use(CertificateRouter);
+app.use(teamRoute);
 
 
 server.listen(PORT, (req, res) => {

@@ -30,6 +30,22 @@ const registration = mongoose.Schema({
         type: String,
         unique: true,
     },
+    teamed_up: {
+        type: Boolean,
+        default: false
+    },
+    team_id: {
+        type: String,
+        default: null
+    },
+    received_requests: {
+        type: Array,
+        default: []
+    },
+    sent_requests: {
+        type: Array,
+        default: []
+    },
     time: {
         type: Date,
         default: Date.now
