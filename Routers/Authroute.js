@@ -51,11 +51,11 @@ router.post('/api/verify_recaptcha', async (req, res) => {
 
 //route to ping for api if it is working
 router.get('/api', async (req, res) => {
-    // const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0];
-    // console.log(ip);
-    // console.log(req.connection.remoteAddress);
-    // console.log(req.headers['x-forwarded-for'])
-    // console.log(req.headers['x-forwarded-for'][0])
+    const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0];
+    console.log(ip);
+    console.log(req.connection.remoteAddress);
+    console.log(req.headers['x-forwarded-for'])
+    console.log(req.headers['x-forwarded-for'][0])
     // var ip = '192.168.0.101';
     // var geo = await geoip.lookup(ip);
     // console.log(geo);
