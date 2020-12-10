@@ -52,6 +52,7 @@ router.post('/api/verify_recaptcha', async (req, res) => {
 //route to ping for api if it is working
 router.get('/api', async (req, res) => {
     // const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0];
+    // console.log(ip);
     // console.log(req.connection.remoteAddress);
     // console.log(req.headers['x-forwarded-for'])
     // console.log(req.headers['x-forwarded-for'][0])
@@ -152,24 +153,24 @@ router.post('/api/users/signup', async (req, res) => {
     }
 })
 
-router.get('/api/testemail', async (req, res) => {
-    const msg = {
-        to: 'lalithpunepalli@gmail.com',
-        from: { "email": 'support@ellipseapp.com', 'name': "Ellipse Support" }, // Use the email address or domain you verified above
-        // subject: 'Information',
-        //     text: 'Nothing 2',
-        //     html: `<h1>testing</h1><h2>nothing</h2>`,
-        templateId: 'd-c3456f977aca444cb52e0ad002d737d8',
-        dynamic_template_data: {
-            subject: "important",
-            pre_header: "important",
-            title: "nothing 2",
-            content: "nothing 3",
-        },
-    };
-    await sgMail.send(msg);
-    res.send("success")
-})
+// router.get('/api/testemail', async (req, res) => {
+//     const msg = {
+//         to: 'lalithpunepalli@gmail.com',
+//         from: { "email": 'support@ellipseapp.com', 'name': "Ellipse Support" }, // Use the email address or domain you verified above
+//         // subject: 'Information',
+//         //     text: 'Nothing 2',
+//         //     html: `<h1>testing</h1><h2>nothing</h2>`,
+//         templateId: 'd-c3456f977aca444cb52e0ad002d737d8',
+//         dynamic_template_data: {
+//             subject: "important",
+//             pre_header: "important",
+//             title: "nothing 2",
+//             content: "nothing 3",
+//         },
+//     };
+//     await sgMail.send(msg);
+//     res.send("success")
+// })
 
 
 //roite to send verification mail

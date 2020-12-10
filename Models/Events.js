@@ -137,6 +137,13 @@ let eventShema = mongoose.Schema({
     certificate:{
         type: Object,
     },
+    isTeamed: {
+        type: Boolean,
+        default: false
+    },
+    team_size: {
+        type: Object
+    }
 
 });
 
