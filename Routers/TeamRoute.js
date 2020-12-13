@@ -225,7 +225,7 @@ router.post('/api/event/leave_team', auth, async (req, res) => {
         const uid = user._id;
         await Registration.updateOne(
             { event_id: req.body.event_id, user_id: uid },
-            { $set: { 'teamed_up': false, 'team_id': null },$pull: {'sent_requests': req.body.team_id} })
+            { $set: { 'teamed_up': false, 'team_id': null }, $pull: { 'sent_requests': req.body.team_id } })
         Teams.updateOne({ _id: req.body.team_id },
             {
                 $pull: { "members": mongoose.Types.ObjectId(uid) }
@@ -233,6 +233,18 @@ router.post('/api/event/leave_team', auth, async (req, res) => {
                 // console.log(r);
                 res.status(200).json({ message: "success" });
             })
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+
+router.get('/api/user/get_all_teams', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const teams = await Teams.find({ members: user._id });
+        res.status(200).json(teams);
     }
     catch (error) {
         res.status(400).json({ error: error.message })

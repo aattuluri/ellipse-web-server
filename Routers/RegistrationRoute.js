@@ -45,7 +45,7 @@ router.post('/api/event/register',auth, async (req, res) => {
 router.get('/api/user/registeredEvents', auth, (req, res) => {
     try {
         const user = req.user;
-        Registration.find({ user_id: req.query.id }).then((result) => {
+        Registration.find({ user_id: user._id }).then((result) => {
             res.status(200).json(result);
         })
     }

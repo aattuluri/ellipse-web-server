@@ -61,22 +61,37 @@ webSocketServer.on('connection', (webSocketClient) => {
     // })
     webSocketClient.on('message', (message) => {
         let data = JSON.parse(message);
-
+        const uu_id = data.msg.user_id;
         switch (data.action) {
+
+            case 'join_event_room':
+                if (!rooms[data.event_id + ":eventroom"]) {
+                    rooms[data.event_id + ":eventroom"] = {};
+                }
+                rooms[data.event_id + ":eventroom"][uu_id] = webSocketClient;
+                break;
+
+            case 'join_team_room':
+                if (!rooms[data.team_id + ":teamroom"]) {
+                    rooms[data.team_id + ":teamroom"] = {};
+                }
+                rooms[data.team_id + ":teamroom"][uu_id] = webSocketClient;
+                break;
+
             case 'send_message':
-                
+
                 const uid = data.msg.user_id;
                 chatService.addChatMessage(data.event_id, JSON.stringify(data.msg), (value) => {
                     // console.log("done");
                 })
-                if(!rooms[data.event_id+":eventroom"]){
-                    rooms[data.event_id+":eventroom"] = {};
+                if (!rooms[data.event_id + ":eventroom"]) {
+                    rooms[data.event_id + ":eventroom"] = {};
                 }
                 // if(!rooms[data.event_id+":eventroom"][uid]){
-                    rooms[data.event_id+":eventroom"][uid] = webSocketClient
+                rooms[data.event_id + ":eventroom"][uid] = webSocketClient
                 // }
-                Object.entries(rooms[data.event_id+":eventroom"]).forEach(([, client]) => {
-                    // console.log(client);
+
+                Object.entries(rooms[data.event_id + ":eventroom"]).forEach(([, client]) => {
                     client.send(JSON.stringify({
                         action: "receive_message",
                         event_id: data.event_id,
@@ -84,28 +99,39 @@ webSocketServer.on('connection', (webSocketClient) => {
                     }))
 
                 });
-                // webSocketServer
-                //     .clients
-                //     .forEach(client => {
-                //         client.send(JSON.stringify({
-                //             action: "receive_message",
-                //             event_id: data.event_id,
-                //             msg: data.msg
-                //         }))
-
-                //     });
                 break;
+            case 'send_team_message':
+
+                chatService.addTeamChatMessage(data.team_id, JSON.stringify(data.msg), (value) => {
+                    // console.log("done");
+                })
+                
+                if (!rooms[data.team_id + ":teamroom"]) {
+                    rooms[data.team_id + ":teamroom"] = {};
+                }
+                rooms[data.team_id + ":teamroom"][uu_id] = webSocketClient;
+
+                Object.entries(rooms[data.team_id + ":teamroom"]).forEach(([, client]) => {
+                    client.send(JSON.stringify({
+                        action: "receive_team_message",
+                        team_id: data.team_id,
+                        msg: data.msg
+                    }))
+
+                });
+                break;
+
             case 'close_socket':
                 const uuid = data.user_id;
-                if(!rooms[data.event_id+":eventroom"][uuid]){
+                if (!rooms[data.event_id + ":eventroom"][uuid]) {
                     // rooms[data.event_id+":eventroom"][uid] = webSocketClient
                 }
-                else{
-                    if(Object.keys(rooms[data.event_id+":eventroom"]).length === 1) {
-                        delete rooms[data.event_id+":eventroom"];
+                else {
+                    if (Object.keys(rooms[data.event_id + ":eventroom"]).length === 1) {
+                        delete rooms[data.event_id + ":eventroom"];
                     }
                     else {
-                        delete rooms[data.event_id+":eventroom"][uuid];
+                        delete rooms[data.event_id + ":eventroom"][uuid];
                     }
                 }
 
@@ -211,3 +237,15 @@ server.listen(PORT, (req, res) => {
 //         console.log('user disconnected');
 //     });
 // });
+
+
+// webSocketServer
+                    //     .clients
+                    //     .forEach(client => {
+                    //         client.send(JSON.stringify({
+                    //             action: "receive_message",
+                    //             event_id: data.event_id,
+                    //             msg: data.msg
+                    //         }))
+
+                    //     });

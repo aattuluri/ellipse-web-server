@@ -18,5 +18,19 @@ router.get('/api/chat/load_messages',auth, (req, res) => {
     }
 })
 
+router.get('/api/chat/load_team_chat_messages',auth, (req, res) => {
+    try {
+        chatService.getTeamChatMessages(req.query.id, function (data) {
+            const parsedData = [];
+            data.forEach(element => {
+                parsedData.push(JSON.parse(element))
+            });
+            res.send(parsedData)
+        })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
 
 module.exports = router

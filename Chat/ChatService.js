@@ -23,15 +23,29 @@ function getChatMessages(chatId,callback){
   });
 }
 
+//function for getting chat messages
+function getTeamChatMessages(chatId,callback){
+  redisClient.lrange(chatId + ":team_messages", 0, -1, (error,data)=>{
+    callback(data);
+  });
+}
+
 
 //function for adding chat message
 function addChatMessage(eventId,message,cb){
   redisClient.RPUSH(eventId+":messages",message,cb);
 }
+
+function addTeamChatMessage(teamId,message,cb){
+  redisClient.RPUSH(teamId+":team_messages",message,cb);
+}
+
 module.exports = {
   createChatForEvent: createChatForEvent,
   getChatMessages: getChatMessages,
   addChatMessage: addChatMessage,
+  addTeamChatMessage: addTeamChatMessage,
+  getTeamChatMessages: getTeamChatMessages
 };
 
 
