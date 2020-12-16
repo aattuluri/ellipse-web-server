@@ -149,6 +149,13 @@ webSocketServer.on('connection', (webSocketClient) => {
                         msg: data.msg
                     }))
                 });
+                webSocketServer.clients.forEach((client) => {
+                    client.send(JSON.stringify({
+                        action: "receive_team_status_message",
+                        team_id: data.team_id,
+                        msg: data.msg
+                    }))
+                });
                 
                 break;
 
