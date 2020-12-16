@@ -105,7 +105,7 @@ webSocketServer.on('connection', (webSocketClient) => {
                 chatService.addTeamChatMessage(data.team_id, JSON.stringify(data.msg), (value) => {
                     // console.log("done");
                 })
-                
+
                 if (!rooms[data.team_id + ":teamroom"]) {
                     rooms[data.team_id + ":teamroom"] = {};
                 }
@@ -119,6 +119,37 @@ webSocketServer.on('connection', (webSocketClient) => {
                     }))
 
                 });
+                break;
+            case 'delete_event_chat_message':
+                chatService.deleteEventChatMessage(data.event_id, JSON.stringify(data.msg), (err, data) => {
+                    //do nothing
+                    console.log(err);
+                })
+                break;
+            case 'delete_team_chat_message':
+                chatService.deleteTeamChatMessage(data.team_id, JSON.stringify(data.msg), (err, data) => {
+                    //do nothing
+                    console.log(err);
+                })
+                break;
+            case 'team_status_update_message':
+                chatService.addTeamChatMessage(data.team_id, JSON.stringify(data.msg), (value) => {
+                    // console.log("done");
+                })
+
+                if (!rooms[data.team_id + ":teamroom"]) {
+                    rooms[data.team_id + ":teamroom"] = {};
+                }
+                rooms[data.team_id + ":teamroom"][uu_id] = webSocketClient;
+
+                Object.entries(rooms[data.team_id + ":teamroom"]).forEach(([, client]) => {
+                    client.send(JSON.stringify({
+                        action: "receive_team_status_message",
+                        team_id: data.team_id,
+                        msg: data.msg
+                    }))
+                });
+                
                 break;
 
             case 'close_socket':
@@ -134,6 +165,7 @@ webSocketServer.on('connection', (webSocketClient) => {
                         delete rooms[data.event_id + ":eventroom"][uuid];
                     }
                 }
+                break;
 
         }
     });

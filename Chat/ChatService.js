@@ -40,12 +40,22 @@ function addTeamChatMessage(teamId,message,cb){
   redisClient.RPUSH(teamId+":team_messages",message,cb);
 }
 
+function deleteEventChatMessage(eventId,message,cb){
+  redisClient.LREM(eventId+":messages",1,message,cb)
+}
+
+function deleteTeamChatMessage(teamId,message,cb){
+  redisClient.LREM(teamId+":team_messages",1,message,cb)
+}
+
 module.exports = {
   createChatForEvent: createChatForEvent,
   getChatMessages: getChatMessages,
   addChatMessage: addChatMessage,
   addTeamChatMessage: addTeamChatMessage,
-  getTeamChatMessages: getTeamChatMessages
+  getTeamChatMessages: getTeamChatMessages,
+  deleteEventChatMessage: deleteEventChatMessage,
+  deleteTeamChatMessage: deleteTeamChatMessage
 };
 
 
