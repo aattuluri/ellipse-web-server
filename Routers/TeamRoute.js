@@ -145,7 +145,7 @@ router.post('/api/event/accept_user_teamup_request', auth, async (req, res) => {
             // console.log(r);
             Teams.updateOne({ _id: req.body.team_id }, { $pull: { "received_requests": mongoose.Types.ObjectId(uid) }, $push: { "members": mongoose.Types.ObjectId(uid) } }).then((r) => {
                 // console.log(r);
-                res.status(200).json({ message: "success" });
+                res.status(200).json({ message: "success",updated_user_id: uid });
             })
         }
         else {

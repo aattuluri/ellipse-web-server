@@ -93,7 +93,7 @@ webSocketServer.on('connection', (webSocketClient) => {
 
                 Object.entries(rooms[data.event_id + ":eventroom"]).forEach(([, client]) => {
                     client.send(JSON.stringify({
-                        action: "receive_message",
+                        action: "receive_event_chat_message",
                         event_id: data.event_id,
                         msg: data.msg
                     }))
@@ -144,19 +144,46 @@ webSocketServer.on('connection', (webSocketClient) => {
 
                 Object.entries(rooms[data.team_id + ":teamroom"]).forEach(([, client]) => {
                     client.send(JSON.stringify({
-                        action: "receive_team_status_message",
+                        action: "receive_team_message",
                         team_id: data.team_id,
                         msg: data.msg
                     }))
                 });
-                webSocketServer.clients.forEach((client) => {
-                    client.send(JSON.stringify({
-                        action: "receive_team_status_message",
-                        team_id: data.team_id,
-                        msg: data.msg
-                    }))
-                });
+                // webSocketServer.clients.forEach((client) => {
+                //     client.send(JSON.stringify({
+                //         action: "receive_team_status_message",
+                //         team_id: data.team_id,
+                //         msg: data.msg
+                //     }))
+                // });
+
+                break;
+            case 'join_team_update_status':
+                if (!rooms["team_updates_room:teamroom"]) {
+                    rooms["team_updates_room:teamroom"] = {};
+                }
+                console.log(uu_id);
+                rooms["team_updates_room:teamroom"][uu_id] = webSocketClient;
+                break;
+            
+            case 'team_status_update_status':
+                if (!rooms["team_updates_room:teamroom"]) {
+                    rooms["team_updates_room:teamroom"] = {};
+                }
+                rooms["team_updates_room:teamroom"][uu_id] = webSocketClient;
+                const ids = data.users;
+                // console.log(ids);
+                ids.forEach(id=>{
+                    if(rooms["team_updates_room:teamroom"][id]){
+                        rooms["team_updates_room:teamroom"][id].send(JSON.stringify({
+                            action: "receive_team_update_message",
+                            team_id: data.team_id,
+                            msg: data.msg
+                        }))
+                    }
+                })
                 
+
                 break;
 
             case 'close_socket':
