@@ -1,19 +1,21 @@
 const express = require('express');
 var Mongoose = require('mongoose');
+const md5 = require('md5');
 
 const auth = require('../Middleware/Auth');
 const Events = require('../Models/Events');
 const Registration = require('../Models/Registrations');
 const randomstring = require('randomstring');
-   
+
 const router = express.Router();
+const Files = require('../Models/Files');
 
 //register the event
 
-router.post('/api/event/register',auth, async (req, res) => {
+router.post('/api/event/register', auth, async (req, res) => {
     try {
         const user = req.user;
-        const { data} = req.body;
+        const { data } = req.body;
         const eventId = req.query.id;
         const shareId = randomstring.generate(10);
         const registration = new Registration({
@@ -22,15 +24,56 @@ router.post('/api/event/register',auth, async (req, res) => {
             data: data,
             share_id: shareId
         })
-        registration.save((err) => {
-            if (err) {
-                res.status(400).json({ error: err.message })
+        const event = await Events.findOne({ _id: eventId });
+        if (event.isTeamed) {
+            registration.save((err) => {
+                if (err) {
+                    res.status(400).json({ error: err.message })
+                }
+                else {
+                    res.status(200).json({ message: "success" })
+                }
+
+            })
+        }
+        else {
+            if (event.rounds.length === 0) {
+                registration.save((err) => {
+                    if (err) {
+                        res.status(400).json({ error: err.message })
+                    }
+                    else {
+                        res.status(200).json({ message: "success" })
+                    }
+
+                })
             }
-            else{
-                res.status(200).json({ message: "success" })
+            else {
+                registration.submissions = [];
+                event.rounds.forEach((round, index) => {
+                    if(index === 0){
+                        registration.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false,submission_access: true, submission_id: null });
+                    }
+                    else{
+                        registration.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false,submission_access: false, submission_id: null });
+                    }
+                    
+                    if (index === event.rounds.length - 1) {
+                        registration.save((err) => {
+                            if (err) {
+                                res.status(400).json({ error: err.message })
+                            }
+                            else {
+                                res.status(200).json({ message: "success" })
+                            }
+
+                        })
+                    }
+                });
             }
-            
-        })
+
+        }
+
 
     }
     catch (error) {
@@ -38,6 +81,43 @@ router.post('/api/event/register',auth, async (req, res) => {
     }
 
 });
+
+router.post('/api/event/register/upload_file', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const eventId = req.query.id;
+        // console.log('aaa');
+        const fileName = eventId + md5(Date.now());
+        // console.log("bbb")
+        // console.log(fileName);
+        // const event = await Events.findOne({ _id: eventId });
+        Files.saveFile(req.files.uploaded_file, fileName, user._id, "file", function (err, result) {
+            if (!err) {
+                console.log(fileName)
+                res.status(200).send({ 'file_name': fileName });
+                // console.log("aaxd")
+                // Events.updateOne({ _id: eventId }, { $set: { 'poster_url': fileName } }).then((value) => {
+                //     res.status(200).json({
+                //         status: 'success',
+                //         code: 200,
+                //         message: 'image added successfully',
+                //     })
+                // })
+            }
+            else {
+                res.status(400).json({
+                    status: 'error',
+                    code: 500,
+                    message: err
+                })
+            }
+        });
+
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
 
 
 
@@ -70,6 +150,23 @@ router.get('/api/event/registeredEvents', auth, (req, res) => {
         res.status(400).json({ 'error': error })
     }
 
+})
+
+//certificate for certificate verification page with share url
+router.get('/api/event/registration/get_file', async (req, res) => {
+    try {
+        const id = req.query.id;
+        Files.getFile(id, res, function (err, result) {
+            if (!err) {
+                //Do Nothing
+            }
+            console.log(err);
+            res.send(new Error("Failed to find a file."));
+        });
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
 })
 
 

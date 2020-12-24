@@ -4,6 +4,7 @@ const Teams = require('../Models/Teams');
 const auth = require('../Middleware/Auth');
 const Registration = require('../Models/Registrations');
 const UserDetails = require('../Models/UserDetails');
+const Events = require('../Models/Events');
 
 const router = express.Router();
 
@@ -16,9 +17,38 @@ router.post('/api/event/create_team', auth, async (req, res) => {
         team.user_id = user._id;
         team.description = req.body.desc;
         team.members.push(user._id);
-        await team.save();
-        await Registration.updateOne({ user_id: user._id, event_id: req.body.event_id }, { $set: { 'teamed_up': true, 'team_id': team._id } });
-        res.status(200).json(team);
+
+        const event = await Events.findOne({ _id: req.body.event_id });
+        if (event.rounds.length === 0) {
+            await team.save();
+            await Registration.updateOne({
+                user_id: user._id,
+                event_id: req.body.event_id
+            }, { $set: { 'teamed_up': true, 'team_id': team._id } });
+            res.status(200).json(team);
+        }
+        else {
+            team.submissions = [];
+            event.rounds.forEach(async (round, index) => {
+                if(index === 0){
+                    team.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false,submission_access: true, submission_id: null });
+                }
+                else{
+                    team.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false, submission_access: false, submission_id: null });
+                }
+                
+                if (event.rounds.length === index + 1) {
+                    console.log(index);
+                    await team.save();
+                    await Registration.updateOne({
+                        user_id: user._id,
+                        event_id: req.body.event_id
+                    }, { $set: { 'teamed_up': true, 'team_id': team._id } });
+                    res.status(200).json(team);
+                }
+            });
+        }
+
     }
     catch (error) {
         res.status(400).json({ error: error.message })
@@ -41,9 +71,14 @@ router.get('/api/event/get_user_registration', auth, async (req, res) => {
 router.get('/api/event/get_team_details', auth, async (req, res) => {
     try {
         const user = req.user;
-        Teams.find({ _id: req.query.id }).then((result) => {
-            res.status(200).json(result);
-        })
+        if(req.query.id){
+            Teams.find({ _id: req.query.id }).then((result) => {
+                res.status(200).json(result);
+            })
+        }else{
+            res.status(400).json({"message": "not_found"})
+        }
+        
     }
     catch (error) {
         res.status(400).json({ error: error.message })
@@ -145,7 +180,7 @@ router.post('/api/event/accept_user_teamup_request', auth, async (req, res) => {
             // console.log(r);
             Teams.updateOne({ _id: req.body.team_id }, { $pull: { "received_requests": mongoose.Types.ObjectId(uid) }, $push: { "members": mongoose.Types.ObjectId(uid) } }).then((r) => {
                 // console.log(r);
-                res.status(200).json({ message: "success",updated_user_id: uid });
+                res.status(200).json({ message: "success", updated_user_id: uid });
             })
         }
         else {

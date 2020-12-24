@@ -46,6 +46,10 @@ const registration = mongoose.Schema({
         type: Array,
         default: []
     },
+    submissions: {
+        type: Array,
+        default: []
+    },
     time: {
         type: Date,
         default: Date.now

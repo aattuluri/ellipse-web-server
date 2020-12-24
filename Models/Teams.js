@@ -33,7 +33,7 @@ const teams = mongoose.Schema({
         default: []
     },
     submissions: {
-        type: Object,
+        type: Array,
     },
     time: {
         type: Date,

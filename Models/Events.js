@@ -143,6 +143,10 @@ let eventShema = mongoose.Schema({
     },
     team_size: {
         type: Object
+    },
+    rounds: {
+        type: Array,
+        default: [],
     }
 
 });

@@ -23,6 +23,7 @@ const feedBackRouter = require('./Routers/FeedBackRoute');
 const EventKeywordsRouter = require('./Routers/EventKeywordsRoute');
 const CertificateRouter = require('./Routers/CertificateRoute');
 const teamRoute = require('./Routers/TeamRoute');
+const submissionRouter = require('./Routers/SubmissionRoute');
 
 //Database models
 const Events = require('./Models/Events');
@@ -78,7 +79,7 @@ webSocketServer.on('connection', (webSocketClient) => {
                 rooms[data.team_id + ":teamroom"][uu_id] = webSocketClient;
                 break;
 
-            case 'send_message':
+            case 'send_event_message':
 
                 const uid = data.msg.user_id;
                 chatService.addChatMessage(data.event_id, JSON.stringify(data.msg), (value) => {
@@ -100,6 +101,7 @@ webSocketServer.on('connection', (webSocketClient) => {
 
                 });
                 break;
+
             case 'send_team_message':
 
                 chatService.addTeamChatMessage(data.team_id, JSON.stringify(data.msg), (value) => {
@@ -120,18 +122,50 @@ webSocketServer.on('connection', (webSocketClient) => {
 
                 });
                 break;
+
             case 'delete_event_chat_message':
                 chatService.deleteEventChatMessage(data.event_id, JSON.stringify(data.msg), (err, data) => {
                     //do nothing
-                    console.log(err);
+                    // console.log(err);
                 })
+                if (!rooms[data.event_id + ":eventroom"]) {
+                    rooms[data.event_id + ":eventroom"] = {};
+                }
+                // if(!rooms[data.event_id+":eventroom"][uid]){
+                rooms[data.event_id + ":eventroom"][uu_id] = webSocketClient
+                // }
+
+                Object.entries(rooms[data.event_id + ":eventroom"]).forEach(([, client]) => {
+                    client.send(JSON.stringify({
+                        action: "delete_event_chat_message",
+                        event_id: data.event_id,
+                        msg: data.msg
+                    }))
+
+                });
+                
                 break;
+
             case 'delete_team_chat_message':
                 chatService.deleteTeamChatMessage(data.team_id, JSON.stringify(data.msg), (err, data) => {
                     //do nothing
-                    console.log(err);
+                    // console.log(err);
                 })
+                if (!rooms[data.team_id + ":teamroom"]) {
+                    rooms[data.team_id + ":teamroom"] = {};
+                }
+                rooms[data.team_id + ":teamroom"][uu_id] = webSocketClient;
+
+                Object.entries(rooms[data.team_id + ":teamroom"]).forEach(([, client]) => {
+                    client.send(JSON.stringify({
+                        action: "delete_team_chat_message",
+                        team_id: data.team_id,
+                        msg: data.msg
+                    }))
+
+                });
                 break;
+
             case 'team_status_update_message':
                 chatService.addTeamChatMessage(data.team_id, JSON.stringify(data.msg), (value) => {
                     // console.log("done");
@@ -149,20 +183,14 @@ webSocketServer.on('connection', (webSocketClient) => {
                         msg: data.msg
                     }))
                 });
-                // webSocketServer.clients.forEach((client) => {
-                //     client.send(JSON.stringify({
-                //         action: "receive_team_status_message",
-                //         team_id: data.team_id,
-                //         msg: data.msg
-                //     }))
-                // });
 
                 break;
+
             case 'join_team_update_status':
                 if (!rooms["team_updates_room:teamroom"]) {
                     rooms["team_updates_room:teamroom"] = {};
                 }
-                console.log(uu_id);
+                // console.log(uu_id);
                 rooms["team_updates_room:teamroom"][uu_id] = webSocketClient;
                 break;
             
@@ -182,8 +210,9 @@ webSocketServer.on('connection', (webSocketClient) => {
                         }))
                     }
                 })
+                break;
+            case 'event_reply_messsage':
                 
-
                 break;
 
             case 'close_socket':
@@ -266,6 +295,7 @@ app.use(feedBackRouter);
 app.use(EventKeywordsRouter);
 app.use(CertificateRouter);
 app.use(teamRoute);
+app.use(submissionRouter);
 
 
 server.listen(PORT, (req, res) => {
