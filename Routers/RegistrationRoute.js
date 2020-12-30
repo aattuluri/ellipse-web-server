@@ -86,23 +86,11 @@ router.post('/api/event/register/upload_file', auth, async (req, res) => {
     try {
         const user = req.user;
         const eventId = req.query.id;
-        // console.log('aaa');
         const fileName = eventId + md5(Date.now());
-        // console.log("bbb")
-        // console.log(fileName);
-        // const event = await Events.findOne({ _id: eventId });
         Files.saveFile(req.files.uploaded_file, fileName, user._id, "file", function (err, result) {
             if (!err) {
-                console.log(fileName)
+                // console.log(fileName)
                 res.status(200).send({ 'file_name': fileName });
-                // console.log("aaxd")
-                // Events.updateOne({ _id: eventId }, { $set: { 'poster_url': fileName } }).then((value) => {
-                //     res.status(200).json({
-                //         status: 'success',
-                //         code: 200,
-                //         message: 'image added successfully',
-                //     })
-                // })
             }
             else {
                 res.status(400).json({

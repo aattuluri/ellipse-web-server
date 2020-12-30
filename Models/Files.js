@@ -25,7 +25,7 @@ async function getFileById(fileId, res, cb) {
             gridFSBucket.openDownloadStreamByName(fileId).
                 pipe(res).
                 on('error', function (error) {
-                    res.status(201).json({"error":"not found"})
+                    res.status(201).json({ "error": "not found" })
                     cb(error, fileId)
                 }).
                 on('finish', function () {

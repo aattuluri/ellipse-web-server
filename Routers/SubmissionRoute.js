@@ -96,6 +96,57 @@ router.get('/api/event/get_submission',auth,async (req,res)=>{
 })
 
 
+//get submissions for the event
+router.get('/api/event/get_all_event_submission',auth,async (req,res)=>{
+    try{
+        const submissions = await Submission.find({event_id: req.query.id});
+        if(submissions){
+            res.status(200).json(submissions);
+        }
+        else{
+            res.status(400).json({message: "not_found"})
+        }
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+
+router.post('/api/event/give_access_round', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        console.log(req.body.event_id);
+        console.log(req.body.user_id);
+        if(req.body.is_teamed){
+
+        }
+        else{
+            const reg = await Registration.findOne({event_id: req.body.event_id,user_id: req.body.user_id});
+            console.log(reg);
+            const updatedReg = [];
+            reg.submissions.forEach((value,index)=>{
+                if(value.title === req.body.round_title){
+                    updatedReg.push({...value,submission_access: true})
+                }
+                else{
+                    updatedReg.push(value);
+                }
+                if(index === reg.submissions.length - 1){
+                    Registration.updateOne({event_id: req.body.event_id,user_id: req.body.user_id},{$set:{submissions: updatedReg}}).then(()=>{
+                        res.status(200).json({"message": "success"})
+                    })
+                    
+                }
+            })
+        }
+        
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
 
 
 module.exports = router
