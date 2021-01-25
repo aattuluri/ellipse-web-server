@@ -73,7 +73,7 @@ let eventShema = mongoose.Schema({
     },
     moderators: {
         type: Array,
-        default: null
+        default: []
     },
     about: {
         type: String,

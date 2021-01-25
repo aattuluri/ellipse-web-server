@@ -473,6 +473,74 @@ router.get('/api/event/get_organizer_details',auth, async (req,res)=>{
     }
 })
 
+router.post('/api/event/add_moderator', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const eId = req.body.event_id;
+        const event = await Events.findOne({_id: eId})
+        if(event.user_id == user._id){
+            Events.updateOne({ _id: eId }, {
+                $push:{
+                    "moderators": req.body.moderator_id
+                }
+            }).then(value => {
+                Events.findOne({ _id: eId }).then((event) => {
+                    res.status(200).json({ event });
+                })
+    
+            })
+        }
+        else{
+            res.status(401).json({error:"not authorized"})
+        }
+        
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).json({ error: error.message })
+    }
+})
+
+router.get('/api/event/get_all_users',auth, async (req,res)=>{
+    try {
+        const user = req.user;
+        const userDetails = await UserDetails.find({user_id : {$ne: user._id}},{name: 1,username: 1,email: 1,user_id: 1});
+        // console.log(userDetails);
+        res.status(200).json(userDetails);
+    }
+    catch (error) {
+        // console.log(error);
+        res.status(400).json({ error: error.message })
+    }
+})
+
+router.post('/api/event/remove_moderator', auth, async (req,res) => {
+    try {
+        const user = req.user;
+        const eId = req.body.event_id;
+        const event = await Events.findOne({_id: eId})
+        if(event.user_id == user._id){
+            Events.updateOne({ _id: eId }, {
+                $pull:{
+                    "moderators": req.body.moderator_id
+                }
+            }).then(value => {
+                Events.findOne({ _id: eId }).then((event) => {
+                    res.status(200).json({ event });
+                })
+    
+            })
+        }
+        else{
+            res.status(401).json({error:"not authorized"})
+        }
+        
+    }
+    catch (error) {
+        console.log(error);
+    }
+})
+
 
 module.exports = router
 
