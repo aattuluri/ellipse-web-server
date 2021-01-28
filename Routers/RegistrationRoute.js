@@ -129,7 +129,7 @@ router.get('/api/user/registeredEvents', auth, (req, res) => {
 router.get('/api/event/registeredEvents', auth, (req, res) => {
     try {
         const user = req.user;
-        console.log(req.query.id);
+        // console.log(req.query.id);
         Registration.find({ event_id: req.query.id }).then((result) => {
             res.status(200).json(result);
         })

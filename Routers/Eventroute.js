@@ -541,6 +541,74 @@ router.post('/api/event/remove_moderator', auth, async (req,res) => {
     }
 })
 
+router.post('/api/event/block_chat_for_user', auth, async (req,res) => {
+    try {
+        const user = req.user;
+        const eId = req.body.event_id;
+        const event = await Events.findOne({_id: eId})
+        if(event.user_id == user._id){
+            Events.updateOne({ _id: eId }, {
+                $push:{
+                    "chat_blocked_users": req.body.blocked_user_id
+                }
+            }).then(value => {
+                Events.findOne({ _id: eId }).then((event) => {
+                    res.status(200).json({ event });
+                })
+    
+            })
+        }
+        else{
+            res.status(401).json({error:"not authorized"})
+        }
+        
+    }
+    catch (error) {
+        console.log(error);
+    }
+})
+
+router.post('/api/event/unblock_chat_for_user', auth, async (req,res) => {
+    try {
+        const user = req.user;
+        const eId = req.body.event_id;
+        const event = await Events.findOne({_id: eId})
+        if(event.user_id == user._id){
+            Events.updateOne({ _id: eId }, {
+                $pull:{
+                    "chat_blocked_users": req.body.blocked_user_id
+                }
+            }).then(value => {
+                Events.findOne({ _id: eId }).then((event) => {
+                    res.status(200).json({ event });
+                })
+    
+            })
+        }
+        else{
+            res.status(401).json({error:"not authorized"})
+        }
+        
+    }
+    catch (error) {
+        console.log(error);
+    }
+})
+
+router.get('/api/event/get_reg_users_for_blocking',auth, async (req,res)=>{
+    try {
+        const user = req.user;
+        const regUsers = await Registration.find({ event_id: req.query.id },{user_id: 1});
+        const resUserIds = regUsers.map((u)=>{return u.user_id});
+        const userDetails = await UserDetails.find({user_id : {$in: resUserIds}},{name: 1,username: 1,email: 1,user_id: 1});
+        res.status(200).json(userDetails);
+    }
+    catch (error) {
+        // console.log(error);
+        res.status(400).json({ error: error.message })
+    }
+})
+
 
 module.exports = router
 

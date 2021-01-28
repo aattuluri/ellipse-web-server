@@ -30,13 +30,13 @@ router.post('/api/event/create_team', auth, async (req, res) => {
         else {
             team.submissions = [];
             event.rounds.forEach(async (round, index) => {
-                if(index === 0){
-                    team.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false,submission_access: true, submission_id: null });
+                if (index === 0) {
+                    team.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false, submission_access: true, submission_id: null });
                 }
-                else{
+                else {
                     team.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false, submission_access: false, submission_id: null });
                 }
-                
+
                 if (event.rounds.length === index + 1) {
                     console.log(index);
                     await team.save();
@@ -71,14 +71,14 @@ router.get('/api/event/get_user_registration', auth, async (req, res) => {
 router.get('/api/event/get_team_details', auth, async (req, res) => {
     try {
         const user = req.user;
-        if(req.query.id != null){
+        if (req.query.id != null) {
             Teams.find({ _id: req.query.id }).then((result) => {
                 res.status(200).json(result);
             })
-        }else{
-            res.status(400).json({"message": "not_found"})
+        } else {
+            res.status(400).json({ "message": "not_found" })
         }
-        
+
     }
     catch (error) {
         res.status(400).json({ error: error.message })
@@ -172,21 +172,27 @@ router.post('/api/event/accept_user_teamup_request', auth, async (req, res) => {
     try {
         const user = req.user;
         const team = await Teams.findOne({ _id: req.body.team_id });
-        const userRegistartion = await Registration.findOne({event_id: req.body.event_id, user_id: req.body.user_id});
-        // console.log(req.body.user_id);
-        // console.log(req.body.event_id);
+        const userRegistartion = await Registration.findOne({ event_id: req.body.event_id, user_id: req.body.user_id });
+        const event = await Events.findOne({ _id: req.body.event_id });
         const uid = req.body.user_id;
         if (team) {
-            if(userRegistartion.teamed_up){
-                res.status(201).json({message: "User has already joined some other team"});
-            }else{
-                const r = await Registration.updateOne({ event_id: req.body.event_id, user_id: req.body.user_id }, { $set: { 'teamed_up': true, 'team_id': req.body.team_id } })
-            // console.log(r);
-            Teams.updateOne({ _id: req.body.team_id }, { $pull: { "received_requests": mongoose.Types.ObjectId(uid) }, $push: { "members": mongoose.Types.ObjectId(uid) } }).then((r) => {
-                // console.log(r);
-                res.status(200).json({ message: "success", updated_user_id: uid });
-            })
+            if (event.team_size.max_team_size <= team.members.length) {
+                res.status(201).json({ message: "Team size exceeded" });
             }
+            else {
+                if (userRegistartion.teamed_up) {
+                    res.status(201).json({ message: "User has already joined some other team" });
+                } 
+                else {
+                    const r = await Registration.updateOne({ event_id: req.body.event_id, user_id: req.body.user_id }, { $set: { 'teamed_up': true, 'team_id': req.body.team_id } })
+                    // console.log(r);
+                    Teams.updateOne({ _id: req.body.team_id }, { $pull: { "received_requests": mongoose.Types.ObjectId(uid) }, $push: { "members": mongoose.Types.ObjectId(uid) } }).then((r) => {
+                        // console.log(r);
+                        res.status(200).json({ message: "success", updated_user_id: uid });
+                    })
+                }
+            }
+
         }
         else {
             res.status(400).json({ message: "no team found" });
