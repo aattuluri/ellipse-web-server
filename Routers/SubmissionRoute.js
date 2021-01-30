@@ -116,14 +116,33 @@ router.get('/api/event/get_all_event_submission',auth,async (req,res)=>{
 router.post('/api/event/give_access_round', auth, async (req, res) => {
     try {
         const user = req.user;
-        console.log(req.body.event_id);
-        console.log(req.body.user_id);
+        // console.log(req.body.event_id);
+        // console.log(req.body.user_id);
+        // console.log(req.body.team_id);
+        const updatedReg = [];
         if(req.body.is_teamed){
+            const team = await Teams.findOne({_id: req.body.team_id});
+            // console.log(team)
+            team.submissions.forEach((value,index)=>{
+                // console.log(value);
+                if(value.title === req.body.round_title){
+                    updatedReg.push({...value,submission_access: true})
+                }
+                else{
+                    updatedReg.push(value);
+                }
+
+                if(index === team.submissions.length - 1){
+                    Teams.updateOne({_id: req.body.team_id},{$set:{submissions: updatedReg}}).then(()=>{
+                        res.status(200).json({"message": "success"})
+                    })
+                }
+            })
 
         }
         else{
             const reg = await Registration.findOne({event_id: req.body.event_id,user_id: req.body.user_id});
-            console.log(reg);
+            // console.log(reg);
             const updatedReg = [];
             reg.submissions.forEach((value,index)=>{
                 if(value.title === req.body.round_title){

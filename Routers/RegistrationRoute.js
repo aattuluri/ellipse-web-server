@@ -18,26 +18,19 @@ router.post('/api/event/register', auth, async (req, res) => {
         const { data } = req.body;
         const eventId = req.query.id;
         const shareId = randomstring.generate(10);
-        const registration = new Registration({
-            user_id: user._id,
-            event_id: eventId,
-            data: data,
-            share_id: shareId
-        })
-        const event = await Events.findOne({ _id: eventId });
-        if (event.isTeamed) {
-            registration.save((err) => {
-                if (err) {
-                    res.status(400).json({ error: err.message })
-                }
-                else {
-                    res.status(200).json({ message: "success" })
-                }
-
-            })
+        const aRegisteration = await Registration.findOne({ event_id: eventId, user_id: user._id });
+        if (aRegisteration) {
+            res.status(201).json({ message: "already registered" })
         }
         else {
-            if (event.rounds.length === 0) {
+            const registration = new Registration({
+                user_id: user._id,
+                event_id: eventId,
+                data: data,
+                share_id: shareId
+            })
+            const event = await Events.findOne({ _id: eventId });
+            if (event.isTeamed) {
                 registration.save((err) => {
                     if (err) {
                         res.status(400).json({ error: err.message })
@@ -49,28 +42,42 @@ router.post('/api/event/register', auth, async (req, res) => {
                 })
             }
             else {
-                registration.submissions = [];
-                event.rounds.forEach((round, index) => {
-                    if(index === 0){
-                        registration.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false,submission_access: true, submission_id: null });
-                    }
-                    else{
-                        registration.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false,submission_access: false, submission_id: null });
-                    }
-                    
-                    if (index === event.rounds.length - 1) {
-                        registration.save((err) => {
-                            if (err) {
-                                res.status(400).json({ error: err.message })
-                            }
-                            else {
-                                res.status(200).json({ message: "success" })
-                            }
+                if (event.rounds.length === 0) {
+                    registration.save((err) => {
+                        if (err) {
+                            res.status(400).json({ error: err.message })
+                        }
+                        else {
+                            res.status(200).json({ message: "success" })
+                        }
 
-                        })
-                    }
-                });
+                    })
+                }
+                else {
+                    registration.submissions = [];
+                    event.rounds.forEach((round, index) => {
+                        if (index === 0) {
+                            registration.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false, submission_access: true, submission_id: null });
+                        }
+                        else {
+                            registration.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false, submission_access: false, submission_id: null });
+                        }
+
+                        if (index === event.rounds.length - 1) {
+                            registration.save((err) => {
+                                if (err) {
+                                    res.status(400).json({ error: err.message })
+                                }
+                                else {
+                                    res.status(200).json({ message: "success" })
+                                }
+
+                            })
+                        }
+                    });
+                }
             }
+
 
         }
 

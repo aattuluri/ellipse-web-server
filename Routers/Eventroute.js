@@ -16,7 +16,7 @@ const Announcement = require('../Models/Announcements');
 const template = require('../certificatetemplate');
 const UserDetails = require('../Models/UserDetails');
 
-
+const firebase_url = "https://us-central1-ellipse-e2428.cloudfunctions.net/sendNotification";
 
 const router = express.Router();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -54,8 +54,22 @@ router.post('/api/event/add_announcement', auth, async (req, res) => {
                 message: 'Added successfully',
 
             })
+            
 
         })
+        const regs = await Registration.find({event_id: req.body.event_id});
+            regs.forEach(r=>{
+                UserDetails.findOne({ user_id: r.user_id }).then((v) => {
+                    const tokens = v.notification_tokens;
+                    tokens.forEach((t) => {
+                        // console.log(t.token);
+                        https.get(`${firebase_url}?token=${t.token}&imageUrl=https://ellipseapp.com/api/image?id=${req.body.title}&title=${req.body.description}&message=`, (resp) => {
+                        }).on("error", (err) => {
+                            console.log("Error: " + err.message);
+                        });
+                    })
+                })
+            })
     } catch (error) {
         res.status(400).json({
             status: 'error',
