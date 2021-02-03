@@ -34,7 +34,10 @@ const UserDetails = require('./Models/UserDetails');
 
 //importing functions for adding and deleting in redis chat
 const chatService = require('./Chat/ChatService');
-const { Console } = require('console');
+const sendNotification = require('./Chat/SendNotification');
+const admin = require('./Utilities/firebase_config');
+
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -55,6 +58,7 @@ mongoose.connect(process.env.MONGODB_URL, {
 const server = http.createServer(app);
 const webSocketServer = new webSocket.Server({ server });
 var rooms = [];
+var activeUsers = [];
 webSocketServer.on('connection', (webSocketClient) => {
     // webSocketClient.on('close',(m,b)=>{
     //     console.log(m);
@@ -63,13 +67,15 @@ webSocketServer.on('connection', (webSocketClient) => {
     webSocketClient.on('message', (message) => {
         let data = JSON.parse(message);
         const uu_id = data.msg.user_id;
-        switch (data.action) {
 
+        switch (data.action) {
             case 'join_event_room':
                 if (!rooms[data.event_id + ":eventroom"]) {
                     rooms[data.event_id + ":eventroom"] = {};
+                    activeUsers.push(uu_id);
                 }
                 rooms[data.event_id + ":eventroom"][uu_id] = webSocketClient;
+                // activeUsers.push()
                 break;
 
             case 'join_team_room':
@@ -100,6 +106,7 @@ webSocketServer.on('connection', (webSocketClient) => {
                     }))
 
                 });
+                sendNotification.sendChatMessageNotification(data.event_id,data.msg,activeUsers)
                 break;
 
             case 'send_team_message':
@@ -119,8 +126,8 @@ webSocketServer.on('connection', (webSocketClient) => {
                         team_id: data.team_id,
                         msg: data.msg
                     }))
-
                 });
+                sendNotification.sendTeamChatMessageNotification(data.team_id.data.msg,activeUsers);
                 break;
 
             case 'delete_event_chat_message':
@@ -240,7 +247,12 @@ webSocketServer.on('connection', (webSocketClient) => {
 
 //CRON TASKS FOR NOTIFICATIONS
 
-const firebase_url = "https://us-central1-ellipse-e2428.cloudfunctions.net/sendNotification";
+// const firebase_url = "https://us-central1-ellipse-e2428.cloudfunctions.net/sendNotification";
+
+const notification_options = {
+    priority: "high",
+    timeToLive: 60 * 60 * 24
+};
 
 
 cron.schedule('00 08 * * *', () => {
@@ -267,9 +279,22 @@ cron.schedule('00 08 * * *', () => {
                         const tokens = v.notification_tokens;
                         tokens.forEach((t) => {
                             // console.log(t.token);
-                            https.get(`${firebase_url}?token=${t.token}&imageUrl=https://ellipseapp.com/api/image?id=${e.poster_url}&title=${e.name}&message=Starts at ${e.start_time.toDateString()} ${e.start_time.toLocaleTimeString()} IST`, (resp) => {
-                            }).on("error", (err) => {
-                                console.log("Error: " + err.message);
+                            // https.get(`${process.env.FIREBASE_NOTIFICATIONS_URL}?token=${t.token}&imageUrl=https://ellipseapp.com/api/image?id=${e.poster_url}&title=${e.name}&message=Starts at ${e.start_time.toDateString()} ${e.start_time.toLocaleTimeString()} IST`, (resp) => {
+                            // }).on("error", (err) => {
+                            //     console.log("Error: " + err.message);
+                            // });
+                            const notification_message = {
+                                notification: {
+                                    title: e.name,
+                                    body: `Starts at ${e.start_time.toDateString()} ${e.start_time.toLocaleTimeString()} IST`,
+                                    image: `https://ellipseapp.com/api/image?id=${e.poster_url}`
+                                }
+                            }
+                            admin.messaging().sendToDevice(t.token,notification_message,notification_options).then(reponse=>{
+                                //do nothing
+                            })
+                            .catch(error => {
+                                console.log(error);
                             });
                         })
                     })
