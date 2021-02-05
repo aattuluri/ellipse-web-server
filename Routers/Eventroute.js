@@ -450,7 +450,8 @@ router.post('/api/updateevent', auth, async (req, res) => {
     try {
         const user = req.user;
         const eId = req.body.eventId;
-        const event = await Events.findOne({ _id: eId })
+        const event = await Events.findOne({ _id: eId });
+
         if (event.user_id == user._id) {
             Events.updateOne({ _id: eId }, {
                 $set: {
@@ -472,7 +473,8 @@ router.post('/api/updateevent', auth, async (req, res) => {
                     'venue_type': req.body.venue_type,
                     'venue': req.body.venue,
                     'venue_college': req.body.venue_college,
-                    'platform_details': req.body.platform_details
+                    'platform_details': req.body.platform_details,
+                    'rounds': req.body.rounds
                 }
             }).then(value => {
                 Events.findOne({ _id: eId }).then((event) => {
