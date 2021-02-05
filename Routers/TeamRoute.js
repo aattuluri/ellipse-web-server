@@ -31,14 +31,14 @@ router.post('/api/event/create_team', auth, async (req, res) => {
             team.submissions = [];
             event.rounds.forEach(async (round, index) => {
                 if (index === 0) {
-                    team.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false, submission_access: true, submission_id: null });
+                    team.submissions.push({ 'title': round.title,  is_submitted: false, submission_access: true, submission_form: null });
                 }
                 else {
-                    team.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false, submission_access: false, submission_id: null });
+                    team.submissions.push({ 'title': round.title, is_submitted: false, submission_access: false, submission_form: null });
                 }
 
                 if (event.rounds.length === index + 1) {
-                    console.log(index);
+                    // console.log(index);
                     await team.save();
                     await Registration.updateOne({
                         user_id: user._id,

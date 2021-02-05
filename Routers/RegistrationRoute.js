@@ -57,10 +57,10 @@ router.post('/api/event/register', auth, async (req, res) => {
                     registration.submissions = [];
                     event.rounds.forEach((round, index) => {
                         if (index === 0) {
-                            registration.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false, submission_access: true, submission_id: null });
+                            registration.submissions.push({ 'title': round.title, is_submitted: false, submission_access: true, submission_form: null });
                         }
                         else {
-                            registration.submissions.push({ 'title': round.title, 'type': round.action, is_submitted: false, submission_access: false, submission_id: null });
+                            registration.submissions.push({ 'title': round.title, is_submitted: false, submission_access: false, submission_form: null });
                         }
 
                         if (index === event.rounds.length - 1) {
