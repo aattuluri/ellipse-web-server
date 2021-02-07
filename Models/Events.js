@@ -151,6 +151,18 @@ let eventShema = mongoose.Schema({
     chat_blocked_users: {
         type: Array,
         default: [],
+    },
+    attachments: {
+        type: Array,
+        default: []
+    },
+    rules: {
+        type: String,
+        default: null
+    },
+    prizes: {
+        type: Array,
+        default: []
     }
 
 });
