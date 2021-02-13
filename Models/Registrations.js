@@ -53,9 +53,11 @@ const registration = mongoose.Schema({
     time: {
         type: Date,
         default: Date.now
+    },
+    share_link: {
+        type: String
     }
 });
-
 
 const Registration = mongoose.model('Registration', registration);
 

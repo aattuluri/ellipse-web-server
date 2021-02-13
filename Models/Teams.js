@@ -38,6 +38,9 @@ const teams = mongoose.Schema({
     time: {
         type: Date,
         default: Date.now
+    },
+    share_link: {
+        type: String,
     }
 });
 

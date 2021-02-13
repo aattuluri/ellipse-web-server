@@ -5,6 +5,7 @@ const auth = require('../Middleware/Auth');
 const Registration = require('../Models/Registrations');
 const UserDetails = require('../Models/UserDetails');
 const Events = require('../Models/Events');
+const https = require('https');
 
 const router = express.Router();
 
@@ -19,6 +20,35 @@ router.post('/api/event/create_team', auth, async (req, res) => {
         team.members.push(user._id);
 
         const event = await Events.findOne({ _id: req.body.event_id });
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+        const data = JSON.stringify({
+            "dynamicLinkInfo": {
+                "domainUriPrefix": "https://ellipseapp.page.link",
+                "link": `https://ellipseapp.com/submission/${team._id}`,
+                "androidInfo": {
+                    "androidPackageName": "com.ellipse.ellipseapp"
+                },
+            }
+        });
+        const r = https.request(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=${process.env.FIREBASE_DLINKS_API_KEY}`, options, (result) => {
+            result.setEncoding('utf8');
+            result.on('data', (d) => {
+                const parsedData = JSON.parse(d);
+                team.share_link = parsedData.shortLink;
+                // event.save();
+                team.save();
+            })
+        })
+        r.on('error', (error) => {
+            console.error(error)
+        })
+        r.write(data)
+        r.end()
         if (event.rounds.length === 0) {
             await team.save();
             await Registration.updateOne({

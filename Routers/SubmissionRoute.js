@@ -1,23 +1,16 @@
 const express = require('express');
-var mongoose = require('mongoose');
 const Teams = require('../Models/Teams');
-const Submission = require('../Models/Submissions');
 const auth = require('../Middleware/Auth');
 const Registration = require('../Models/Registrations');
 const UserDetails = require('../Models/UserDetails');
+const https = require('https');
+const Events = require('../Models/Events');
 
 const router = express.Router();
 
 router.post('/api/event/team/add_submission', auth, async (req, res) => {
     try {
         const user = req.user;
-        // const submission = new Submission();
-        // submission.user_id = user._id;
-        // submission.event_id = req.body.event_id;
-        // submission.team_id = req.body.team_id;
-        // submission.submission = req.body.submission;
-
-        // await submission.save();
         if (req.body.is_teamed) {
             const team = await Teams.findOne({ _id: req.body.team_id });
             var sub = team.submissions;
@@ -43,7 +36,7 @@ router.post('/api/event/team/add_submission', auth, async (req, res) => {
             var sub = registration.submissions;
             var updatedSubs = [];
             sub.forEach((s, index) => {
-                console.log(s);
+                // console.log(s);
                 if (req.body.event_round == s.title) {
                     updatedSubs.push({ 'title': s.title, is_submitted: true, submission_access: s.submission_access, submission_form: req.body.submission })
                 }
@@ -66,66 +59,39 @@ router.post('/api/event/team/add_submission', auth, async (req, res) => {
 })
 
 
-// router.post('/api/event/team/edit_submission', auth, async (req, res) => {
-//     try {
-//         const user = req.user;
-//         // await Submission.updateOne({_id: req.body.sub_id},{$set:{submission:req.body.submission}});
-
-//         res.status(200).json({"message": "success"})
-//     }
-//     catch (error) {
-//         res.status(400).json({ error: error.message })
-//     }
-// })
-
-//get submission
-// router.get('/api/event/get_submission',auth,async (req,res)=>{
-//     try{
-//         const submission = await Submission.findOne({_id: req.query.id});
-//         if(submission){
-//             res.status(200).json(submission);
-//         }
-//         else{
-//             res.status(400).json({message: "not_found"})
-//         }
-        
-
-//     }
-//     catch (error) {
-//         res.status(400).json({ error: error.message })
-//     }
-// })
+//get submission without auth
+router.get('/api/event/get_submission',async (req,res)=>{
+    try{
+        const team_submission = await Teams.findOne({_id: req.query.id});
+        const reg_submission = await Registration.findOne({_id: req.query.id});
+        if(team_submission){
+            const event = await Events.findOne({_id: team_submission.event_id},{rounds: 1,name: 1, isTeamed: 1,poster_url: 1});
+            const users = await UserDetails.find({user_id:{$in:team_submission.members}},{name: 1, college_name: 1,profile_pic: 1});
+            res.status(200).json({submission:team_submission,rounds_info: event.rounds,event: event,users: users});
+        }
+        else if(reg_submission){
+            const event = await Events.findOne({_id:reg_submission.event_id},{rounds: 1,name: 1, isTeamed: 1,poster_url: 1});
+            const users = await UserDetails.find({user_id: reg_submission.user_id},{name: 1, college_name: 1,profile_pic: 1});
+            res.status(200).json({submission: reg_submission,rounds_info: event.rounds,event: event,users: users});
+        }
+        else{
+            res.status(201).json({"message":"not found"});
+        }
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
 
 
-//get submissions for the event
-// router.get('/api/event/get_all_event_submission',auth,async (req,res)=>{
-//     try{
-//         const submissions = await Submission.find({event_id: req.query.id});
-//         if(submissions){
-//             res.status(200).json(submissions);
-//         }
-//         else{
-//             res.status(400).json({message: "not_found"})
-//         }
-//     }
-//     catch (error) {
-//         res.status(400).json({ error: error.message })
-//     }
-// })
-
-
+//route to give access to user for particular round
 router.post('/api/event/give_access_round', auth, async (req, res) => {
     try {
         const user = req.user;
-        // console.log(req.body.event_id);
-        // console.log(req.body.user_id);
-        // console.log(req.body.team_id);
         const updatedReg = [];
         if(req.body.is_teamed){
             const team = await Teams.findOne({_id: req.body.team_id});
-            // console.log(team)
             team.submissions.forEach((value,index)=>{
-                // console.log(value);
                 if(value.title === req.body.round_title){
                     updatedReg.push({...value,submission_access: true})
                 }
@@ -143,7 +109,6 @@ router.post('/api/event/give_access_round', auth, async (req, res) => {
         }
         else{
             const reg = await Registration.findOne({event_id: req.body.event_id,user_id: req.body.user_id});
-            // console.log(reg);
             const updatedReg = [];
             reg.submissions.forEach((value,index)=>{
                 if(value.title === req.body.round_title){
@@ -166,7 +131,5 @@ router.post('/api/event/give_access_round', auth, async (req, res) => {
         res.status(400).json({ error: error.message })
     }
 })
-
-
 
 module.exports = router

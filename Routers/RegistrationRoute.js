@@ -9,6 +9,7 @@ const randomstring = require('randomstring');
 
 const router = express.Router();
 const Files = require('../Models/Files');
+const https = require('https');
 
 //register the event
 
@@ -54,6 +55,34 @@ router.post('/api/event/register', auth, async (req, res) => {
                     })
                 }
                 else {
+                    const options = {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }
+                    const data = JSON.stringify({
+                        "dynamicLinkInfo": {
+                            "domainUriPrefix": "https://ellipseapp.page.link",
+                            "link": `https://ellipseapp.com/submission/${registration._id}`,
+                            "androidInfo": {
+                                "androidPackageName": "com.ellipse.ellipseapp"
+                            },
+                        }
+                    });
+                    const r = https.request(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=${process.env.FIREBASE_DLINKS_API_KEY}`, options, (result) => {
+                        result.setEncoding('utf8');
+                        result.on('data', (d) => {
+                            const parsedData = JSON.parse(d);
+                            registration.share_link = parsedData.shortLink;
+                            registration.save()
+                        })
+                    })
+                    r.on('error', (error) => {
+                        console.error(error)
+                    })
+                    r.write(data)
+                    r.end()
                     registration.submissions = [];
                     event.rounds.forEach((round, index) => {
                         if (index === 0) {
