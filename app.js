@@ -114,7 +114,7 @@ webSocketServer.on('connection', (webSocketClient) => {
                 chatService.addTeamChatMessage(data.team_id, JSON.stringify(data.msg), (value) => {
                     // console.log("done");
                 })
-
+                console.log(data.msg);
                 if (!rooms[data.team_id + ":teamroom"]) {
                     rooms[data.team_id + ":teamroom"] = {};
                 }
@@ -127,7 +127,7 @@ webSocketServer.on('connection', (webSocketClient) => {
                         msg: data.msg
                     }))
                 });
-                sendNotification.sendTeamChatMessageNotification(data.team_id.data.msg,activeUsers);
+                sendNotification.sendTeamChatMessageNotification(data.team_id,data.msg,activeUsers)
                 break;
 
             case 'delete_event_chat_message':

@@ -107,7 +107,8 @@ router.post('/api/check_email_exists', async (req, res) => {
 router.post('/api/users/signup', async (req, res) => {
     // Create a new user
     try {
-        const { email } = req.body;
+        const { email , designation} = req.body;
+        // console.log(designation);
         const user = await UserLogin.findOne({ email: email });
         if (!user) {
             const user = new UserLogin(req.body)
@@ -118,6 +119,7 @@ router.post('/api/users/signup', async (req, res) => {
                 'username': user.username,
                 'email': user.email,
                 'name': user.name,
+                'designation': designation
             })
             await userDetails.save();
             const userid = user._id;
@@ -212,7 +214,7 @@ router.post('/api/users/sendverificationemail', async (req, res) => {
             try {
                 await sgMail.send(msg);
                 UserLogin.updateOne({ 'email': email }, { $set: { 'otp': otp } }).then((val) => {
-                    console.log(val);
+                    // console.log(val);
                 })
                 res.status(200).json({ message: "success" });
             } catch (error) {
@@ -417,7 +419,7 @@ router.post('/api/users/login', async (req, res) => {
 //route to post the user details
 router.post('/api/users/userdetails', auth, async (req, res) => {
     try {
-        const { gender, college_id, designation, bio } = req.body;
+        const { gender, college_id, bio } = req.body;
         const user = await req.user;
         const college = await Colleges.findOne({ _id: college_id });
         UserDetails.updateOne({ email: user.email }, {
@@ -427,7 +429,7 @@ router.post('/api/users/userdetails', auth, async (req, res) => {
                 'name': user.name,
                 'gender': gender,
                 'college_name': college.name,
-                'designation': designation,
+                // 'designation': designation,
                 'college_id': college_id
             }
 
