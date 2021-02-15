@@ -163,6 +163,9 @@ let eventShema = mongoose.Schema({
     prizes: {
         type: Array,
         default: []
+    },
+    themes: {
+        type: String
     }
 
 });

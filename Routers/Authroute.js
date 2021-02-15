@@ -107,8 +107,9 @@ router.post('/api/check_email_exists', async (req, res) => {
 router.post('/api/users/signup', async (req, res) => {
     // Create a new user
     try {
-        const { email , designation} = req.body;
+        const { email , designation, college_id} = req.body;
         // console.log(designation);
+        const college = await Colleges.findOne({ _id: college_id });
         const user = await UserLogin.findOne({ email: email });
         if (!user) {
             const user = new UserLogin(req.body)
@@ -119,7 +120,9 @@ router.post('/api/users/signup', async (req, res) => {
                 'username': user.username,
                 'email': user.email,
                 'name': user.name,
-                'designation': designation
+                'designation': designation,
+                'college_name': college.name,
+                'college_id': college_id
             })
             await userDetails.save();
             const userid = user._id;
@@ -419,18 +422,18 @@ router.post('/api/users/login', async (req, res) => {
 //route to post the user details
 router.post('/api/users/userdetails', auth, async (req, res) => {
     try {
-        const { gender, college_id, bio } = req.body;
+        const { gender, bio } = req.body;
         const user = await req.user;
-        const college = await Colleges.findOne({ _id: college_id });
+        // const college = await Colleges.findOne({ _id: college_id });
         UserDetails.updateOne({ email: user.email }, {
             $set: {
                 'user_id': user._id,
                 'bio': bio,
                 'name': user.name,
                 'gender': gender,
-                'college_name': college.name,
+                // 'college_name': college.name,
                 // 'designation': designation,
-                'college_id': college_id
+                // 'college_id': college_id
             }
 
         }).then(val => {
@@ -605,7 +608,14 @@ router.post('/api/users/check_fill', auth, async (req, res) => {
     try {
         const colleges = await Colleges.findOne({ _id: req.body.college })
         const cname = colleges.name
-        UserDetails.updateOne({ 'userid': req.body.id }, { $set: { 'college_id': req.body.college, 'college_name': cname, 'profile_pic': req.body.image_url, 'bio': req.body.bio, 'designation': req.body.designation } }).then((val) => {
+        UserDetails.updateOne({ 'userid': req.body.id }, 
+        { $set: { 
+            'college_id': req.body.college, 
+            'college_name': cname, 
+            'profile_pic': req.body.image_url, 
+            'bio': req.body.bio, 
+            'designation': req.body.designation 
+        } }).then((val) => {
             // console.log(val);
         })
 

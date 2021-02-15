@@ -477,6 +477,7 @@ router.post('/api/updateevent', auth, async (req, res) => {
                     'rounds': req.body.rounds,
                     'rules': req.body.rules,
                     'prizes': req.body.prizes,
+                    'themes': req.body.themes
                 }
             }).then(value => {
                 Events.findOne({ _id: eId }).then((event) => {
