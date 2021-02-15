@@ -581,25 +581,29 @@ router.post('/api/users/check', auth, async (req, res) => {
         if (userdetails.verified == false) {
             return res.status(401).send("empty");
         }
-        if (userdetails.college_id == null) {
-            return res.status(402).send("empty");
+        else if(userdetails.verified == true){
+            return res.status(200).send("empty");  
         }
-
-        if (userdetails.college_id != null && userdetails.verified != false) {
-            const user = req.user;
-            const userDetails = await UserDetails.findOne({ email: user.email })
-            const college_id = userDetails.college_id
-            return res.status(403).send(college_id);
-        }
-        // console.log("Checked")
-
     } catch (e) {
         console.log(e)
         res.status(500).send('There was a problem in check');
     }
 })
 
+router.post('/api/users/updateCollege', auth, async (req, res) => {
+    try {
+        const colleges = await Colleges.findOne({ _id: req.body.college })
+        const cname = colleges.name
+        UserDetails.updateOne({ 'user_id': req.body.id }, { $set: { 'college_id': req.body.college, 'college_name': cname} }).then((val) => {
+          
+        })
+        res.status(200).send("success");
 
+    } catch (e) {
+        console.log(e)
+        res.status(500).send('There was a problem');
+    }
+})
 
 router.post('/api/users/check_fill', auth, async (req, res) => {
     try {
