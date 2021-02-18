@@ -114,7 +114,6 @@ webSocketServer.on('connection', (webSocketClient) => {
                 chatService.addTeamChatMessage(data.team_id, JSON.stringify(data.msg), (value) => {
                     // console.log("done");
                 })
-                console.log(data.msg);
                 if (!rooms[data.team_id + ":teamroom"]) {
                     rooms[data.team_id + ":teamroom"] = {};
                 }
@@ -222,21 +221,54 @@ webSocketServer.on('connection', (webSocketClient) => {
                 
                 break;
 
-            case 'close_socket':
-                const uuid = data.user_id;
-                if (!rooms[data.event_id + ":eventroom"][uuid]) {
-                    // rooms[data.event_id+":eventroom"][uid] = webSocketClient
-                }
-                else {
-                    if (Object.keys(rooms[data.event_id + ":eventroom"]).length === 1) {
-                        delete rooms[data.event_id + ":eventroom"];
+            case 'close_event_socket':
+                if(rooms[data.event_id + ":eventroom"]){
+                    if (!rooms[data.event_id + ":eventroom"][uu_id]) {
+                        // rooms[data.event_id+":eventroom"][uid] = webSocketClient
                     }
                     else {
-                        delete rooms[data.event_id + ":eventroom"][uuid];
+                        if (Object.keys(rooms[data.event_id + ":eventroom"]).length === 1) {
+                            delete rooms[data.event_id + ":eventroom"];
+                        }
+                        else {
+                            delete rooms[data.event_id + ":eventroom"][uu_id];
+                        }
+                    }
+                }
+                break;
+            
+            case 'close_team_socket':
+                if(rooms[data.team_id + ":teamroom"]){
+                    if (!rooms[data.team_id + ":teamroom"][uu_id]) {
+                        // rooms[data.event_id+":eventroom"][uid] = webSocketClient
+                    }
+                    else {
+                        if (Object.keys(rooms[data.team_id + ":teamroom"]).length === 1) {
+                            delete rooms[data.team_id + ":teamroom"];
+                        }
+                        else {
+                            delete rooms[data.team_id + ":teamroom"][uu_id]
+                        }
                     }
                 }
                 break;
 
+            case 'close_team_update_status_socket':
+                if(rooms["team_updates_room:teamroom"]){
+                    if (!rooms["team_updates_room:teamroom"][uu_id]) {
+                        // rooms[data.event_id+":eventroom"][uid] = webSocketClient
+                    }
+                    else {
+                        if (Object.keys(rooms["team_updates_room:teamroom"]).length === 1) {
+                            delete rooms["team_updates_room:teamroom"];
+                        }
+                        else {
+                            delete rooms["team_updates_room:teamroom"][uu_id]
+                        }
+                    }
+                }
+                break;
+                
         }
     });
 })
