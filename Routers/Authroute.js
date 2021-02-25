@@ -741,7 +741,7 @@ router.post('/api/users/emailverified_forgot_password', async (req, res) => {
 router.post('/api/users/reset_password', async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log(email)
+        // console.log(email)
         const user = await UserLogin.findOne({ 'email': email })
         if (!user) {
             return res.status(401).send({ error: 'Reset failed' });

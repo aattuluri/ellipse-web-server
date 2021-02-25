@@ -5,7 +5,6 @@ const https = require('https');
 const Team = require('../Models/Teams');
 const admin = require('../Utilities/firebase_config');
 
-// const firebase_url = "https://us-central1-ellipse-e2428.cloudfunctions.net/sendNotification";
 
 const notification_options = {
     priority: "high",
@@ -15,7 +14,7 @@ const notification_options = {
 
 const sendChatMessageNotification = async (eventId,message,users) => {
     const event = await Events.findOne({_id: eventId});
-    const registrations = await Registration.find({event_id: eventId});
+    const registrations = await Registration.find({event_id: eventId}).select('user_id');
     // console.log(registrations);
     registrations.forEach((reg)=>{
         // console.log(reg.user_id);
@@ -86,7 +85,16 @@ const sendTeamChatMessageNotification = async (teamId,message,users) => {
     })
 }
 
+const updateUnreadMessageCount = async (eventId,mesa,cb) => {
+    const event = await Events.findOne({_id: eventId});
+    const registered_user_ids = await Registration.find({event_id: eventId},{user_id:1}).distinct('user_id');
+    const users = await UserDetails.find({user_id:{$in: registered_user_ids},},{user_id:1});
+    console.log(users);
+    cb(users)
+}
+
 module.exports = {
     sendChatMessageNotification: sendChatMessageNotification,
-    sendTeamChatMessageNotification: sendTeamChatMessageNotification
+    sendTeamChatMessageNotification: sendTeamChatMessageNotification,
+    updateUnreadMessageCount: updateUnreadMessageCount
 }

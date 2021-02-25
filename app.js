@@ -72,10 +72,11 @@ webSocketServer.on('connection', (webSocketClient) => {
             case 'join_event_room':
                 if (!rooms[data.event_id + ":eventroom"]) {
                     rooms[data.event_id + ":eventroom"] = {};
-                    activeUsers.push(uu_id);
                 }
                 rooms[data.event_id + ":eventroom"][uu_id] = webSocketClient;
-                // activeUsers.push()
+                if(!activeUsers.includes(uu_id)){
+                    activeUsers.push(uu_id);
+                }
                 break;
 
             case 'join_team_room':
@@ -106,7 +107,20 @@ webSocketServer.on('connection', (webSocketClient) => {
                     }))
 
                 });
-                sendNotification.sendChatMessageNotification(data.event_id,data.msg,activeUsers)
+                sendNotification.sendChatMessageNotification(data.event_id,data.msg,activeUsers);
+                // sendNotification.updateUnreadMessageCount(data.event_id,data.msg,(users)=>{
+                //     console.log(users);
+                //     // if(users.includes)
+                //     users.forEach(value=>{
+                //         if(subscribedUsers.includes(value)){
+                //             rooms["unread_messages_room"][value].send(JSON.stringify({
+                //                 action: "add_one_to_unread_message_count",
+                //                 event_id: data.event_id,
+                //                 msg: data.msg
+                //             }))
+                //         }
+                //     })
+                // });
                 break;
 
             case 'send_team_message':
@@ -268,6 +282,14 @@ webSocketServer.on('connection', (webSocketClient) => {
                     }
                 }
                 break;
+            // case 'join_for_unread_messages_socket':
+            //     if (!rooms["unread_messages_room"]) {
+            //         rooms["unread_messages_room"] = {};
+            //     }
+            //     rooms["unread_messages_room"][uu_id] = webSocketClient;
+            //     break;
+            // case 'leave_unread_messages_socket':
+            //     break;
                 
         }
     });

@@ -183,7 +183,7 @@ router.post('/api/events', auth, async (req, res) => {
             const data = JSON.stringify({
                 "dynamicLinkInfo": {
                     "domainUriPrefix": "https://ellipseapp.page.link",
-                    "link": `https://ellipseapp.com/un/event/${event._id}`,
+                    "link": `https://staging.ellipseapp.com/un/event/${event._id}`,
                     "androidInfo": {
                         "androidPackageName": "com.ellipse.ellipseapp"
                     },
@@ -390,7 +390,7 @@ router.get('/api/events', auth, async (req, res) => {
 //route to get all the events for website home page without login
 router.get('/api/get_events', async (req, res) => {
     // const user = req.user;
-    console.log("dshvc")
+    // console.log("dshvc")
     // const finalEvents = [];
     try {
         Events.get((err, events) => {

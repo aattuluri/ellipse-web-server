@@ -29,7 +29,7 @@ router.post('/api/event/create_team', auth, async (req, res) => {
         const data = JSON.stringify({
             "dynamicLinkInfo": {
                 "domainUriPrefix": "https://ellipseapp.page.link",
-                "link": `https://ellipseapp.com/submission/${team._id}`,
+                "link": `https://staging.ellipseapp.com/submission/${team._id}`,
                 "androidInfo": {
                     "androidPackageName": "com.ellipse.ellipseapp"
                 },
