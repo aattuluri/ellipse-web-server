@@ -36,7 +36,6 @@ router.post('/api/event/team/add_submission', auth, async (req, res) => {
             var sub = registration.submissions;
             var updatedSubs = [];
             sub.forEach((s, index) => {
-                // console.log(s);
                 if (req.body.event_round == s.title) {
                     updatedSubs.push({ 'title': s.title, is_submitted: true, submission_access: s.submission_access, submission_form: req.body.submission })
                 }
@@ -50,8 +49,6 @@ router.post('/api/event/team/add_submission', auth, async (req, res) => {
                 }
             });
         }
-
-
     }
     catch (error) {
         res.status(400).json({ error: error.message })
@@ -113,6 +110,54 @@ router.post('/api/event/give_access_round', auth, async (req, res) => {
             reg.submissions.forEach((value,index)=>{
                 if(value.title === req.body.round_title){
                     updatedReg.push({...value,submission_access: true})
+                }
+                else{
+                    updatedReg.push(value);
+                }
+                if(index === reg.submissions.length - 1){
+                    Registration.updateOne({event_id: req.body.event_id,user_id: req.body.user_id},{$set:{submissions: updatedReg}}).then(()=>{
+                        res.status(200).json({"message": "success"})
+                    })
+                    
+                }
+            })
+        }
+        
+    }
+    catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+})
+
+
+//remove access to user for particular round
+router.post('/api/event/remove_access_round', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const updatedReg = [];
+        if(req.body.is_teamed){
+            const team = await Teams.findOne({_id: req.body.team_id});
+            team.submissions.forEach((value,index)=>{
+                if(value.title === req.body.round_title){
+                    updatedReg.push({...value,submission_access: false})
+                }
+                else{
+                    updatedReg.push(value);
+                }
+
+                if(index === team.submissions.length - 1){
+                    Teams.updateOne({_id: req.body.team_id},{$set:{submissions: updatedReg}}).then(()=>{
+                        res.status(200).json({"message": "success"})
+                    })
+                }
+            })
+        }
+        else{
+            const reg = await Registration.findOne({event_id: req.body.event_id,user_id: req.body.user_id});
+            const updatedReg = [];
+            reg.submissions.forEach((value,index)=>{
+                if(value.title === req.body.round_title){
+                    updatedReg.push({...value,submission_access: false})
                 }
                 else{
                     updatedReg.push(value);

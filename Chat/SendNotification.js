@@ -15,18 +15,19 @@ const notification_options = {
 const sendChatMessageNotification = async (eventId,message,users) => {
     const event = await Events.findOne({_id: eventId});
     const registrations = await Registration.find({event_id: eventId}).select('user_id');
-    // console.log(registrations);
+    console.log(registrations);
     registrations.forEach((reg)=>{
         // console.log(reg.user_id);
         UserDetails.findOne({user_id: reg.user_id}).then((value)=>{
             // console.log(value);
-            if(users.includes(value.user_id)){
-                //don't send notificaation
-            }
-            else{
+            // if(users.includes(value.user_id)){
+            //     //don't send notificaation
+            // }
+            // else{
                 const tokens = value.notification_tokens;
+                console.log(tokens)
                 tokens.forEach((t) => {
-                    // console.log(t.token);
+                    console.log(t.token);
                     
                     const notification_message = {
                         notification: {
@@ -45,7 +46,7 @@ const sendChatMessageNotification = async (eventId,message,users) => {
                     //     console.log("Error: " + err.message);
                     // });
                 })
-            }
+            // }
         })
         
     })
@@ -56,10 +57,10 @@ const sendTeamChatMessageNotification = async (teamId,message,users) => {
     const team = await Team.findOne({_id: teamId});
     team.members.forEach(member=>{
         UserDetails.findOne({user_id: member}).then((value)=>{
-            if(users.includes(value.user_id)){
-                //don't send message
-            }
-            else{
+            // if(users.includes(value.user_id)){
+            //     //don't send message
+            // }
+            // else{
                 const tokens = value.notification_tokens;
                 tokens.forEach((t) => {
                     // console.log(t.token);
@@ -80,7 +81,7 @@ const sendTeamChatMessageNotification = async (teamId,message,users) => {
                     //     console.log("Error: " + err.message);
                     // });
                 })
-            }
+            // }
         })
     })
 }
