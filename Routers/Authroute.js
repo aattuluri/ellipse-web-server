@@ -51,9 +51,11 @@ router.post('/api/verify_recaptcha', async (req, res) => {
 
 //route to ping for api if it is working
 router.get('/api', async (req, res) => {
-    console.log(req.connection.remoteAddress);
-    console.log(req.headers['x-forwarded-for'])
-    console.log(req.headers['x-forwarded-for'][0])
+    const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0];
+    console.log(ip);
+    // console.log(req.connection.remoteAddress);
+    // console.log(req.headers['x-forwarded-for'])
+    // console.log(req.headers['x-forwarded-for'][0])
     // var ip = '192.168.0.101';
     // var geo = await geoip.lookup(ip);
     // console.log(geo);
@@ -61,7 +63,7 @@ router.get('/api', async (req, res) => {
 })
 
 router.get('/api/get_version', (req, res) => {
-    res.status(200).json({ version_name: "1.0.2", required: true });
+    res.status(200).json({ version_name: "1.0.3", required: true });
 })
 
 
@@ -105,7 +107,9 @@ router.post('/api/check_email_exists', async (req, res) => {
 router.post('/api/users/signup', async (req, res) => {
     // Create a new user
     try {
-        const { email } = req.body;
+        const { email , designation, college_id} = req.body;
+        // console.log(designation);
+        const college = await Colleges.findOne({ _id: college_id });
         const user = await UserLogin.findOne({ email: email });
         if (!user) {
             const user = new UserLogin(req.body)
@@ -116,6 +120,9 @@ router.post('/api/users/signup', async (req, res) => {
                 'username': user.username,
                 'email': user.email,
                 'name': user.name,
+                'designation': designation,
+                'college_name': college.name,
+                'college_id': college_id
             })
             await userDetails.save();
             const userid = user._id;
@@ -151,24 +158,24 @@ router.post('/api/users/signup', async (req, res) => {
     }
 })
 
-router.get('/api/testemail', async (req, res) => {
-    const msg = {
-        to: 'lalithpunepalli@gmail.com',
-        from: { "email": 'support@ellipseapp.com', 'name': "Ellipse Support" }, // Use the email address or domain you verified above
-        // subject: 'Information',
-        //     text: 'Nothing 2',
-        //     html: `<h1>testing</h1><h2>nothing</h2>`,
-        templateId: 'd-c3456f977aca444cb52e0ad002d737d8',
-        dynamic_template_data: {
-            subject: "important",
-            pre_header: "important",
-            title: "nothing 2",
-            content: "nothing 3",
-        },
-    };
-    await sgMail.send(msg);
-    res.send("success")
-})
+// router.get('/api/testemail', async (req, res) => {
+//     const msg = {
+//         to: 'lalithpunepalli@gmail.com',
+//         from: { "email": 'support@ellipseapp.com', 'name': "Ellipse Support" }, // Use the email address or domain you verified above
+//         // subject: 'Information',
+//         //     text: 'Nothing 2',
+//         //     html: `<h1>testing</h1><h2>nothing</h2>`,
+//         templateId: 'd-c3456f977aca444cb52e0ad002d737d8',
+//         dynamic_template_data: {
+//             subject: "important",
+//             pre_header: "important",
+//             title: "nothing 2",
+//             content: "nothing 3",
+//         },
+//     };
+//     await sgMail.send(msg);
+//     res.send("success")
+// })
 
 
 //roite to send verification mail
@@ -210,7 +217,7 @@ router.post('/api/users/sendverificationemail', async (req, res) => {
             try {
                 await sgMail.send(msg);
                 UserLogin.updateOne({ 'email': email }, { $set: { 'otp': otp } }).then((val) => {
-                    console.log(val);
+                    // console.log(val);
                 })
                 res.status(200).json({ message: "success" });
             } catch (error) {
@@ -415,18 +422,18 @@ router.post('/api/users/login', async (req, res) => {
 //route to post the user details
 router.post('/api/users/userdetails', auth, async (req, res) => {
     try {
-        const { gender, college_id, designation, bio } = req.body;
+        const { gender, bio } = req.body;
         const user = await req.user;
-        const college = await Colleges.findOne({ _id: college_id });
+        // const college = await Colleges.findOne({ _id: college_id });
         UserDetails.updateOne({ email: user.email }, {
             $set: {
                 'user_id': user._id,
                 'bio': bio,
                 'name': user.name,
                 'gender': gender,
-                'college_name': college.name,
-                'designation': designation,
-                'college_id': college_id
+                // 'college_name': college.name,
+                // 'designation': designation,
+                // 'college_id': college_id
             }
 
         }).then(val => {
@@ -577,31 +584,42 @@ router.post('/api/users/check', auth, async (req, res) => {
         if (userdetails.verified == false) {
             return res.status(401).send("empty");
         }
-        if (userdetails.college_id == null) {
-            return res.status(402).send("empty");
+        else if(userdetails.verified == true){
+            return res.status(200).send("empty");  
         }
-
-        if (userdetails.college_id != null && userdetails.verified != false) {
-            const user = req.user;
-            const userDetails = await UserDetails.findOne({ email: user.email })
-            const college_id = userDetails.college_id
-            return res.status(403).send(college_id);
-        }
-        // console.log("Checked")
-
     } catch (e) {
         console.log(e)
         res.status(500).send('There was a problem in check');
     }
 })
 
+router.post('/api/users/updateCollege', auth, async (req, res) => {
+    try {
+        const colleges = await Colleges.findOne({ _id: req.body.college })
+        const cname = colleges.name
+        UserDetails.updateOne({ 'user_id': req.body.id }, { $set: { 'college_id': req.body.college, 'college_name': cname} }).then((val) => {
+          
+        })
+        res.status(200).send("success");
 
+    } catch (e) {
+        console.log(e)
+        res.status(500).send('There was a problem');
+    }
+})
 
 router.post('/api/users/check_fill', auth, async (req, res) => {
     try {
         const colleges = await Colleges.findOne({ _id: req.body.college })
         const cname = colleges.name
-        UserDetails.updateOne({ 'userid': req.body.id }, { $set: { 'college_id': req.body.college, 'college_name': cname, 'profile_pic': req.body.image_url, 'bio': req.body.bio, 'designation': req.body.designation } }).then((val) => {
+        UserDetails.updateOne({ 'userid': req.body.id }, 
+        { $set: { 
+            'college_id': req.body.college, 
+            'college_name': cname, 
+            'profile_pic': req.body.image_url, 
+            'bio': req.body.bio, 
+            'designation': req.body.designation 
+        } }).then((val) => {
             // console.log(val);
         })
 
@@ -723,7 +741,7 @@ router.post('/api/users/emailverified_forgot_password', async (req, res) => {
 router.post('/api/users/reset_password', async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log(email)
+        // console.log(email)
         const user = await UserLogin.findOne({ 'email': email })
         if (!user) {
             return res.status(401).send({ error: 'Reset failed' });

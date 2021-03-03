@@ -3,3 +3,4 @@ web/
 npm-debug.log
 .DS_Store
 .env
+Utilities/firebase_adminsdk_key.json

@@ -73,7 +73,7 @@ let eventShema = mongoose.Schema({
     },
     moderators: {
         type: Array,
-        default: null
+        default: []
     },
     about: {
         type: String,
@@ -137,6 +137,36 @@ let eventShema = mongoose.Schema({
     certificate:{
         type: Object,
     },
+    isTeamed: {
+        type: Boolean,
+        default: false
+    },
+    team_size: {
+        type: Object
+    },
+    rounds: {
+        type: Array,
+        default: [],
+    },
+    chat_blocked_users: {
+        type: Array,
+        default: [],
+    },
+    attachments: {
+        type: Array,
+        default: []
+    },
+    rules: {
+        type: String,
+        default: null
+    },
+    prizes: {
+        type: Array,
+        default: []
+    },
+    themes: {
+        type: String
+    }
 
 });
 

@@ -16,7 +16,9 @@ const Announcement = require('../Models/Announcements');
 const template = require('../certificatetemplate');
 const UserDetails = require('../Models/UserDetails');
 
+const admin = require('../Utilities/firebase_config');
 
+// const firebase_url = "https://us-central1-ellipse-e2428.cloudfunctions.net/sendNotification";
 
 const router = express.Router();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -35,6 +37,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 router.post('/api/event/add_announcement', auth, async (req, res) => {
     try {
         // const event_id = req.query.id;
+        const event = await Events.findOne({_id: req.body.event_id})
         const announcement = new Announcement();
         announcement.event_id = req.body.event_id;
         announcement.title = req.body.title;
@@ -55,7 +58,42 @@ router.post('/api/event/add_announcement', auth, async (req, res) => {
 
             })
 
+
         })
+        const regs = await Registration.find({ event_id: req.body.event_id });
+        regs.forEach(r => {
+            UserDetails.findOne({ user_id: r.user_id }).then((v) => {
+                const tokens = v.notification_tokens;
+                tokens.forEach((t) => {
+                    const notification_options = {
+                        priority: "high",
+                        timeToLive: 60 * 60 * 24
+                    };
+                    const notification_message = {
+                        notification: {
+                            title: event.name + " Announcement",
+                            body: req.body.title + " - " +req.body.description,
+                        }
+                    }
+                    admin.messaging().sendToDevice(t.token,notification_message,notification_options).then(reponse=>{
+                        //do nothing
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+                    // console.log(t.token);
+                    // https.get(`${process.env.FIREBASE_NOTIFICATIONS_URL}?token=${t.token}&imageUrl=https://ellipseapp.com/api/image?id=${req.body.title}&title=${event.name + " Announcement"}&message=${req.body.title + " - " +req.body.description}`, (resp) => {
+                    // }).on("error", (err) => {
+                    //     console.log("Error: " + err.message);
+                    // });
+                })
+            })
+        })
+        // tok = "eoIghG_qQiKoIXjc6qE23-:APA91bElnC-I3rwFOeF0LKViBoW57nfhdDz-uUn9-i8f6Y4swJLDBd0k8jXO2kB-vOx9pRQdOkB7fS2880OwWxZBZJS9RXw7vHehbpLkTYmsavrS20fggHjpkZDTclsMp_ftviiv2jwU"
+        // https.get(`${firebase_url}?token=${tok}&imageUrl=https://ellipseapp.com/api/image?id=${req.body.title}&title=${event.name + " Announcement"}&message=${req.body.title + " - " +req.body.description}`, (resp) => {
+        // }).on("error", (err) => {
+        //     console.log("Error: " + err.message);
+        // });
     } catch (error) {
         res.status(400).json({
             status: 'error',
@@ -127,7 +165,7 @@ router.post('/api/events', auth, async (req, res) => {
         const college = await Colleges.findOne({ _id: req.body.college_id });
         event.college_name = college.name;
         const user = req.user;
-        event.certificate = {"title":req.body.name}
+        event.certificate = { "title": req.body.name }
         await event.save(function (err) {
             if (err) {
                 res.status(400).json({
@@ -201,21 +239,22 @@ router.post('/api/post_event', auth, async (req, res) => {
     event.college_id = college._id
     event.venue = req.body.venue
     event.platform_details = req.body.platform_details
-    event.save(function (err) {
-        if (err) {
-            res.json({
-                status: 'error',
-                code: 500,
-                message: err
-            })
-        }
-        res.json({
-            status: 'success',
-            code: 200,
-            message: 'added event successfully',
-            eventId: event._id
-        })
-    })
+    event.themes = req.body.themes
+    // event.save(function (err) {
+    //     if (err) {
+    //         res.json({
+    //             status: 'error',
+    //             code: 500,
+    //             message: err
+    //         })
+    //     }
+    //     res.json({
+    //         status: 'success',
+    //         code: 200,
+    //         message: 'added event successfully',
+    //         eventId: event._id
+    //     })
+    // })
 });
 
 
@@ -227,28 +266,28 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
     const fileName = eventId + md5(Date.now())
     const event = await Events.findOne({ _id: eventId })
     if (event.poster_url != null) {
-        if(event.user_id == user._id){
-        Files.deleteFile(event.poster_url, (result) => {
-            Files.saveFile(req.files.image, fileName, user._id, "eventposter", function (err, result) {
-                if (!err) {
-                    Events.updateOne({ _id: eventId }, { $set: { 'poster_url': fileName } }).then((value) => {
-                        res.status(200).json({
-                            status: 'success',
-                            code: 200,
-                            message: 'image added successfully',
+        if (event.user_id == user._id) {
+            Files.deleteFile(event.poster_url, (result) => {
+                Files.saveFile(req.files.image, fileName, user._id, "eventposter", function (err, result) {
+                    if (!err) {
+                        Events.updateOne({ _id: eventId }, { $set: { 'poster_url': fileName } }).then((value) => {
+                            res.status(200).json({
+                                status: 'success',
+                                code: 200,
+                                message: 'image added successfully',
+                            })
                         })
-                    })
-                }
-                else {
-                    res.status(400).json({
-                        status: 'error',
-                        code: 500,
-                        message: err
-                    })
-                }
-            });
-        })
-    }
+                    }
+                    else {
+                        res.status(400).json({
+                            status: 'error',
+                            code: 500,
+                            message: err
+                        })
+                    }
+                });
+            })
+        }
 
 
     }
@@ -281,10 +320,10 @@ router.post('/api/event/uploadimage', auth, async (req, res) => {
 //route to retrive the poster from db with file name
 router.get('/api/image', (req, res) => {
     try {
-        if(req.query.id == 'undefined'){
+        if (req.query.id == 'undefined') {
             res.send(new Error("Failed to find a file."));
         }
-        else{
+        else {
             Files.getFile(req.query.id, res, function (err, result) {
                 if (!err) {
                     //Do Nothing
@@ -293,7 +332,7 @@ router.get('/api/image', (req, res) => {
                 res.send(new Error("Failed to find a file."));
             });
         }
-        
+
     }
     catch (error) {
         res.status(400).json({ error: error.message })
@@ -315,10 +354,10 @@ router.get('/api/events', auth, async (req, res) => {
             }
             var count = 0;
             var len = events.length;
-            if(events.length === 0){
+            if (events.length === 0) {
                 // console.log(events)
                 res.status(200).json(events)
-            }else{
+            } else {
                 events.forEach(async (e, index, array) => {
                     const registeredEvent = await Registration.find({ user_id: user._id, event_id: e._id })
                     // console.log(registeredEvent);
@@ -338,7 +377,7 @@ router.get('/api/events', auth, async (req, res) => {
                     }
                 })
             }
-            
+
         })
     }
     catch (error) {
@@ -349,9 +388,9 @@ router.get('/api/events', auth, async (req, res) => {
 
 
 //route to get all the events for website home page without login
-router.get('/api/get_events',async (req, res) => {
+router.get('/api/get_events', async (req, res) => {
     // const user = req.user;
-    console.log("dshvc")
+    // console.log("dshvc")
     // const finalEvents = [];
     try {
         Events.get((err, events) => {
@@ -363,7 +402,7 @@ router.get('/api/get_events',async (req, res) => {
                     message: err
                 });
             }
-            res.status(200).json(events);   
+            res.status(200).json(events);
         })
     }
     catch (error) {
@@ -412,8 +451,9 @@ router.post('/api/updateevent', auth, async (req, res) => {
     try {
         const user = req.user;
         const eId = req.body.eventId;
-        const event = await Events.findOne({_id: eId})
-        if(event.user_id == user._id){
+        const event = await Events.findOne({ _id: eId });
+
+        if (event.user_id == user._id) {
             Events.updateOne({ _id: eId }, {
                 $set: {
                     'name': req.body.name,
@@ -434,19 +474,23 @@ router.post('/api/updateevent', auth, async (req, res) => {
                     'venue_type': req.body.venue_type,
                     'venue': req.body.venue,
                     'venue_college': req.body.venue_college,
-                    'platform_details': req.body.platform_details
+                    'platform_details': req.body.platform_details,
+                    'rounds': req.body.rounds,
+                    'rules': req.body.rules,
+                    'prizes': req.body.prizes,
+                    'themes': req.body.themes
                 }
             }).then(value => {
                 Events.findOne({ _id: eId }).then((event) => {
                     res.status(200).json({ event });
                 })
-    
+
             })
         }
-        else{
-            res.status(401).json({error:"not authorized"})
+        else {
+            res.status(401).json({ error: "not authorized" })
         }
-        
+
     }
     catch (error) {
         console.log(error);
@@ -455,17 +499,153 @@ router.post('/api/updateevent', auth, async (req, res) => {
 })
 
 //route for getting organizer details with event id
-router.get('/api/event/get_organizer_details',auth, async (req,res)=>{
+router.get('/api/event/get_organizer_details', auth, async (req, res) => {
     try {
         const user = req.user;
         const event_id = await req.query.eventId;
         const user_id = req.query.userId;
-        const event = await Events.findOne({_id:event_id});
-        if(event.user_id === user_id){
-            UserDetails.findOne({user_id:user_id}).then(value=>{
-                res.status(200).json({name:value.name,profile_pic:value.profile_pic,college_name:value.college_name});
+        const event = await Events.findOne({ _id: event_id });
+        if (event.user_id === user_id) {
+            UserDetails.findOne({ user_id: user_id }).then(value => {
+                res.status(200).json({ name: value.name, profile_pic: value.profile_pic, college_name: value.college_name });
             })
         }
+    }
+    catch (error) {
+        // console.log(error);
+        res.status(400).json({ error: error.message })
+    }
+})
+
+router.post('/api/event/add_moderator', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const eId = req.body.event_id;
+        const event = await Events.findOne({ _id: eId })
+        if (event.user_id == user._id) {
+            Events.updateOne({ _id: eId }, {
+                $push: {
+                    "moderators": req.body.moderator_id
+                }
+            }).then(value => {
+                Events.findOne({ _id: eId }).then((event) => {
+                    res.status(200).json({ event });
+                })
+
+            })
+        }
+        else {
+            res.status(401).json({ error: "not authorized" })
+        }
+
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).json({ error: error.message })
+    }
+})
+
+router.get('/api/event/get_all_users', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const userDetails = await UserDetails.find({ user_id: { $ne: user._id } }, { name: 1, username: 1, email: 1, user_id: 1 });
+        // console.log(userDetails);
+        res.status(200).json(userDetails);
+    }
+    catch (error) {
+        // console.log(error);
+        res.status(400).json({ error: error.message })
+    }
+})
+
+router.post('/api/event/remove_moderator', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const eId = req.body.event_id;
+        const event = await Events.findOne({ _id: eId })
+        if (event.user_id == user._id) {
+            Events.updateOne({ _id: eId }, {
+                $pull: {
+                    "moderators": req.body.moderator_id
+                }
+            }).then(value => {
+                Events.findOne({ _id: eId }).then((event) => {
+                    res.status(200).json({ event });
+                })
+
+            })
+        }
+        else {
+            res.status(401).json({ error: "not authorized" })
+        }
+
+    }
+    catch (error) {
+        console.log(error);
+    }
+})
+
+router.post('/api/event/block_chat_for_user', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const eId = req.body.event_id;
+        const event = await Events.findOne({ _id: eId })
+        if (event.user_id == user._id) {
+            Events.updateOne({ _id: eId }, {
+                $push: {
+                    "chat_blocked_users": req.body.blocked_user_id
+                }
+            }).then(value => {
+                Events.findOne({ _id: eId }).then((event) => {
+                    res.status(200).json({ event });
+                })
+
+            })
+        }
+        else {
+            res.status(401).json({ error: "not authorized" })
+        }
+
+    }
+    catch (error) {
+        console.log(error);
+    }
+})
+
+router.post('/api/event/unblock_chat_for_user', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const eId = req.body.event_id;
+        const event = await Events.findOne({ _id: eId })
+        if (event.user_id == user._id) {
+            Events.updateOne({ _id: eId }, {
+                $pull: {
+                    "chat_blocked_users": req.body.blocked_user_id
+                }
+            }).then(value => {
+                Events.findOne({ _id: eId }).then((event) => {
+                    res.status(200).json({ event });
+                })
+
+            })
+        }
+        else {
+            res.status(401).json({ error: "not authorized" })
+        }
+
+    }
+    catch (error) {
+        console.log(error);
+    }
+})
+
+router.get('/api/event/get_reg_users_for_blocking', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const regUsers = await Registration.find({ event_id: req.query.id }, { user_id: 1 });
+        const resUserIds = regUsers.map((u) => { return u.user_id });
+        const userDetails = await UserDetails.find({ user_id: { $in: resUserIds } }, { name: 1, username: 1, email: 1, user_id: 1 });
+        res.status(200).json(userDetails);
     }
     catch (error) {
         // console.log(error);
