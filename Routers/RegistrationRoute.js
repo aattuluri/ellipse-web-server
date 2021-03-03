@@ -64,7 +64,7 @@ router.post('/api/event/register', auth, async (req, res) => {
                     const data = JSON.stringify({
                         "dynamicLinkInfo": {
                             "domainUriPrefix": "https://ellipseapp.page.link",
-                            "link": `https://staging.ellipseapp.com/submission/${registration._id}`,
+                            "link": `https://ellipseapp.com/submission/${registration._id}`,
                             "androidInfo": {
                                 "androidPackageName": "com.ellipse.ellipseapp"
                             },

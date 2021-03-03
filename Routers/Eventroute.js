@@ -183,7 +183,7 @@ router.post('/api/events', auth, async (req, res) => {
             const data = JSON.stringify({
                 "dynamicLinkInfo": {
                     "domainUriPrefix": "https://ellipseapp.page.link",
-                    "link": `https://staging.ellipseapp.com/un/event/${event._id}`,
+                    "link": `https://ellipseapp.com/un/event/${event._id}`,
                     "androidInfo": {
                         "androidPackageName": "com.ellipse.ellipseapp"
                     },
@@ -240,21 +240,21 @@ router.post('/api/post_event', auth, async (req, res) => {
     event.venue = req.body.venue
     event.platform_details = req.body.platform_details
     event.themes = req.body.themes
-    event.save(function (err) {
-        if (err) {
-            res.json({
-                status: 'error',
-                code: 500,
-                message: err
-            })
-        }
-        res.json({
-            status: 'success',
-            code: 200,
-            message: 'added event successfully',
-            eventId: event._id
-        })
-    })
+    // event.save(function (err) {
+    //     if (err) {
+    //         res.json({
+    //             status: 'error',
+    //             code: 500,
+    //             message: err
+    //         })
+    //     }
+    //     res.json({
+    //         status: 'success',
+    //         code: 200,
+    //         message: 'added event successfully',
+    //         eventId: event._id
+    //     })
+    // })
 });
 
 
