@@ -164,6 +164,10 @@ let eventShema = mongoose.Schema({
         type: Array,
         default: []
     },
+    socialMediaLinks: {
+        type: Array,
+        default: []
+    },
     themes: {
         type: String
     }
