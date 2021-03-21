@@ -478,6 +478,7 @@ router.post('/api/updateevent', auth, async (req, res) => {
                     'rounds': req.body.rounds,
                     'rules': req.body.rules,
                     'prizes': req.body.prizes,
+                    'socialMediaLinks': req.body.socialMediaLinks,
                     'themes': req.body.themes
                 }
             }).then(value => {
