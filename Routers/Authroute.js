@@ -63,7 +63,7 @@ router.get('/api', async (req, res) => {
 })
 
 router.get('/api/get_version', (req, res) => {
-    res.status(200).json({ version_name: "1.0.3", required: true });
+    res.status(200).json({ version_name: "1.0.4", required: true });
 })
 
 
